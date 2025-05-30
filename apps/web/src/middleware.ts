@@ -1,11 +1,7 @@
-import createMiddleware from 'next-intl/middleware';
+import { clerkMiddleware } from '@clerk/nextjs/server';
 
-export default createMiddleware({
-  locales: ['en', 'es'],
-  defaultLocale: 'es',
-  localePrefix: 'never'
-});
+export default clerkMiddleware();
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
-}; 
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+};

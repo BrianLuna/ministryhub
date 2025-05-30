@@ -2,8 +2,9 @@ import { Example } from '@/components/Example';
 
 export default function Home() {
   return (
-    <div className="min-h-screen p-8">
-      <Example />
-    </div>
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <h1>MinistryHub</h1>
+      <p>Connect, collaborate, and grow your ministry</p>
+    </main>
   );
 } 
