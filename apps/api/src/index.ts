@@ -1,15 +1,13 @@
 import Fastify from 'fastify';
 
 const app = Fastify({
-  logger: true, // Opcional: loggea los requests
+  logger: true,
 });
 
-// Ruta de prueba
 app.get('/ping', async (request, reply) => {
   return { pong: true };
 });
 
-// Inicializar el servidor
 const start = async () => {
   try {
     await app.listen({ port: 3001, host: '0.0.0.0' });
