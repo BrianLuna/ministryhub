@@ -9,9 +9,11 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@/*": ["./*"],
       "@db/*": ["packages/db/*"],
       "@web/*": ["apps/web/*"],
-      "@api/*": ["apps/api/*"]
+      "@api/*": ["apps/api/*"],
+      "@config/*": ["packages/config/*"]
     }
   },
   "exclude": ["node_modules", "dist"]

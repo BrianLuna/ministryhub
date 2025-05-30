@@ -4,6 +4,7 @@ const app = Fastify({
   logger: true,
 });
 
+
 app.get('/ping', async (request, reply) => {
   return { pong: true };
 });

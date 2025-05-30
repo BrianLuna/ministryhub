@@ -5,5 +5,5 @@
     "target": "es2016",
     "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": ["src", "../../middleware.ts"]
 }
