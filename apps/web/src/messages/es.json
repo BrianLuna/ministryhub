@@ -1,0 +1,12 @@
+{
+  "common": {
+    "welcome": "Bienvenido a MinistryHub",
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar Sesión"
+  },
+  "home": {
+    "title": "Bienvenido a MinistryHub",
+    "description": "Tu plataforma todo en uno para la gestión ministerial"
+  }
+} 

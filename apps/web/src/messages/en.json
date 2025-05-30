@@ -1,0 +1,12 @@
+{
+  "common": {
+    "welcome": "Welcome to MinistryHub",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out"
+  },
+  "home": {
+    "title": "Welcome to MinistryHub",
+    "description": "Your all-in-one platform for ministry management"
+  }
+} 
