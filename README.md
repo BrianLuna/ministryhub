@@ -1,84 +1,69 @@
-# Turborepo starter
+# MinistryHub
 
-This Turborepo starter is maintained by the Turborepo core team.
+**MinistryHub** is a platform designed to help organize ministries composed of churches, enabling the management of volunteers, roles, leaders, deacons, people, small groups, calendars, locations, and more.
 
-## Using this example
+---
 
-Run the following command:
+## 🚀 Core Technologies
 
-```sh
-npx create-turbo@latest
-```
+### 🔧 Project Base
 
-## What's inside?
+- **TypeScript**
+- **Monorepo with Turborepo**
+- **pnpm** as the package manager
+- **Turbopack** as the bundler for `web`
 
-This Turborepo includes the following packages/apps:
+### 🌐 Frontend
 
-### Apps and Packages
+- **React**
+- **Next.js (App Router + RSC)**
+- **TailwindCSS**
+- **shadcn/ui**
+- **Zustand** for local state management
+- **TanStack Query** for remote state and backend synchronization
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### 🧠 Backend
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- **Node.js**
+- **Fastify** as the HTTP framework
+- **tRPC** for fullstack type-safe communication (no REST or GraphQL needed)
+- **Drizzle ORM** for database access
+- **Firebase Data Connect** as the PostgreSQL database
+- **Redis** for caching, microservices state sync, and event queues
 
-### Utilities
+### 🔐 Authentication
 
-This Turborepo has some additional tools already setup for you:
+- **Clerk** + **Firebase** for user and session management
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+### ⚙️ Infrastructure
 
-### Build
+- **Docker**
+- **Kubernetes** (local via WSL + K8s)
+- **Google Cloud Platform (free tier)** for deployments and services
 
-To build all apps and packages, run the following command:
+### 🧪 Testing
 
-```
-cd my-turborepo
-pnpm build
-```
+- **Jest** for unit testing
+- **Playwright** for end-to-end testing
 
-### Develop
+### 🧹 Validation
 
-To develop all apps and packages, run the following command:
+- **Zod** for schema validation on both frontend and backend
 
-```
-cd my-turborepo
-pnpm dev
-```
+### 📦 Version Control
 
-### Remote Caching
+- **Git + Gitflow**
+- **GitHub** as the code hosting platform
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+---
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## 📁 Monorepo Structure (Turbo)
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+```plaintext
+ministryhub/
+├── apps/
+│   ├── web/       # Web client (Next.js)
+│   └── api/       # Fastify server (API)
+├── packages/
+│   ├── db/        # Drizzle ORM config + migrations
+│   └── config/    # Shared configs, types, utilities
