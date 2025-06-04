@@ -6,6 +6,7 @@
     "signOut": "Cerrar Sesión"
   },
   "home": {
+    "appName": "MinistryHub",
     "title": "Bienvenido a MinistryHub",
     "description": "Tu plataforma todo en uno para la gestión ministerial"
   }
