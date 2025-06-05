@@ -4,6 +4,8 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing'
 import { esES, enUS } from '@clerk/localizations'
+import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeModeToggle } from '@/components/theme-mode-togle'
 
 
 import {
@@ -15,7 +17,8 @@ import {
 } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import './globals.css'
+import '@/styles/globals.css'
+import { Button } from '@/components/ui/button';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -49,23 +52,40 @@ export default async function RootLayout({ children, params }: Props) {
   }
   
   const language = locale === 'es' ? esES : enUS;
+  const t = await getTranslations('common');
   
   return (
     <ClerkProvider localization={language}>
-      <html lang={locale}>
+      <html lang={locale} suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <header className="flex justify-end items-center p-4 gap-4 h-16">
-            <SignedOut>
-              <SignInButton />
-              <SignUpButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </header>
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <header className="flex justify-end items-center p-4 gap-4 h-16">
+              <ThemeModeToggle />
+              <SignedOut>
+                <SignInButton children={
+                  <Button>
+                    <p>{t('signIn')}</p>
+                  </Button>
+                }/>
+                <SignUpButton children={
+                  <Button>
+                    <p>{t('signUp')}</p>
+                  </Button>
+                }/>
+              </SignedOut>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+            </header>
+            <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
   )
-} 
+}
