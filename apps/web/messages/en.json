@@ -9,5 +9,10 @@
     "appName": "MinistryHub",
     "title": "Welcome to MinistryHub",
     "description": "Your all-in-one platform for ministry management"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   }
 } 

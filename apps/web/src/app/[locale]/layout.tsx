@@ -58,6 +58,7 @@ export default async function RootLayout({ children, params }: Props) {
     <ClerkProvider localization={language}>
       <html lang={locale} suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <NextIntlClientProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -82,8 +83,9 @@ export default async function RootLayout({ children, params }: Props) {
                 <UserButton />
               </SignedIn>
             </header>
-            <NextIntlClientProvider>{children}</NextIntlClientProvider>
+            {children}
           </ThemeProvider>
+          </NextIntlClientProvider>
         </body>
       </html>
     </ClerkProvider>
