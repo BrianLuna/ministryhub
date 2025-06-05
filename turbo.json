@@ -1,23 +1,35 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
-  
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "inputs": ["src/**", "package.json", "tsconfig.json", ".env*"],
+      "outputs": [
+        "apps/web/.next/**",
+        "apps/api/dist/**",
+        "packages/db/dist/**"
+      ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "inputs": ["src/**", ".eslintrc.*", "eslint.config.*", "package.json"]
+    },
+    "format": {
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "inputs": ["src/**", "package.json", "tsconfig.json"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types"],
+      "inputs": ["src/**", "tsconfig.json"]
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "inputs": []
     }
   }
-
 }

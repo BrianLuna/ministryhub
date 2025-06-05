@@ -10,11 +10,13 @@ const compat = new FlatCompat({
 });
 
 export default [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...compat.extends("plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"),
   {
-    files: ["*.ts", "*.tsx"],
+    files: ["*.ts"],
     rules: {
-      
+      // Reglas específicas para db
+      "no-console": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
 ];
