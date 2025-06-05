@@ -46,6 +46,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@clerk/localizations": "^3.16.4",
     "@clerk/nextjs": "^6.20.2",
     "@formatjs/intl-localematcher": "^0.6.1",
     "drizzle-orm": "^0.44.0",

@@ -1,8 +1,10 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { getTranslations } from 'next-intl/server'
-import {NextIntlClientProvider, hasLocale} from 'next-intl';
-import {notFound} from 'next/navigation';
+import { NextIntlClientProvider, hasLocale } from 'next-intl';
+import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing'
+import { esES, enUS } from '@clerk/localizations'
+
 
 import {
   SignInButton,
@@ -46,8 +48,10 @@ export default async function RootLayout({ children, params }: Props) {
     notFound();
   }
   
+  const language = locale === 'es' ? esES : enUS;
+  
   return (
-    <ClerkProvider>
+    <ClerkProvider localization={language}>
       <html lang={locale}>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <header className="flex justify-end items-center p-4 gap-4 h-16">
