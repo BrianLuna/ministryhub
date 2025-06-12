@@ -29,7 +29,7 @@ export function ThemeModeToggle() {
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-30">
+      <DropdownMenuContent align="end">
         <DropdownMenuCheckboxItem checked={theme === "light"} onClick={() => setTheme("light")}>
           {t('light')}
         </DropdownMenuCheckboxItem>
