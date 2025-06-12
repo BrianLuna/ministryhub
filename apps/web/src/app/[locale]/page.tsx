@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server'
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
 
   const t = await getTranslations('home');
+  
 
   return (
     <main className="flex flex-col items-center p-8">
