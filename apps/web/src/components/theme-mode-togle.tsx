@@ -10,11 +10,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 import { useTranslations } from "next-intl"
+import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
+
+type Checked = DropdownMenuCheckboxItemProps["checked"]
 
 export function ThemeModeToggle() {
-  const { setTheme } = useTheme()
+  const { theme,  setTheme } = useTheme()
   const t = useTranslations('theme')
 
   return (
@@ -26,16 +30,16 @@ export function ThemeModeToggle() {
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+      <DropdownMenuContent align="end" className="w-30">
+        <DropdownMenuCheckboxItem checked={theme === "light"} onClick={() => setTheme("light")}>
           {t('light')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={theme === "dark"} onClick={() => setTheme("dark")}>
           {t('dark')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={theme === "system"} onClick={() => setTheme("system")}>
           {t('system')}
-        </DropdownMenuItem>
+        </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
