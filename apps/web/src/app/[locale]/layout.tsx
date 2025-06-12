@@ -61,7 +61,7 @@ export default async function RootLayout({ children, params }: Props) {
             disableTransitionOnChange
           >
             <ClerkThemeProvider locale={locale}>
-              <header className="flex justify-end items-center p-4 gap-4 h-16">
+              <header className="fixed top-0 left-0 right-0 z-50 flex justify-end items-center p-4 gap-4 h-16 bg-background/40 backdrop-blur-lg border-b">
                 <ThemeModeToggle />
                 <SignedOut>
                   <SignInButton children={
@@ -79,7 +79,9 @@ export default async function RootLayout({ children, params }: Props) {
                   <UserButton />
                 </SignedIn>
               </header>
-              {children}
+              <main className="pt-16">
+                {children}
+              </main>
             </ClerkThemeProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
