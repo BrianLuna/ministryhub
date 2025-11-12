@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ministryhub/core/export_core.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,16 +8,15 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'MinistryHub',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: SizedBox.shrink(),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      home: const SizedBox.shrink(),
     );
   }
 }
