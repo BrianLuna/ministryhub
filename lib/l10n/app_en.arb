@@ -1,0 +1,20 @@
+{
+  "@@locale": "en",
+  "appTitle": "MinistryHub",
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "loginRegisterTitle": "Login / Register",
+  "@loginRegisterTitle": {
+    "description": "Title for login and register page"
+  },
+  "welcome": "Welcome",
+  "@welcome": {
+    "description": "Welcome message"
+  },
+  "loginRegisterFormPlaceholder": "Login/Register form",
+  "@loginRegisterFormPlaceholder": {
+    "description": "Placeholder text for login/register form"
+  }
+}
+
