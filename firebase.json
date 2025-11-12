@@ -1,0 +1,35 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "ministryhub-prod-22147",
+          "appId": "1:90332085361:android:1b9a1ec233efd232656fd0",
+          "fileOutput": "android/app/google-services-prod.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options_dev.dart": {
+          "projectId": "ministryhub-dev-38d80",
+          "configurations": {
+            "android": "1:1072108771248:android:9dfa9c349910c65f3a2875",
+            "ios": "1:1072108771248:ios:9867187a85f71ff83a2875",
+            "macos": "1:1072108771248:ios:9867187a85f71ff83a2875",
+            "web": "1:1072108771248:web:0f4cb9be7c5b13413a2875",
+            "windows": "1:1072108771248:web:c346fdaf23cb985e3a2875"
+          }
+        },
+        "lib/firebase_options_prod.dart": {
+          "projectId": "ministryhub-prod-22147",
+          "configurations": {
+            "android": "1:90332085361:android:1b9a1ec233efd232656fd0",
+            "ios": "1:90332085361:ios:fa1596b8138793cc656fd0",
+            "macos": "1:90332085361:ios:fa1596b8138793cc656fd0",
+            "web": "1:90332085361:web:e05692d83856de4c656fd0",
+            "windows": "1:90332085361:web:5fbebdd9808e5976656fd0"
+          }
+        }
+      }
+    }
+  }
+}

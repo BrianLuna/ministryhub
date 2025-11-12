@@ -1,9 +1,22 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ministryhub/core/export_core.dart';
+import 'package:ministryhub/firebase_options_dev.dart';
+import 'package:ministryhub/firebase_options_prod.dart';
 import 'package:ministryhub/l10n/app_localizations.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase with the correct options based on build mode
+  await Firebase.initializeApp(
+    options: kDebugMode
+        ? DevFirebaseOptions.currentPlatform
+        : ProdFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
 }
 
