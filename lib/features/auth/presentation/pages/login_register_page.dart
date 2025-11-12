@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ministryhub/l10n/app_localizations.dart';
 
 /// Login and Register page
 /// This page displays the login/register interface
@@ -7,6 +8,8 @@ class LoginRegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -26,13 +29,13 @@ class LoginRegisterPage extends StatelessWidget {
                     children: [
                       // Title
                       Text(
-                        'MinistryHub',
+                        l10n.appTitle,
                         style: Theme.of(context).textTheme.headlineLarge,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Inicio de Sesión / Registro',
+                        l10n.loginRegisterTitle,
                         style: Theme.of(context).textTheme.titleMedium,
                         textAlign: TextAlign.center,
                       ),
@@ -46,14 +49,14 @@ class LoginRegisterPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Text(
-                                'Bienvenido',
+                                l10n.welcome,
                                 style: Theme.of(context).textTheme.titleLarge,
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 24),
                               // Form fields will be added here later
                               Text(
-                                'Formulario de inicio de sesión/registro',
+                                l10n.loginRegisterFormPlaceholder,
                                 style: Theme.of(context).textTheme.bodyMedium,
                                 textAlign: TextAlign.center,
                               ),
