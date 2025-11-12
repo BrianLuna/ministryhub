@@ -123,3 +123,7 @@ coverage/
 **/android/fastlane/Preview.html
 **/android/fastlane/screenshots
 **/android/fastlane/test_output
+
+# AI Agent Instructions
+.cursorrules
+.ai-instructions.md
