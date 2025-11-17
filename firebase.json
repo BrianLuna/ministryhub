@@ -5,7 +5,14 @@
         "default": {
           "projectId": "ministryhub-prod-22147",
           "appId": "1:90332085361:android:1b9a1ec233efd232656fd0",
-          "fileOutput": "android/app/google-services-prod.json"
+          "fileOutput": "android/app/src/releasegoogle-services.json"
+        },
+        "buildConfigurations": {
+          "src\\release": {
+            "projectId": "ministryhub-prod-22147",
+            "appId": "1:90332085361:android:1b9a1ec233efd232656fd0",
+            "fileOutput": "android/app/src/release/google-services.json"
+          }
         }
       },
       "dart": {
@@ -22,11 +29,7 @@
         "lib/firebase_options_prod.dart": {
           "projectId": "ministryhub-prod-22147",
           "configurations": {
-            "android": "1:90332085361:android:1b9a1ec233efd232656fd0",
-            "ios": "1:90332085361:ios:fa1596b8138793cc656fd0",
-            "macos": "1:90332085361:ios:fa1596b8138793cc656fd0",
-            "web": "1:90332085361:web:e05692d83856de4c656fd0",
-            "windows": "1:90332085361:web:5fbebdd9808e5976656fd0"
+            "android": "1:90332085361:android:1b9a1ec233efd232656fd0"
           }
         }
       }
