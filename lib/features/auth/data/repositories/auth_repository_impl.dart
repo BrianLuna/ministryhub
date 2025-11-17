@@ -52,6 +52,37 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> signOut() => _datasource.signOut();
 
+  @override
+  Future<void> sendPasswordResetEmail({required String email}) {
+    return _datasource.sendPasswordResetEmail(email: email);
+  }
+
+  @override
+  Future<AuthUser?> registerWithEmail({
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+  }) async {
+    try {
+      final credential = await _datasource.registerWithEmail(
+        email: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+      );
+      return _mapUser(credential.user);
+    } on AuthFailure {
+      rethrow;
+    } catch (error) {
+      throw AuthFailure(
+        code: AuthErrorCodes.generic,
+        message: error.toString(),
+        cause: error,
+      );
+    }
+  }
+
   AuthUser? _mapUser(User? user) {
     if (user == null) return null;
     return AuthUser(

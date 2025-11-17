@@ -259,6 +259,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Account settings'**
   String get homeProfileMenuSettings;
+
+  /// Button label used to continue email verification
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueButtonLabel;
+
+  /// Label displayed when no account is associated with an email
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find an account with that email.'**
+  String get accountNotFoundLabel;
+
+  /// Button label to open the registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get accountNotFoundAction;
+
+  /// Title for the registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Create MinistryHub account'**
+  String get registerDialogTitle;
+
+  /// Subtitle explaining the registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Complete the information below to create your access.'**
+  String get registerDialogSubtitle;
+
+  /// Label for the first name field in registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get registerFirstNameLabel;
+
+  /// Label for the last name field in registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Last name'**
+  String get registerLastNameLabel;
+
+  /// Label for the email field in registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get registerEmailLabel;
+
+  /// Primary action in the registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get registerPrimaryButton;
+
+  /// Cancel button in the registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get registerCancelButton;
+
+  /// Validation error for missing first name
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your first name.'**
+  String get firstNameRequiredError;
+
+  /// Validation error for missing last name
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your last name.'**
+  String get lastNameRequiredError;
+
+  /// Button label to trigger password reset flow
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPasswordButton;
+
+  /// Confirmation message after sending password reset email
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent. Check your inbox.'**
+  String get passwordResetEmailSent;
 }
 
 class _AppLocalizationsDelegate

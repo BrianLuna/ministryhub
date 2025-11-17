@@ -94,4 +94,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeProfileMenuSettings => 'Account settings';
+
+  @override
+  String get continueButtonLabel => 'Continue';
+
+  @override
+  String get accountNotFoundLabel =>
+      'We couldn\'t find an account with that email.';
+
+  @override
+  String get accountNotFoundAction => 'Create account';
+
+  @override
+  String get registerDialogTitle => 'Create MinistryHub account';
+
+  @override
+  String get registerDialogSubtitle =>
+      'Complete the information below to create your access.';
+
+  @override
+  String get registerFirstNameLabel => 'First name';
+
+  @override
+  String get registerLastNameLabel => 'Last name';
+
+  @override
+  String get registerEmailLabel => 'Email';
+
+  @override
+  String get registerPrimaryButton => 'Create account';
+
+  @override
+  String get registerCancelButton => 'Cancel';
+
+  @override
+  String get firstNameRequiredError => 'Please enter your first name.';
+
+  @override
+  String get lastNameRequiredError => 'Please enter your last name.';
+
+  @override
+  String get forgotPasswordButton => 'Forgot password?';
+
+  @override
+  String get passwordResetEmailSent =>
+      'Password reset email sent. Check your inbox.';
 }

@@ -85,6 +85,196 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
     ref.read(authControllerProvider.notifier).signInWithGoogle();
   }
 
+  Future<void> _onForgotPassword(AppLocalizations l10n) async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(l10n.emailRequiredError)));
+      return;
+    }
+    final emailRegex = RegExp(r'^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(email)) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(l10n.invalidEmailFormatError)));
+      return;
+    }
+    try {
+      await ref
+          .read(authControllerProvider.notifier)
+          .sendPasswordResetEmail(email: email);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(l10n.passwordResetEmailSent)));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(l10n.authErrorGeneric)));
+    }
+  }
+
+  Future<void> _onOpenRegistrationDialog(AppLocalizations l10n) async {
+    final email = _emailController.text.trim();
+    final result = await _showRegistrationDialog(email: email, l10n: l10n);
+    if (result == null || !mounted) return;
+    ref
+        .read(authControllerProvider.notifier)
+        .registerWithEmail(
+          email: email,
+          password: result.password,
+          firstName: result.firstName,
+          lastName: result.lastName,
+        );
+  }
+
+  Future<_RegistrationFormData?> _showRegistrationDialog({
+    required String email,
+    required AppLocalizations l10n,
+  }) async {
+    final formKey = GlobalKey<FormState>();
+    final firstNameController = TextEditingController();
+    final lastNameController = TextEditingController();
+    final passwordController = TextEditingController();
+    var autoValidateDialog = false;
+    final disposables = <VoidCallback>[];
+    try {
+      final result = await showDialog<_RegistrationFormData>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          return StatefulBuilder(
+            builder: (context, setDialogState) {
+              return AlertDialog(
+                title: Text(l10n.registerDialogTitle),
+                content: Form(
+                  key: formKey,
+                  autovalidateMode: autoValidateDialog
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            l10n.registerDialogSubtitle,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: firstNameController,
+                          decoration: InputDecoration(
+                            labelText: l10n.registerFirstNameLabel,
+                            prefixIcon: const Icon(Icons.badge_outlined),
+                          ),
+                          textCapitalization: TextCapitalization.words,
+                          validator: (value) =>
+                              _validateName(value, l10n.firstNameRequiredError),
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: lastNameController,
+                          decoration: InputDecoration(
+                            labelText: l10n.registerLastNameLabel,
+                            prefixIcon: const Icon(Icons.badge),
+                          ),
+                          textCapitalization: TextCapitalization.words,
+                          validator: (value) =>
+                              _validateName(value, l10n.lastNameRequiredError),
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          initialValue: email,
+                          enabled: false,
+                          decoration: InputDecoration(
+                            labelText: l10n.registerEmailLabel,
+                            prefixIcon: const Icon(Icons.alternate_email),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: passwordController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: l10n.passwordFieldLabel,
+                            hintText: l10n.passwordFieldHint,
+                            prefixIcon: const Icon(Icons.lock_outline),
+                          ),
+                          validator: (value) => _validatePassword(value, l10n),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: Text(l10n.registerCancelButton),
+                  ),
+                  FilledButton(
+                    onPressed: () {
+                      if (!autoValidateDialog) {
+                        setDialogState(() {
+                          autoValidateDialog = true;
+                        });
+                      }
+                      if (!formKey.currentState!.validate()) {
+                        return;
+                      }
+                      Navigator.of(dialogContext).pop(
+                        _RegistrationFormData(
+                          firstName: firstNameController.text.trim(),
+                          lastName: lastNameController.text.trim(),
+                          password: passwordController.text.trim(),
+                        ),
+                      );
+                    },
+                    child: Text(l10n.registerPrimaryButton),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+      disposables.addAll([
+        () => firstNameController.dispose(),
+        () => lastNameController.dispose(),
+        () => passwordController.dispose(),
+      ]);
+      return result;
+    } finally {
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          for (final dispose in disposables) {
+            dispose();
+          }
+        });
+      } else {
+        for (final dispose in disposables) {
+          dispose();
+        }
+      }
+    }
+  }
+
+  String? _validateName(String? value, String errorMessage) {
+    if (value == null || value.trim().isEmpty) {
+      return errorMessage;
+    }
+    return null;
+  }
+
   String? _validateEmail(String? value, AppLocalizations l10n) {
     if (value == null || value.trim().isEmpty) {
       return l10n.emailRequiredError;
@@ -111,6 +301,7 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
       case AuthErrorCodes.invalidEmail:
         return l10n.authErrorInvalidEmail;
       case AuthErrorCodes.wrongPassword:
+      case AuthErrorCodes.userNotFound:
         return l10n.authErrorWrongPassword;
       case AuthErrorCodes.userDisabled:
         return l10n.authErrorUserDisabled;
@@ -182,14 +373,6 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                   Align(
                     alignment: isWide ? Alignment.centerLeft : Alignment.center,
                     child: logo,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.appTitle,
-                    textAlign: isWide ? TextAlign.start : TextAlign.center,
-                    style: theme.textTheme.displaySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
                   ),
                   const SizedBox(height: 32),
                   Text(
@@ -268,6 +451,46 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                     validator: (value) => _validatePassword(value, l10n),
                     onFieldSubmitted: (_) => _onSubmit(l10n),
                   ),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: isLoading
+                          ? null
+                          : () => _onForgotPassword(l10n),
+                      child: Text(l10n.forgotPasswordButton),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton(
+                    onPressed: isLoading ? null : () => _onSubmit(l10n),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                    ),
+                    child: isLoading
+                        ? _buildProgressIndicator(colorScheme.onPrimary)
+                        : Text(l10n.primaryAuthButton),
+                  ),
+                  if (authState.showRegistrationPrompt) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.accountNotFoundLabel,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () => _onOpenRegistrationDialog(l10n),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Text(l10n.accountNotFoundAction),
+                    ),
+                  ],
                 ],
               ),
             );
@@ -304,17 +527,7 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                       ),
                       const SizedBox(height: 32),
                       formFields,
-                      const SizedBox(height: 32),
-                      FilledButton(
-                        onPressed: isLoading ? null : () => _onSubmit(l10n),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                        ),
-                        child: isLoading
-                            ? _buildProgressIndicator(colorScheme.onPrimary)
-                            : Text(l10n.primaryAuthButton),
-                      ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 8),
                       divider,
                       const SizedBox(height: 20),
                       OutlinedButton.icon(
@@ -383,4 +596,16 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
       ),
     );
   }
+}
+
+class _RegistrationFormData {
+  const _RegistrationFormData({
+    required this.firstName,
+    required this.lastName,
+    required this.password,
+  });
+
+  final String firstName;
+  final String lastName;
+  final String password;
 }

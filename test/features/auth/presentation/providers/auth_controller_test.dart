@@ -1,16 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ministryhub/core/errors/app_exception.dart';
-import 'package:ministryhub/features/auth/domain/constants/auth_error_codes.dart';
-import 'package:ministryhub/features/auth/domain/entities/auth_user.dart';
-import 'package:ministryhub/features/auth/domain/repositories/auth_repository.dart';
-import 'package:ministryhub/features/auth/domain/usecases/sign_in_with_email.dart';
-import 'package:ministryhub/features/auth/domain/usecases/sign_in_with_google.dart';
-import 'package:ministryhub/features/auth/domain/usecases/sign_out.dart';
-import 'package:ministryhub/features/auth/domain/usecases/watch_auth_state.dart';
-import 'package:ministryhub/features/auth/presentation/providers/auth_controller.dart';
-import 'package:ministryhub/features/auth/presentation/providers/auth_state.dart';
+import 'package:ministryhub/ministryhub.dart';
 
 void main() {
   group('AuthController', () {
@@ -72,6 +63,22 @@ void main() {
       controller.dispose();
       await repository.dispose();
     });
+
+    test('signInWithEmail user-not-found shows registration prompt', () async {
+      final repository = _FakeAuthRepository()
+        ..signInFailure = const AuthFailure(code: AuthErrorCodes.userNotFound);
+      final controller = _buildController(repository);
+
+      await controller.signInWithEmail(
+        email: 'new@test.com',
+        password: '12345678',
+      );
+
+      expect(controller.state.status, AuthStatus.idle);
+      expect(controller.state.showRegistrationPrompt, isTrue);
+      controller.dispose();
+      await repository.dispose();
+    });
   });
 }
 
@@ -81,6 +88,8 @@ AuthController _buildController(_FakeAuthRepository repository) {
     signInWithGoogle: SignInWithGoogleUseCase(repository),
     signOutUseCase: SignOutUseCase(repository),
     watchAuthStateUseCase: WatchAuthStateUseCase(repository),
+    registerWithEmailUseCase: RegisterWithEmailUseCase(repository),
+    sendPasswordResetEmailUseCase: SendPasswordResetEmailUseCase(repository),
   );
 }
 
@@ -136,4 +145,15 @@ class _FakeAuthRepository implements AuthRepository {
     _currentUser = null;
     _authController.add(null);
   }
+
+  @override
+  Future<void> sendPasswordResetEmail({required String email}) async {}
+
+  @override
+  Future<AuthUser?> registerWithEmail({
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+  }) async => null;
 }

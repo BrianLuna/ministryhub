@@ -26,12 +26,6 @@ class FirebaseAuthDatasource {
       );
       return credential;
     } on FirebaseAuthException catch (error) {
-      if (error.code == 'user-not-found') {
-        return _firebaseAuth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-      }
       throw AuthFailure(
         code: _mapFirebaseCode(error.code),
         message: error.message,
@@ -92,6 +86,56 @@ class FirebaseAuthDatasource {
     }
   }
 
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (error) {
+      throw AuthFailure(
+        code: _mapFirebaseCode(error.code),
+        message: error.message,
+        cause: error,
+      );
+    } catch (error) {
+      throw AuthFailure(
+        code: AuthErrorCodes.generic,
+        message: error.toString(),
+        cause: error,
+      );
+    }
+  }
+
+  Future<UserCredential> registerWithEmail({
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+  }) async {
+    try {
+      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final displayName = '$firstName $lastName'.trim();
+      if (displayName.isNotEmpty) {
+        await credential.user?.updateDisplayName(displayName);
+        await credential.user?.reload();
+      }
+      return credential;
+    } on FirebaseAuthException catch (error) {
+      throw AuthFailure(
+        code: _mapFirebaseCode(error.code),
+        message: error.message,
+        cause: error,
+      );
+    } catch (error) {
+      throw AuthFailure(
+        code: AuthErrorCodes.generic,
+        message: error.toString(),
+        cause: error,
+      );
+    }
+  }
+
   static GoogleSignIn? _buildGoogleSignIn() {
     if (kIsWeb) {
       final clientId = GoogleClientIdResolver.resolve();
@@ -105,9 +149,12 @@ class FirebaseAuthDatasource {
       case 'invalid-email':
         return AuthErrorCodes.invalidEmail;
       case 'wrong-password':
+      case 'invalid-credential':
         return AuthErrorCodes.wrongPassword;
       case 'user-disabled':
         return AuthErrorCodes.userDisabled;
+      case 'user-not-found':
+        return AuthErrorCodes.userNotFound;
       case 'account-exists-with-different-credential':
       case 'credential-already-in-use':
         return AuthErrorCodes.credentialConflict;
