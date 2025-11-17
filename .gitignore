@@ -111,8 +111,8 @@ coverage/
 # Firebase
 **/ios/firebase_app_id_file.json
 **/ios/GoogleService-Info.plist
-**/android/app/google-services*.json
 **/android/app/google-services.json
+**/android/app/src/*/google-services.json
 **/lib/firebase_options*.dart
 
 # Fastlane

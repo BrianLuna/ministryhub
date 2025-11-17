@@ -1,0 +1,13 @@
+# Android Gradle Properties Example
+# Copy this file to gradle.properties and adjust values as needed
+
+org.gradle.jvmargs=-Xmx8G -XX:MaxMetaspaceSize=4G -XX:ReservedCodeCacheSize=512m -XX:+HeapDumpOnOutOfMemoryError
+android.useAndroidX=true
+android.enableJetifier=true
+
+# Custom Android configuration
+# Minimum SDK version required by Firebase Core and other plugins
+customMinSdkVersion=23
+# NDK version required by Firebase Core and path_provider_android
+customNdkVersion=27.0.12077973
+
