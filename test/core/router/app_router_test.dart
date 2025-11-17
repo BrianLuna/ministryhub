@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ministryhub/core/router/app_router.dart';
-import 'package:ministryhub/l10n/app_localizations.dart';
 import 'package:ministryhub/ministryhub.dart';
 
 void main() {
@@ -24,15 +23,22 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp.router(
-          routerConfig: AppRouter.router,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
+        ProviderScope(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(
+              _RouterAuthRepositoryStub(),
+            ),
           ],
-          supportedLocales: const [Locale('en'), Locale('es')],
+          child: MaterialApp.router(
+            routerConfig: AppRouter.router,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en'), Locale('es')],
+          ),
         ),
       );
 
@@ -46,15 +52,22 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp.router(
-          routerConfig: AppRouter.router,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
+        ProviderScope(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(
+              _RouterAuthRepositoryStub(),
+            ),
           ],
-          supportedLocales: const [Locale('en'), Locale('es')],
+          child: MaterialApp.router(
+            routerConfig: AppRouter.router,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en'), Locale('es')],
+          ),
         ),
       );
 
@@ -64,4 +77,21 @@ void main() {
       expect(find.text('MinistryHub'), findsOneWidget);
     });
   });
+}
+
+class _RouterAuthRepositoryStub implements AuthRepository {
+  @override
+  Stream<AuthUser?> authStateChanges() => Stream<AuthUser?>.value(null);
+
+  @override
+  Future<AuthUser?> signInWithEmail({
+    required String email,
+    required String password,
+  }) async => null;
+
+  @override
+  Future<AuthUser?> signInWithGoogle() async => null;
+
+  @override
+  Future<void> signOut() async {}
 }

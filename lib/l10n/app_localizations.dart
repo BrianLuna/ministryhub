@@ -173,7 +173,7 @@ abstract class AppLocalizations {
   /// Text shown between dividers
   ///
   /// In en, this message translates to:
-  /// **'or continue with'**
+  /// **'or'**
   String get dividerLabel;
 
   /// Footer hint explaining the create account flow
@@ -181,6 +181,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'If the email is new, we will guide you to create an account.'**
   String get authFooterHint;
+
+  /// Validation error for empty email field
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email.'**
+  String get emailRequiredError;
+
+  /// Validation error for invalid email format
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get invalidEmailFormatError;
+
+  /// Validation error for empty password field
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password.'**
+  String get passwordRequiredError;
+
+  /// Validation error for short passwords
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters.'**
+  String get passwordLengthError;
+
+  /// Shown when Firebase reports invalid email
+  ///
+  /// In en, this message translates to:
+  /// **'The email address is invalid.'**
+  String get authErrorInvalidEmail;
+
+  /// Shown when user enters wrong password
+  ///
+  /// In en, this message translates to:
+  /// **'The password does not match this account.'**
+  String get authErrorWrongPassword;
+
+  /// Shown when Firebase reports disabled user
+  ///
+  /// In en, this message translates to:
+  /// **'This account has been disabled. Contact your administrator.'**
+  String get authErrorUserDisabled;
+
+  /// Shown when there is a credential conflict
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already linked to another provider.'**
+  String get authErrorCredentialConflict;
+
+  /// Shown when the Google popup is dismissed
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in was cancelled.'**
+  String get authErrorGoogleCancelled;
+
+  /// Fallback auth error message
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t complete the action. Please try again.'**
+  String get authErrorGeneric;
+
+  /// Tooltip/label for the profile menu trigger in home
+  ///
+  /// In en, this message translates to:
+  /// **'Account options'**
+  String get homeProfileMenuLabel;
+
+  /// Label for the sign out entry in the profile menu
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get homeProfileMenuSignOut;
+
+  /// Label for the user settings entry in the profile menu
+  ///
+  /// In en, this message translates to:
+  /// **'Account settings'**
+  String get homeProfileMenuSettings;
 }
 
 class _AppLocalizationsDelegate

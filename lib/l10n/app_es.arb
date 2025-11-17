@@ -12,6 +12,19 @@
   "passwordFieldHint": "Ingresa tu contraseña",
   "primaryAuthButton": "Entrar a MinistryHub",
   "googleAuthButton": "Continuar con Google",
-  "dividerLabel": "o continuar con",
-  "authFooterHint": "Si el correo es nuevo, te guiaremos para crear una cuenta."
+  "dividerLabel": "o",
+  "authFooterHint": "Si el correo es nuevo, te guiaremos para crear una cuenta.",
+  "emailRequiredError": "Ingresa tu correo electrónico.",
+  "invalidEmailFormatError": "Ingresa un correo válido.",
+  "passwordRequiredError": "Ingresa tu contraseña.",
+  "passwordLengthError": "La contraseña debe tener al menos 8 caracteres.",
+  "authErrorInvalidEmail": "El correo electrónico es inválido.",
+  "authErrorWrongPassword": "La contraseña no coincide con esta cuenta.",
+  "authErrorUserDisabled": "Esta cuenta fue deshabilitada. Contacta a tu administrador.",
+  "authErrorCredentialConflict": "Este correo ya está vinculado a otro proveedor.",
+  "authErrorGoogleCancelled": "Se canceló el acceso con Google.",
+  "authErrorGeneric": "No pudimos completar la acción. Intenta nuevamente.",
+  "homeProfileMenuLabel": "Opciones de cuenta",
+  "homeProfileMenuSignOut": "Cerrar sesión",
+  "homeProfileMenuSettings": "Configuración de cuenta"
 }

@@ -1,22 +1,145 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:ministryhub/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ministryhub/ministryhub.dart';
 
 /// Login and Register page
 /// Displays the unified auth surface for both sign in and sign out flows.
-class LoginRegisterPage extends StatelessWidget {
+class LoginRegisterPage extends ConsumerStatefulWidget {
   const LoginRegisterPage({super.key});
+
+  @override
+  ConsumerState<LoginRegisterPage> createState() => _LoginRegisterPageState();
+}
+
+class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
+  final FocusNode _passwordFocusNode = FocusNode();
+  ProviderSubscription<AuthState>? _authSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _authSubscription = ref.listenManual<AuthState>(
+      authControllerProvider,
+      _handleAuthStateUpdates,
+    );
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.close();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleAuthStateUpdates(AuthState? previous, AuthState next) {
+    if (!mounted) {
+      return;
+    }
+    if (next.status == AuthStatus.authenticated &&
+        previous?.status != AuthStatus.authenticated) {
+      context.goNamed('home');
+      return;
+    }
+    if (next.errorCode != null && next.errorCode != previous?.errorCode) {
+      final l10n = AppLocalizations.of(context)!;
+      final message = _mapAuthErrorToMessage(next.errorCode!, l10n);
+      if (message != null) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(SnackBar(content: Text(message)));
+      }
+      ref.read(authControllerProvider.notifier).clearError();
+    }
+  }
+
+  void _onSubmit(AppLocalizations l10n) {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    FocusScope.of(context).unfocus();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    ref
+        .read(authControllerProvider.notifier)
+        .signInWithEmail(email: email, password: password);
+  }
+
+  void _onGoogleSignIn() {
+    FocusScope.of(context).unfocus();
+    ref.read(authControllerProvider.notifier).signInWithGoogle();
+  }
+
+  String? _validateEmail(String? value, AppLocalizations l10n) {
+    if (value == null || value.trim().isEmpty) {
+      return l10n.emailRequiredError;
+    }
+    final emailRegex = RegExp(r'^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value.trim())) {
+      return l10n.invalidEmailFormatError;
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value, AppLocalizations l10n) {
+    if (value == null || value.trim().isEmpty) {
+      return l10n.passwordRequiredError;
+    }
+    if (value.trim().length < 8) {
+      return l10n.passwordLengthError;
+    }
+    return null;
+  }
+
+  String? _mapAuthErrorToMessage(String code, AppLocalizations l10n) {
+    switch (code) {
+      case AuthErrorCodes.invalidEmail:
+        return l10n.authErrorInvalidEmail;
+      case AuthErrorCodes.wrongPassword:
+        return l10n.authErrorWrongPassword;
+      case AuthErrorCodes.userDisabled:
+        return l10n.authErrorUserDisabled;
+      case AuthErrorCodes.credentialConflict:
+        return l10n.authErrorCredentialConflict;
+      case AuthErrorCodes.googleCancelled:
+        return l10n.authErrorGoogleCancelled;
+      case AuthErrorCodes.generic:
+      default:
+        return l10n.authErrorGeneric;
+    }
+  }
+
+  Widget _buildProgressIndicator(Color color) {
+    return SizedBox(
+      height: 20,
+      width: 20,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        valueColor: AlwaysStoppedAnimation<Color>(color),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final authState = ref.watch(authControllerProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final brightness = theme.brightness;
     final logoColor = brightness == Brightness.dark
         ? Colors.white
         : Colors.black;
+    final isLoading = authState.isLoading;
 
     return Scaffold(
       body: SafeArea(
@@ -53,6 +176,14 @@ class LoginRegisterPage extends StatelessWidget {
                   Align(
                     alignment: isWide ? Alignment.centerLeft : Alignment.center,
                     child: logo,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.appTitle,
+                    textAlign: isWide ? TextAlign.start : TextAlign.center,
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 32),
                   Text(
@@ -93,6 +224,46 @@ class LoginRegisterPage extends StatelessWidget {
               ],
             );
 
+            final formFields = Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    autofillHints: const [AutofillHints.email],
+                    decoration: InputDecoration(
+                      labelText: l10n.emailFieldLabel,
+                      hintText: l10n.emailFieldHint,
+                      prefixIcon: const Icon(Icons.alternate_email_outlined),
+                    ),
+                    validator: (value) => _validateEmail(value, l10n),
+                    onFieldSubmitted: (_) =>
+                        FocusScope.of(context).requestFocus(_passwordFocusNode),
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _passwordController,
+                    focusNode: _passwordFocusNode,
+                    obscureText: true,
+                    textInputAction: TextInputAction.done,
+                    autofillHints: const [AutofillHints.password],
+                    decoration: InputDecoration(
+                      labelText: l10n.passwordFieldLabel,
+                      hintText: l10n.passwordFieldHint,
+                      prefixIcon: const Icon(Icons.lock_outline),
+                    ),
+                    validator: (value) => _validatePassword(value, l10n),
+                    onFieldSubmitted: (_) => _onSubmit(l10n),
+                  ),
+                ],
+              ),
+            );
+
             final formCard = FadeInUp(
               duration: const Duration(milliseconds: 900),
               child: Card(
@@ -124,47 +295,31 @@ class LoginRegisterPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      TextFormField(
-                        keyboardType: TextInputType.emailAddress,
-                        autofillHints: const [AutofillHints.email],
-                        decoration: InputDecoration(
-                          labelText: l10n.emailFieldLabel,
-                          hintText: l10n.emailFieldHint,
-                          prefixIcon: const Icon(
-                            Icons.alternate_email_outlined,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        obscureText: true,
-                        autofillHints: const [AutofillHints.password],
-                        decoration: InputDecoration(
-                          labelText: l10n.passwordFieldLabel,
-                          hintText: l10n.passwordFieldHint,
-                          prefixIcon: const Icon(Icons.lock_outline),
-                        ),
-                      ),
+                      formFields,
                       const SizedBox(height: 32),
                       FilledButton(
-                        onPressed: () {},
+                        onPressed: isLoading ? null : () => _onSubmit(l10n),
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 18),
                         ),
-                        child: Text(l10n.primaryAuthButton),
+                        child: isLoading
+                            ? _buildProgressIndicator(colorScheme.onPrimary)
+                            : Text(l10n.primaryAuthButton),
                       ),
                       const SizedBox(height: 20),
                       divider,
                       const SizedBox(height: 20),
                       OutlinedButton.icon(
-                        onPressed: () {},
+                        onPressed: isLoading ? null : _onGoogleSignIn,
                         icon: SvgPicture.asset(
                           'assets/google.svg',
                           height: 20,
                           width: 20,
                           semanticsLabel: l10n.googleAuthButton,
                         ),
-                        label: Text(l10n.googleAuthButton),
+                        label: isLoading
+                            ? _buildProgressIndicator(colorScheme.primary)
+                            : Text(l10n.googleAuthButton),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 18),
                         ),

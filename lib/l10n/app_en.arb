@@ -48,12 +48,64 @@
   "@googleAuthButton": {
     "description": "Label for the Google auth button"
   },
-  "dividerLabel": "or continue with",
+  "dividerLabel": "or",
   "@dividerLabel": {
     "description": "Text shown between dividers"
   },
   "authFooterHint": "If the email is new, we will guide you to create an account.",
   "@authFooterHint": {
     "description": "Footer hint explaining the create account flow"
+  },
+  "emailRequiredError": "Please enter your email.",
+  "@emailRequiredError": {
+    "description": "Validation error for empty email field"
+  },
+  "invalidEmailFormatError": "Enter a valid email address.",
+  "@invalidEmailFormatError": {
+    "description": "Validation error for invalid email format"
+  },
+  "passwordRequiredError": "Please enter your password.",
+  "@passwordRequiredError": {
+    "description": "Validation error for empty password field"
+  },
+  "passwordLengthError": "Password must be at least 8 characters.",
+  "@passwordLengthError": {
+    "description": "Validation error for short passwords"
+  },
+  "authErrorInvalidEmail": "The email address is invalid.",
+  "@authErrorInvalidEmail": {
+    "description": "Shown when Firebase reports invalid email"
+  },
+  "authErrorWrongPassword": "The password does not match this account.",
+  "@authErrorWrongPassword": {
+    "description": "Shown when user enters wrong password"
+  },
+  "authErrorUserDisabled": "This account has been disabled. Contact your administrator.",
+  "@authErrorUserDisabled": {
+    "description": "Shown when Firebase reports disabled user"
+  },
+  "authErrorCredentialConflict": "This email is already linked to another provider.",
+  "@authErrorCredentialConflict": {
+    "description": "Shown when there is a credential conflict"
+  },
+  "authErrorGoogleCancelled": "Google sign-in was cancelled.",
+  "@authErrorGoogleCancelled": {
+    "description": "Shown when the Google popup is dismissed"
+  },
+  "authErrorGeneric": "We couldn't complete the action. Please try again.",
+  "@authErrorGeneric": {
+    "description": "Fallback auth error message"
+  },
+  "homeProfileMenuLabel": "Account options",
+  "@homeProfileMenuLabel": {
+    "description": "Tooltip/label for the profile menu trigger in home"
+  },
+  "homeProfileMenuSignOut": "Sign out",
+  "@homeProfileMenuSignOut": {
+    "description": "Label for the sign out entry in the profile menu"
+  },
+  "homeProfileMenuSettings": "Account settings",
+  "@homeProfileMenuSettings": {
+    "description": "Label for the user settings entry in the profile menu"
   }
 }

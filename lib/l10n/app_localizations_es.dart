@@ -47,9 +47,53 @@ class AppLocalizationsEs extends AppLocalizations {
   String get googleAuthButton => 'Continuar con Google';
 
   @override
-  String get dividerLabel => 'o continuar con';
+  String get dividerLabel => 'o';
 
   @override
   String get authFooterHint =>
       'Si el correo es nuevo, te guiaremos para crear una cuenta.';
+
+  @override
+  String get emailRequiredError => 'Ingresa tu correo electrónico.';
+
+  @override
+  String get invalidEmailFormatError => 'Ingresa un correo válido.';
+
+  @override
+  String get passwordRequiredError => 'Ingresa tu contraseña.';
+
+  @override
+  String get passwordLengthError =>
+      'La contraseña debe tener al menos 8 caracteres.';
+
+  @override
+  String get authErrorInvalidEmail => 'El correo electrónico es inválido.';
+
+  @override
+  String get authErrorWrongPassword =>
+      'La contraseña no coincide con esta cuenta.';
+
+  @override
+  String get authErrorUserDisabled =>
+      'Esta cuenta fue deshabilitada. Contacta a tu administrador.';
+
+  @override
+  String get authErrorCredentialConflict =>
+      'Este correo ya está vinculado a otro proveedor.';
+
+  @override
+  String get authErrorGoogleCancelled => 'Se canceló el acceso con Google.';
+
+  @override
+  String get authErrorGeneric =>
+      'No pudimos completar la acción. Intenta nuevamente.';
+
+  @override
+  String get homeProfileMenuLabel => 'Opciones de cuenta';
+
+  @override
+  String get homeProfileMenuSignOut => 'Cerrar sesión';
+
+  @override
+  String get homeProfileMenuSettings => 'Configuración de cuenta';
 }

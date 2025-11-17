@@ -12,6 +12,11 @@ class AppRouter {
         name: 'login',
         builder: (context, state) => const LoginRegisterPage(),
       ),
+      GoRoute(
+        path: '/home',
+        name: 'home',
+        builder: (context, state) => const HomePage(),
+      ),
     ],
   );
 }
