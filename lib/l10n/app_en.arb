@@ -15,6 +15,45 @@
   "loginRegisterFormPlaceholder": "Login/Register form",
   "@loginRegisterFormPlaceholder": {
     "description": "Placeholder text for login/register form"
+  },
+  "authSubtitle": "Ministry administration, modernized",
+  "@authSubtitle": {
+    "description": "Short subtitle for the auth hero section"
+  },
+  "authDescription": "Coordinate campuses, teams, and resources from a single hub designed for scale.",
+  "@authDescription": {
+    "description": "Supportive description for the hero section"
+  },
+  "emailFieldLabel": "Email address",
+  "@emailFieldLabel": {
+    "description": "Label for the email text field"
+  },
+  "emailFieldHint": "name@ministry.org",
+  "@emailFieldHint": {
+    "description": "Hint text for the email field"
+  },
+  "passwordFieldLabel": "Password",
+  "@passwordFieldLabel": {
+    "description": "Label for the password text field"
+  },
+  "passwordFieldHint": "Enter your password",
+  "@passwordFieldHint": {
+    "description": "Hint text for the password field"
+  },
+  "primaryAuthButton": "Enter MinistryHub",
+  "@primaryAuthButton": {
+    "description": "Label for the main auth button"
+  },
+  "googleAuthButton": "Continue with Google",
+  "@googleAuthButton": {
+    "description": "Label for the Google auth button"
+  },
+  "dividerLabel": "or continue with",
+  "@dividerLabel": {
+    "description": "Text shown between dividers"
+  },
+  "authFooterHint": "If the email is new, we will guide you to create an account.",
+  "@authFooterHint": {
+    "description": "Footer hint explaining the create account flow"
   }
 }
-

@@ -121,6 +121,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Login/Register form'**
   String get loginRegisterFormPlaceholder;
+
+  /// Short subtitle for the auth hero section
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry administration, modernized'**
+  String get authSubtitle;
+
+  /// Supportive description for the hero section
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinate campuses, teams, and resources from a single hub designed for scale.'**
+  String get authDescription;
+
+  /// Label for the email text field
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get emailFieldLabel;
+
+  /// Hint text for the email field
+  ///
+  /// In en, this message translates to:
+  /// **'name@ministry.org'**
+  String get emailFieldHint;
+
+  /// Label for the password text field
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordFieldLabel;
+
+  /// Hint text for the password field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get passwordFieldHint;
+
+  /// Label for the main auth button
+  ///
+  /// In en, this message translates to:
+  /// **'Enter MinistryHub'**
+  String get primaryAuthButton;
+
+  /// Label for the Google auth button
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get googleAuthButton;
+
+  /// Text shown between dividers
+  ///
+  /// In en, this message translates to:
+  /// **'or continue with'**
+  String get dividerLabel;
+
+  /// Footer hint explaining the create account flow
+  ///
+  /// In en, this message translates to:
+  /// **'If the email is new, we will guide you to create an account.'**
+  String get authFooterHint;
 }
 
 class _AppLocalizationsDelegate

@@ -3,6 +3,15 @@
   "appTitle": "MinistryHub",
   "loginRegisterTitle": "Inicio de Sesión / Registro",
   "welcome": "Bienvenido",
-  "loginRegisterFormPlaceholder": "Formulario de inicio de sesión/registro"
+  "loginRegisterFormPlaceholder": "Formulario de inicio de sesión/registro",
+  "authSubtitle": "Administración ministerial, modernizada",
+  "authDescription": "Coordina campus, equipos y recursos desde un solo hub pensado para escalar.",
+  "emailFieldLabel": "Correo electrónico",
+  "emailFieldHint": "nombre@ministerio.org",
+  "passwordFieldLabel": "Contraseña",
+  "passwordFieldHint": "Ingresa tu contraseña",
+  "primaryAuthButton": "Entrar a MinistryHub",
+  "googleAuthButton": "Continuar con Google",
+  "dividerLabel": "o continuar con",
+  "authFooterHint": "Si el correo es nuevo, te guiaremos para crear una cuenta."
 }
-
