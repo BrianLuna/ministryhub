@@ -19,6 +19,7 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
   final FocusNode _passwordFocusNode = FocusNode();
+  bool _autoValidate = false;
   ProviderSubscription<AuthState>? _authSubscription;
 
   @override
@@ -63,6 +64,11 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
   }
 
   void _onSubmit(AppLocalizations l10n) {
+    if (!_autoValidate) {
+      setState(() {
+        _autoValidate = true;
+      });
+    }
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -226,7 +232,9 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
 
             final formFields = Form(
               key: _formKey,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
+              autovalidateMode: _autoValidate
+                  ? AutovalidateMode.onUserInteraction
+                  : AutovalidateMode.disabled,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
