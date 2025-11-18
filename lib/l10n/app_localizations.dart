@@ -349,6 +349,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password reset email sent. Check your inbox.'**
   String get passwordResetEmailSent;
+
+  /// Title for the account settings overlay
+  ///
+  /// In en, this message translates to:
+  /// **'Account Settings'**
+  String get settingsTitle;
+
+  /// Section title for profile settings
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get settingsProfileSection;
+
+  /// Section title for theme settings
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get settingsThemeSection;
+
+  /// Section title for language settings
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguageSection;
+
+  /// Label for first name field in settings
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get settingsFirstNameLabel;
+
+  /// Label for last name field in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Last name'**
+  String get settingsLastNameLabel;
+
+  /// Label for email field in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get settingsEmailLabel;
+
+  /// Label for profile photo in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo'**
+  String get settingsPhotoLabel;
+
+  /// Button label to change profile photo
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get settingsChangePhoto;
+
+  /// Option to take a new photo
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get settingsTakePhoto;
+
+  /// Option to select photo from gallery
+  ///
+  /// In en, this message translates to:
+  /// **'Select photo'**
+  String get settingsSelectPhoto;
+
+  /// Light theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settingsThemeLight;
+
+  /// Dark theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get settingsThemeDark;
+
+  /// System theme option (follows device setting)
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get settingsThemeSystem;
+
+  /// Spanish language option
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish'**
+  String get settingsLanguageSpanish;
+
+  /// English language option
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get settingsLanguageEnglish;
+
+  /// Button label to open Google account management
+  ///
+  /// In en, this message translates to:
+  /// **'Manage my Google account'**
+  String get settingsManageGoogleAccount;
+
+  /// Button label to save settings changes
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get settingsSaveButton;
+
+  /// Button label to cancel settings changes
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get settingsCancelButton;
+
+  /// Button label to delete account
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get settingsDeleteAccountButton;
+
+  /// Title for delete account confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get settingsDeleteAccountTitle;
+
+  /// Message in delete account confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete your account? This action cannot be undone and all your data will be deleted.'**
+  String get settingsDeleteAccountMessage;
+
+  /// Confirm button in delete account dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get settingsDeleteAccountConfirm;
+
+  /// Cancel button in delete account dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get settingsDeleteAccountCancel;
+
+  /// Success message after updating profile
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully'**
+  String get settingsProfileUpdated;
+
+  /// Error message when profile update fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating profile'**
+  String get settingsProfileUpdateError;
+
+  /// Success message after deleting account
+  ///
+  /// In en, this message translates to:
+  /// **'Account deleted successfully'**
+  String get settingsAccountDeleted;
+
+  /// Error message when account deletion fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting account'**
+  String get settingsAccountDeleteError;
+
+  /// Error message when photo upload fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error uploading photo'**
+  String get settingsPhotoUploadError;
+
+  /// Message when user cancels photo selection
+  ///
+  /// In en, this message translates to:
+  /// **'Photo selection cancelled'**
+  String get settingsPhotoSelectionCancelled;
+
+  /// Error message when URL cannot be opened
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot open URL. Please visit https://myaccount.google.com manually.'**
+  String get settingsCannotOpenUrl;
 }
 
 class _AppLocalizationsDelegate

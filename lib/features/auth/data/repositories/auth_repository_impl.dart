@@ -98,11 +98,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   AuthUser? _mapUser(User? user) {
     if (user == null) return null;
+    // Get the primary provider ID from providerData
+    final providerId = user.providerData.isNotEmpty
+        ? user.providerData[0].providerId
+        : 'password';
     return AuthUser(
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
       photoUrl: user.photoURL,
+      providerId: providerId,
     );
   }
 }

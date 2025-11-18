@@ -145,4 +145,99 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get passwordResetEmailSent =>
       'Correo de restablecimiento enviado. Revisa tu bandeja de entrada.';
+
+  @override
+  String get settingsTitle => 'Configuración de cuenta';
+
+  @override
+  String get settingsProfileSection => 'Perfil';
+
+  @override
+  String get settingsThemeSection => 'Tema';
+
+  @override
+  String get settingsLanguageSection => 'Idioma';
+
+  @override
+  String get settingsFirstNameLabel => 'Nombre';
+
+  @override
+  String get settingsLastNameLabel => 'Apellido';
+
+  @override
+  String get settingsEmailLabel => 'Correo electrónico';
+
+  @override
+  String get settingsPhotoLabel => 'Foto de perfil';
+
+  @override
+  String get settingsChangePhoto => 'Cambiar foto';
+
+  @override
+  String get settingsTakePhoto => 'Tomar foto';
+
+  @override
+  String get settingsSelectPhoto => 'Seleccionar foto';
+
+  @override
+  String get settingsThemeLight => 'Claro';
+
+  @override
+  String get settingsThemeDark => 'Oscuro';
+
+  @override
+  String get settingsThemeSystem => 'Sistema';
+
+  @override
+  String get settingsLanguageSpanish => 'Español';
+
+  @override
+  String get settingsLanguageEnglish => 'Inglés';
+
+  @override
+  String get settingsManageGoogleAccount => 'Administrar mi cuenta de Google';
+
+  @override
+  String get settingsSaveButton => 'Guardar cambios';
+
+  @override
+  String get settingsCancelButton => 'Cancelar';
+
+  @override
+  String get settingsDeleteAccountButton => 'Eliminar cuenta';
+
+  @override
+  String get settingsDeleteAccountTitle => 'Eliminar cuenta';
+
+  @override
+  String get settingsDeleteAccountMessage =>
+      '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer y se eliminarán todos tus datos.';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'Eliminar';
+
+  @override
+  String get settingsDeleteAccountCancel => 'Cancelar';
+
+  @override
+  String get settingsProfileUpdated => 'Perfil actualizado correctamente';
+
+  @override
+  String get settingsProfileUpdateError => 'Error al actualizar el perfil';
+
+  @override
+  String get settingsAccountDeleted => 'Cuenta eliminada correctamente';
+
+  @override
+  String get settingsAccountDeleteError => 'Error al eliminar la cuenta';
+
+  @override
+  String get settingsPhotoUploadError => 'Error al subir la foto';
+
+  @override
+  String get settingsPhotoSelectionCancelled => 'Selección de foto cancelada';
+
+  @override
+  String get settingsCannotOpenUrl =>
+      'No se puede abrir la URL. Por favor, visita https://myaccount.google.com manualmente.';
 }

@@ -20,3 +20,9 @@ class AppException implements Exception {
 class AuthFailure extends AppException {
   const AuthFailure({required super.code, super.message, super.cause});
 }
+
+/// Specialized exception for settings operations failures.
+class SettingsException extends AppException {
+  const SettingsException({required super.message, super.cause})
+      : super(code: 'settings_error');
+}
