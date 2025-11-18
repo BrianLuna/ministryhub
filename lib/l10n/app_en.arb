@@ -287,5 +287,9 @@
   "settingsPhotoSelectionCancelled": "Photo selection cancelled",
   "@settingsPhotoSelectionCancelled": {
     "description": "Message when user cancels photo selection"
+  },
+  "settingsCannotOpenUrl": "Cannot open URL. Please visit https://myaccount.google.com manually.",
+  "@settingsCannotOpenUrl": {
+    "description": "Error message when URL cannot be opened"
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -33,8 +34,11 @@ class _AccountSettingsOverlayState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authState = ref.read(authControllerProvider);
       final uid = authState.user?.uid;
+      final displayName = authState.user?.displayName;
       if (uid != null) {
-        ref.read(settingsControllerProvider.notifier).loadProfile(uid);
+        ref
+            .read(settingsControllerProvider.notifier)
+            .loadProfile(uid, displayName: displayName);
       }
     });
   }
@@ -129,22 +133,28 @@ class _ProfileSection extends ConsumerStatefulWidget {
 class _ProfileSectionState extends ConsumerState<_ProfileSection> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  bool _controllersInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _updateControllers();
+    _initializeControllers();
   }
 
   @override
   void didUpdateWidget(_ProfileSection oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.settingsState != widget.settingsState) {
-      _updateControllers();
+    // Only update controllers if profile was loaded from server
+    // Don't update if user is currently editing (to avoid text selection)
+    if (!_controllersInitialized &&
+        oldWidget.settingsState.profile != widget.settingsState.profile) {
+      _initializeControllers();
     }
   }
 
-  void _updateControllers() {
+  void _initializeControllers() {
+    if (_controllersInitialized) return;
+
     final firstName = widget.settingsState.firstName.isNotEmpty
         ? widget.settingsState.firstName
         : widget.user.displayName?.split(' ').first ?? '';
@@ -152,8 +162,15 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
         ? widget.settingsState.lastName
         : widget.user.displayName?.split(' ').skip(1).join(' ') ?? '';
 
-    _firstNameController.text = firstName;
-    _lastNameController.text = lastName;
+    // Only set if different to avoid cursor jumping
+    if (_firstNameController.text != firstName) {
+      _firstNameController.text = firstName;
+    }
+    if (_lastNameController.text != lastName) {
+      _lastNameController.text = lastName;
+    }
+
+    _controllersInitialized = true;
   }
 
   @override
@@ -195,21 +212,7 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
                 Positioned(
                   bottom: 0,
                   right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: theme.scaffoldBackgroundColor,
-                        width: 2,
-                      ),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.camera_alt, size: 20),
-                      color: theme.colorScheme.onPrimary,
-                      onPressed: _showPhotoOptions,
-                    ),
-                  ),
+                  child: _buildCameraButton(theme),
                 ),
             ],
           ),
@@ -296,6 +299,41 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
     return '?';
   }
 
+  Widget _buildCameraButton(ThemeData theme) {
+    // Make button smaller on Android, keep current size on web
+    final isAndroid = !kIsWeb && (Platform.isAndroid);
+    final buttonSize = isAndroid ? 32.0 : 48.0;
+    final iconSize = isAndroid ? 16.0 : 20.0;
+    final borderWidth = isAndroid ? 1.5 : 2.0;
+
+    return Container(
+      width: buttonSize,
+      height: buttonSize,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: theme.scaffoldBackgroundColor,
+          width: borderWidth,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _showPhotoOptions,
+          borderRadius: BorderRadius.circular(buttonSize / 2),
+          child: Center(
+            child: Icon(
+              Icons.camera_alt,
+              size: iconSize,
+              color: theme.colorScheme.onPrimary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showPhotoOptions() {
     showModalBottomSheet(
       context: context,
@@ -366,9 +404,36 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
   }
 
   Future<void> _openGoogleAccount() async {
-    final url = Uri.parse('https://myaccount.google.com');
-    if (await canLaunchUrl(url)) {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final url = Uri.parse('https://myaccount.google.com/personal-info');
+
+      // Try to launch directly - canLaunchUrl can fail if plugin isn't ready
+      // but launchUrl will still work in most cases
+      try {
+        final canLaunch = await canLaunchUrl(url).timeout(
+          const Duration(seconds: 2),
+          onTimeout: () => true, // Assume we can launch if timeout
+        );
+        if (!canLaunch) {
+          throw Exception('Cannot launch URL');
+        }
+      } catch (e) {
+        // If canLaunchUrl fails, try to launch anyway
+        debugPrint('canLaunchUrl check failed, attempting launch anyway: $e');
+      }
+
+      // Launch the URL
       await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      // If url_launcher is not available, show a message to the user
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.settingsCannotOpenUrl)));
+      }
+      // Log error for debugging
+      debugPrint('Error opening Google account URL: $e');
     }
   }
 }

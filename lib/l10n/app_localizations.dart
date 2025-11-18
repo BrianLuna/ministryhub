@@ -529,6 +529,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Photo selection cancelled'**
   String get settingsPhotoSelectionCancelled;
+
+  /// Error message when URL cannot be opened
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot open URL. Please visit https://myaccount.google.com manually.'**
+  String get settingsCannotOpenUrl;
 }
 
 class _AppLocalizationsDelegate

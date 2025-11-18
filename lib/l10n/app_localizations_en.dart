@@ -234,4 +234,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPhotoSelectionCancelled => 'Photo selection cancelled';
+
+  @override
+  String get settingsCannotOpenUrl =>
+      'Cannot open URL. Please visit https://myaccount.google.com manually.';
 }

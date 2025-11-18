@@ -29,9 +29,28 @@ class SettingsRepositoryImpl implements SettingsRepository {
         throw const SettingsException(message: 'User not authenticated');
       }
 
+      // Get current profile from Firestore to preserve existing values
+      final currentProfile = await getUserProfile(uid);
+      final currentFirstName = firstName ?? currentProfile?.firstName;
+      final currentLastName = lastName ?? currentProfile?.lastName;
+
+      // If no profile exists and we have displayName from Auth, use it
+      if (currentProfile == null && user.displayName != null) {
+        final nameParts = user.displayName!.split(' ');
+        if (currentFirstName == null && nameParts.isNotEmpty) {
+          // Will be set below
+        }
+        if (currentLastName == null && nameParts.length > 1) {
+          // Will be set below
+        }
+      }
+
       // Update display name in Firebase Auth if name changed
       if (firstName != null || lastName != null) {
-        final displayName = _buildDisplayName(firstName, lastName);
+        // Use current values if new ones are not provided
+        final finalFirstName = firstName ?? currentFirstName ?? '';
+        final finalLastName = lastName ?? currentLastName ?? '';
+        final displayName = _buildDisplayName(finalFirstName, finalLastName);
         if (displayName != null && displayName != user.displayName) {
           await user.updateDisplayName(displayName);
           await user.reload();
@@ -45,6 +64,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
       }
 
       // Save profile data to Firestore
+      // Only include fields that are explicitly provided (not null)
+      // This preserves existing values in Firestore
       final profileData = <String, dynamic>{};
       if (firstName != null) {
         profileData['firstName'] = firstName;

@@ -71,5 +71,6 @@
   "settingsAccountDeleted": "Cuenta eliminada correctamente",
   "settingsAccountDeleteError": "Error al eliminar la cuenta",
   "settingsPhotoUploadError": "Error al subir la foto",
-  "settingsPhotoSelectionCancelled": "Selección de foto cancelada"
+  "settingsPhotoSelectionCancelled": "Selección de foto cancelada",
+  "settingsCannotOpenUrl": "No se puede abrir la URL. Por favor, visita https://myaccount.google.com manualmente."
 }

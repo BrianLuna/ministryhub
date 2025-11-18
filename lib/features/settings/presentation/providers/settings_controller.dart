@@ -57,15 +57,36 @@ class SettingsController extends StateNotifier<SettingsState> {
   final ImagePicker _imagePicker;
 
   /// Load user profile
-  Future<void> loadProfile(String uid) async {
+  Future<void> loadProfile(String uid, {String? displayName}) async {
     state = state.copyWith(isLoading: true);
     try {
       final profile = await _getUserProfileUseCase(uid);
+
+      // If profile doesn't exist in Firestore, try to extract from displayName
+      String? initialFirstName = profile?.firstName;
+      String? initialLastName = profile?.lastName;
+
+      if (initialFirstName == null &&
+          initialLastName == null &&
+          displayName != null) {
+        final nameParts = displayName
+            .trim()
+            .split(' ')
+            .where((p) => p.isNotEmpty)
+            .toList();
+        if (nameParts.isNotEmpty) {
+          initialFirstName = nameParts.first;
+          if (nameParts.length > 1) {
+            initialLastName = nameParts.skip(1).join(' ');
+          }
+        }
+      }
+
       state = state.copyWith(
         isLoading: false,
         profile: profile,
-        firstName: profile?.firstName ?? '',
-        lastName: profile?.lastName ?? '',
+        firstName: initialFirstName ?? '',
+        lastName: initialLastName ?? '',
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -120,11 +141,28 @@ class SettingsController extends StateNotifier<SettingsState> {
         profilePhotoPath = 'users/$uid/profile.jpg';
       }
 
-      // Update profile
+      // Only update fields that have been modified
+      // Compare with original profile to determine what changed
+      final originalFirstName = state.profile?.firstName ?? '';
+      final originalLastName = state.profile?.lastName ?? '';
+
+      // Only pass firstName if it changed from the original
+      String? firstNameToUpdate;
+      if (state.firstName != originalFirstName) {
+        firstNameToUpdate = state.firstName.isNotEmpty ? state.firstName : null;
+      }
+
+      // Only pass lastName if it changed from the original
+      String? lastNameToUpdate;
+      if (state.lastName != originalLastName) {
+        lastNameToUpdate = state.lastName.isNotEmpty ? state.lastName : null;
+      }
+
+      // Update profile - only send fields that actually changed
       await _updateProfileUseCase(
         uid: uid,
-        firstName: state.firstName.isNotEmpty ? state.firstName : null,
-        lastName: state.lastName.isNotEmpty ? state.lastName : null,
+        firstName: firstNameToUpdate,
+        lastName: lastNameToUpdate,
         photoUrl: photoUrl,
         profilePhotoPath: profilePhotoPath,
       );
