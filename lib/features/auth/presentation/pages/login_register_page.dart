@@ -7,6 +7,8 @@ import 'package:ministryhub/ministryhub.dart';
 
 /// Login and Register page
 /// Displays the unified auth surface for both sign in and sign out flows.
+enum _AuthMode { login, register }
+
 class LoginRegisterPage extends ConsumerStatefulWidget {
   const LoginRegisterPage({super.key});
 
@@ -18,11 +20,16 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
+  late final TextEditingController _firstNameController;
+  late final TextEditingController _lastNameController;
+  late final TextEditingController _confirmPasswordController;
   final FocusNode _passwordFocusNode = FocusNode();
+  final FocusNode _confirmPasswordFocusNode = FocusNode();
   bool _autoValidate = false;
   bool _obscurePassword = true;
-  bool _isEmailLoading = false;
+  bool _isPrimaryActionLoading = false;
   bool _isGoogleLoading = false;
+  _AuthMode _authMode = _AuthMode.login;
   ProviderSubscription<AuthState>? _authSubscription;
 
   @override
@@ -30,6 +37,9 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
     super.initState();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    _firstNameController = TextEditingController();
+    _lastNameController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
     _authSubscription = ref.listenManual<AuthState>(
       authControllerProvider,
       _handleAuthStateUpdates,
@@ -48,7 +58,11 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
     _authSubscription?.close();
     _emailController.dispose();
     _passwordController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _confirmPasswordController.dispose();
     _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
     super.dispose();
   }
 
@@ -58,9 +72,9 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
     }
     // Reset loading states when status changes
     if (next.status != AuthStatus.loading) {
-      if (_isEmailLoading || _isGoogleLoading) {
+      if (_isPrimaryActionLoading || _isGoogleLoading) {
         setState(() {
-          _isEmailLoading = false;
+          _isPrimaryActionLoading = false;
           _isGoogleLoading = false;
         });
       }
@@ -80,9 +94,22 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
       }
       ref.read(authControllerProvider.notifier).clearError();
     }
+    if (next.showRegistrationPrompt &&
+        previous?.showRegistrationPrompt != next.showRegistrationPrompt) {
+      final l10n = AppLocalizations.of(context)!;
+      if (_authMode != _AuthMode.register) {
+        setState(() {
+          _authMode = _AuthMode.register;
+        });
+      }
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(l10n.accountNotFoundLabel)));
+      ref.read(authControllerProvider.notifier).clearRegistrationPrompt();
+    }
   }
 
-  void _onSubmit(AppLocalizations l10n) {
+  void _onPrimaryAction(AppLocalizations l10n) {
     if (!_autoValidate) {
       setState(() {
         _autoValidate = true;
@@ -93,13 +120,21 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
     }
     FocusScope.of(context).unfocus();
     setState(() {
-      _isEmailLoading = true;
+      _isPrimaryActionLoading = true;
     });
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-    ref
-        .read(authControllerProvider.notifier)
-        .signInWithEmail(email: email, password: password);
+    final notifier = ref.read(authControllerProvider.notifier);
+    if (_authMode == _AuthMode.login) {
+      notifier.signInWithEmail(email: email, password: password);
+    } else {
+      notifier.registerWithEmail(
+        email: email,
+        password: password,
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+      );
+    }
   }
 
   void _onGoogleSignIn() {
@@ -141,158 +176,6 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
     }
   }
 
-  Future<void> _onOpenRegistrationDialog(AppLocalizations l10n) async {
-    final email = _emailController.text.trim();
-    final result = await _showRegistrationDialog(email: email, l10n: l10n);
-    if (result == null || !mounted) return;
-    ref
-        .read(authControllerProvider.notifier)
-        .registerWithEmail(
-          email: email,
-          password: result.password,
-          firstName: result.firstName,
-          lastName: result.lastName,
-        );
-  }
-
-  Future<_RegistrationFormData?> _showRegistrationDialog({
-    required String email,
-    required AppLocalizations l10n,
-  }) async {
-    final formKey = GlobalKey<FormState>();
-    final firstNameController = TextEditingController();
-    final lastNameController = TextEditingController();
-    final passwordController = TextEditingController();
-    var autoValidateDialog = false;
-    final disposables = <VoidCallback>[];
-    try {
-      final result = await showDialog<_RegistrationFormData>(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogContext) {
-          return StatefulBuilder(
-            builder: (context, setDialogState) {
-              return AlertDialog(
-                title: Text(l10n.registerDialogTitle),
-                content: Form(
-                  key: formKey,
-                  autovalidateMode: autoValidateDialog
-                      ? AutovalidateMode.onUserInteraction
-                      : AutovalidateMode.disabled,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            l10n.registerDialogSubtitle,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                                ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: firstNameController,
-                          decoration: InputDecoration(
-                            labelText: l10n.registerFirstNameLabel,
-                            prefixIcon: const Icon(Icons.badge_outlined),
-                          ),
-                          textCapitalization: TextCapitalization.words,
-                          validator: (value) =>
-                              _validateName(value, l10n.firstNameRequiredError),
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: lastNameController,
-                          decoration: InputDecoration(
-                            labelText: l10n.registerLastNameLabel,
-                            prefixIcon: const Icon(Icons.badge),
-                          ),
-                          textCapitalization: TextCapitalization.words,
-                          validator: (value) =>
-                              _validateName(value, l10n.lastNameRequiredError),
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          initialValue: email,
-                          enabled: false,
-                          decoration: InputDecoration(
-                            labelText: l10n.registerEmailLabel,
-                            prefixIcon: const Icon(Icons.alternate_email),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: passwordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            labelText: l10n.passwordFieldLabel,
-                            hintText: l10n.passwordFieldHint,
-                            prefixIcon: const Icon(Icons.lock_outline),
-                          ),
-                          validator: (value) => _validatePassword(value, l10n),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(dialogContext).pop(),
-                    child: Text(l10n.registerCancelButton),
-                  ),
-                  FilledButton(
-                    onPressed: () {
-                      if (!autoValidateDialog) {
-                        setDialogState(() {
-                          autoValidateDialog = true;
-                        });
-                      }
-                      if (!formKey.currentState!.validate()) {
-                        return;
-                      }
-                      Navigator.of(dialogContext).pop(
-                        _RegistrationFormData(
-                          firstName: firstNameController.text.trim(),
-                          lastName: lastNameController.text.trim(),
-                          password: passwordController.text.trim(),
-                        ),
-                      );
-                    },
-                    child: Text(l10n.registerPrimaryButton),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
-      disposables.addAll([
-        () => firstNameController.dispose(),
-        () => lastNameController.dispose(),
-        () => passwordController.dispose(),
-      ]);
-      return result;
-    } finally {
-      if (mounted) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          for (final dispose in disposables) {
-            dispose();
-          }
-        });
-      } else {
-        for (final dispose in disposables) {
-          dispose();
-        }
-      }
-    }
-  }
-
   String? _validateName(String? value, String errorMessage) {
     if (value == null || value.trim().isEmpty) {
       return errorMessage;
@@ -317,6 +200,19 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
     }
     if (value.trim().length < 8) {
       return l10n.passwordLengthError;
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value, AppLocalizations l10n) {
+    if (_authMode != _AuthMode.register) {
+      return null;
+    }
+    if (value == null || value.trim().isEmpty) {
+      return l10n.confirmPasswordRequiredError;
+    }
+    if (value.trim() != _passwordController.text.trim()) {
+      return l10n.confirmPasswordMismatchError;
     }
     return null;
   }
@@ -438,6 +334,8 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
               ],
             );
 
+            final isRegisterMode = _authMode == _AuthMode.register;
+
             final formFields = Form(
               key: _formKey,
               autovalidateMode: _autoValidate
@@ -447,6 +345,121 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  SegmentedButton<_AuthMode>(
+                    segments: [
+                      ButtonSegment<_AuthMode>(
+                        value: _AuthMode.login,
+                        label: Text(l10n.authModeLoginLabel),
+                        icon: const Icon(Icons.login_rounded),
+                      ),
+                      ButtonSegment<_AuthMode>(
+                        value: _AuthMode.register,
+                        label: Text(l10n.authModeRegisterLabel),
+                        icon: const Icon(Icons.badge_outlined),
+                      ),
+                    ],
+                    selected: {_authMode},
+                    onSelectionChanged: isLoading
+                        ? null
+                        : (selection) {
+                            final mode = selection.first;
+                            if (mode == _authMode) {
+                              return;
+                            }
+                            setState(() {
+                              _authMode = mode;
+                            });
+                          },
+                  ),
+                  const SizedBox(height: 24),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 600),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SizeTransition(
+                          sizeFactor: animation,
+                          axisAlignment: -1,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: isRegisterMode
+                        ? FadeInDown(
+                            key: const ValueKey('registerSection'),
+                            duration: const Duration(milliseconds: 600),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  l10n.registerDialogSubtitle,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _firstNameController,
+                                        textCapitalization:
+                                            TextCapitalization.words,
+                                        textInputAction: TextInputAction.next,
+                                        autofillHints: const [
+                                          AutofillHints.givenName,
+                                        ],
+                                        decoration: InputDecoration(
+                                          labelText:
+                                              l10n.registerFirstNameLabel,
+                                          prefixIcon: const Icon(
+                                            Icons.badge_outlined,
+                                          ),
+                                        ),
+                                        validator: (value) =>
+                                            _authMode != _AuthMode.register
+                                            ? null
+                                            : _validateName(
+                                                value,
+                                                l10n.firstNameRequiredError,
+                                              ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _lastNameController,
+                                        textCapitalization:
+                                            TextCapitalization.words,
+                                        textInputAction: TextInputAction.next,
+                                        autofillHints: const [
+                                          AutofillHints.familyName,
+                                        ],
+                                        decoration: InputDecoration(
+                                          labelText: l10n.registerLastNameLabel,
+                                          prefixIcon: const Icon(Icons.badge),
+                                        ),
+                                        validator: (value) =>
+                                            _authMode != _AuthMode.register
+                                            ? null
+                                            : _validateName(
+                                                value,
+                                                l10n.lastNameRequiredError,
+                                              ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(
+                            key: ValueKey('registerSectionPlaceholder'),
+                          ),
+                  ),
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -466,7 +479,9 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                     controller: _passwordController,
                     focusNode: _passwordFocusNode,
                     obscureText: _obscurePassword,
-                    textInputAction: TextInputAction.done,
+                    textInputAction: isRegisterMode
+                        ? TextInputAction.next
+                        : TextInputAction.done,
                     autofillHints: const [AutofillHints.password],
                     decoration: InputDecoration(
                       labelText: l10n.passwordFieldLabel,
@@ -486,107 +501,190 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                       ),
                     ),
                     validator: (value) => _validatePassword(value, l10n),
-                    onFieldSubmitted: (_) => _onSubmit(l10n),
+                    onChanged: (_) {
+                      if (isRegisterMode && _autoValidate) {
+                        _formKey.currentState?.validate();
+                      }
+                    },
+                    onFieldSubmitted: (_) {
+                      if (isRegisterMode) {
+                        _confirmPasswordFocusNode.requestFocus();
+                      } else {
+                        _onPrimaryAction(l10n);
+                      }
+                    },
+                  ),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 600),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SizeTransition(
+                          sizeFactor: animation,
+                          axisAlignment: -1,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: isRegisterMode
+                        ? FadeInUp(
+                            key: const ValueKey('confirmPasswordField'),
+                            duration: const Duration(milliseconds: 600),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  controller: _confirmPasswordController,
+                                  focusNode: _confirmPasswordFocusNode,
+                                  obscureText: _obscurePassword,
+                                  textInputAction: TextInputAction.done,
+                                  autofillHints: const [
+                                    AutofillHints.newPassword,
+                                  ],
+                                  decoration: InputDecoration(
+                                    labelText: l10n.confirmPasswordFieldLabel,
+                                    hintText: l10n.confirmPasswordFieldHint,
+                                    prefixIcon: const Icon(Icons.lock_reset),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  validator: (value) =>
+                                      _validateConfirmPassword(value, l10n),
+                                  onFieldSubmitted: (_) =>
+                                      _onPrimaryAction(l10n),
+                                ),
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(
+                            key: ValueKey('confirmPasswordPlaceholder'),
+                          ),
                   ),
                   const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: isLoading
-                          ? null
-                          : () => _onForgotPassword(l10n),
-                      child: Text(l10n.forgotPasswordButton),
-                    ),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 600),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SizeTransition(
+                          sizeFactor: animation,
+                          axisAlignment: -1,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: isRegisterMode
+                        ? const SizedBox.shrink(
+                            key: ValueKey('forgotPasswordPlaceholder'),
+                          )
+                        : FadeInRight(
+                            key: const ValueKey('forgotPasswordButton'),
+                            duration: const Duration(milliseconds: 600),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: isLoading
+                                    ? null
+                                    : () => _onForgotPassword(l10n),
+                                child: Text(l10n.forgotPasswordButton),
+                              ),
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 20),
                   FilledButton(
-                    onPressed: isLoading ? null : () => _onSubmit(l10n),
+                    onPressed: isLoading ? null : () => _onPrimaryAction(l10n),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 18),
                     ),
-                    child: _isEmailLoading
+                    child: _isPrimaryActionLoading
                         ? _buildProgressIndicator(colorScheme.onPrimary)
-                        : Text(l10n.primaryAuthButton),
+                        : Text(
+                            isRegisterMode
+                                ? l10n.registerPrimaryButton
+                                : l10n.primaryAuthButton,
+                          ),
                   ),
-                  if (authState.showRegistrationPrompt) ...[
-                    const SizedBox(height: 16),
+                ],
+              ),
+            );
+
+            final cardContent = Card(
+              elevation: 8,
+              shadowColor: colorScheme.shadow.withAlpha(80),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32),
+              ),
+              child: Container(
+                width: cardWidth,
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(32),
+                  color: colorScheme.surface,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     Text(
-                      l10n.accountNotFoundLabel,
-                      textAlign: TextAlign.center,
+                      l10n.loginRegisterTitle,
+                      style: theme.textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.authFooterHint,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    OutlinedButton(
-                      onPressed: isLoading
-                          ? null
-                          : () => _onOpenRegistrationDialog(l10n),
+                    const SizedBox(height: 32),
+                    formFields,
+                    const SizedBox(height: 8),
+                    divider,
+                    const SizedBox(height: 20),
+                    OutlinedButton.icon(
+                      onPressed: isLoading ? null : _onGoogleSignIn,
+                      icon: _isGoogleLoading
+                          ? _buildProgressIndicator(colorScheme.primary)
+                          : SvgPicture.asset(
+                              'assets/google.svg',
+                              height: 20,
+                              width: 20,
+                              semanticsLabel: l10n.googleAuthButton,
+                            ),
+                      label: _isGoogleLoading
+                          ? const SizedBox.shrink()
+                          : Text(l10n.googleAuthButton),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 18),
                       ),
-                      child: Text(l10n.accountNotFoundAction),
                     ),
                   ],
-                ],
+                ),
               ),
             );
 
             final formCard = FadeInUp(
               duration: const Duration(milliseconds: 900),
-              child: Card(
-                elevation: 8,
-                shadowColor: colorScheme.shadow.withAlpha(80),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32),
-                ),
-                child: Container(
-                  width: cardWidth,
-                  padding: const EdgeInsets.all(32),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(32),
-                    color: colorScheme.surface,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        l10n.loginRegisterTitle,
-                        style: theme.textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.authFooterHint,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      formFields,
-                      const SizedBox(height: 8),
-                      divider,
-                      const SizedBox(height: 20),
-                      OutlinedButton.icon(
-                        onPressed: isLoading ? null : _onGoogleSignIn,
-                        icon: _isGoogleLoading
-                            ? _buildProgressIndicator(colorScheme.primary)
-                            : SvgPicture.asset(
-                                'assets/google.svg',
-                                height: 20,
-                                width: 20,
-                                semanticsLabel: l10n.googleAuthButton,
-                              ),
-                        label: _isGoogleLoading
-                            ? const SizedBox.shrink()
-                            : Text(l10n.googleAuthButton),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              child: AnimatedSize(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeInOutCubic,
+                child: cardContent,
               ),
             );
 
@@ -601,11 +699,21 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                     ],
                   )
                 : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       heroSection,
                       const SizedBox(height: 32),
-                      formCard,
+                      Align(
+                        alignment: Alignment.center,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth: cardWidth,
+                            maxWidth: cardWidth,
+                          ),
+                          child: formCard,
+                        ),
+                      ),
                     ],
                   );
 
@@ -635,16 +743,4 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
       ),
     );
   }
-}
-
-class _RegistrationFormData {
-  const _RegistrationFormData({
-    required this.firstName,
-    required this.lastName,
-    required this.password,
-  });
-
-  final String firstName;
-  final String lastName;
-  final String password;
 }

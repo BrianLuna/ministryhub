@@ -158,11 +158,35 @@ abstract class AppLocalizations {
   /// **'Enter your password'**
   String get passwordFieldHint;
 
+  /// Label for the confirm password text field
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPasswordFieldLabel;
+
+  /// Hint text for the confirm password field
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter your password'**
+  String get confirmPasswordFieldHint;
+
   /// Label for the main auth button
   ///
   /// In en, this message translates to:
   /// **'Enter MinistryHub'**
   String get primaryAuthButton;
+
+  /// Label for the login toggle segment
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get authModeLoginLabel;
+
+  /// Label for the register toggle segment
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get authModeRegisterLabel;
 
   /// Label for the Google auth button
   ///
@@ -205,6 +229,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password must be at least 8 characters.'**
   String get passwordLengthError;
+
+  /// Validation error for missing confirm password
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password.'**
+  String get confirmPasswordRequiredError;
+
+  /// Validation error when passwords differ
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get confirmPasswordMismatchError;
 
   /// Shown when Firebase reports invalid email
   ///
@@ -535,6 +571,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cannot open URL. Please visit https://myaccount.google.com manually.'**
   String get settingsCannotOpenUrl;
+
+  /// Helper text for Google account display name field
+  ///
+  /// In en, this message translates to:
+  /// **'Display name from Google account'**
+  String get settingsGoogleDisplayNameHint;
 }
 
 class _AppLocalizationsDelegate

@@ -23,13 +23,17 @@ void main() {
   }
 
   group('LoginRegisterPage', () {
-    testWidgets('renders hero copy and primary actions', (tester) async {
+    testWidgets('renders hero copy, toggle and primary actions', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildSubject());
       await tester.pumpAndSettle();
 
       // Two SVGs: MinistryHub logotype + Google logo
       expect(find.byType(SvgPicture), findsNWidgets(2));
       expect(find.text('Login / Register'), findsOneWidget);
+      expect(find.text('Login'), findsOneWidget);
+      expect(find.text('Register'), findsOneWidget);
       expect(find.text('Enter MinistryHub'), findsOneWidget);
       expect(find.text('Continue with Google'), findsOneWidget);
     });
@@ -38,10 +42,26 @@ void main() {
       await tester.pumpWidget(buildSubject());
       await tester.pumpAndSettle();
 
-      expect(find.byType(TextFormField), findsNWidgets(2));
-      expect(find.text('Email address'), findsOneWidget);
-      expect(find.text('Password'), findsOneWidget);
+      expect(
+        find.widgetWithText(TextFormField, 'Email address'),
+        findsOneWidget,
+      );
+      expect(find.widgetWithText(TextFormField, 'Password'), findsOneWidget);
       expect(find.byType(SvgPicture), findsNWidgets(2));
+    });
+
+    testWidgets('shows register fields when switching mode', (tester) async {
+      await tester.pumpWidget(buildSubject());
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('registerSection')), findsNothing);
+
+      await tester.tap(find.text('Register'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('registerSection')), findsOneWidget);
+      expect(find.text('Create account'), findsOneWidget);
+      expect(find.text('Confirm password'), findsOneWidget);
     });
   });
 }

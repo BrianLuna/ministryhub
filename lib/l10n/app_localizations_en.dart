@@ -40,7 +40,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordFieldHint => 'Enter your password';
 
   @override
+  String get confirmPasswordFieldLabel => 'Confirm password';
+
+  @override
+  String get confirmPasswordFieldHint => 'Re-enter your password';
+
+  @override
   String get primaryAuthButton => 'Enter MinistryHub';
+
+  @override
+  String get authModeLoginLabel => 'Login';
+
+  @override
+  String get authModeRegisterLabel => 'Register';
 
   @override
   String get googleAuthButton => 'Continue with Google';
@@ -63,6 +75,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordLengthError => 'Password must be at least 8 characters.';
+
+  @override
+  String get confirmPasswordRequiredError => 'Please confirm your password.';
+
+  @override
+  String get confirmPasswordMismatchError => 'Passwords do not match.';
 
   @override
   String get authErrorInvalidEmail => 'The email address is invalid.';
@@ -238,4 +256,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsCannotOpenUrl =>
       'Cannot open URL. Please visit https://myaccount.google.com manually.';
+
+  @override
+  String get settingsGoogleDisplayNameHint =>
+      'Display name from Google account';
 }

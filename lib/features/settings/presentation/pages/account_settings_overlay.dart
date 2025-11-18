@@ -236,6 +236,19 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
                 .updateLastName(value),
           ),
           const SizedBox(height: 16),
+        ] else ...[
+          // Display name for Google users (read-only)
+          TextField(
+            controller: TextEditingController(
+              text: widget.user.displayName ?? '',
+            ),
+            decoration: InputDecoration(
+              labelText: l10n.settingsProfileSection,
+              helperText: l10n.settingsGoogleDisplayNameHint,
+            ),
+            enabled: false,
+          ),
+          const SizedBox(height: 16),
         ],
         // Email (read-only)
         TextField(
