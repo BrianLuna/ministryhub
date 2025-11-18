@@ -218,6 +218,12 @@ abstract class AppLocalizations {
   /// **'The password does not match this account.'**
   String get authErrorWrongPassword;
 
+  /// Shown when authentication fails without revealing if email or password is wrong
+  ///
+  /// In en, this message translates to:
+  /// **'Error in the entered data. Please check your email and password.'**
+  String get authErrorInvalidCredentials;
+
   /// Shown when Firebase reports disabled user
   ///
   /// In en, this message translates to:

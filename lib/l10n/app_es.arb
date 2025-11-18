@@ -20,6 +20,7 @@
   "passwordLengthError": "La contraseña debe tener al menos 8 caracteres.",
   "authErrorInvalidEmail": "El correo electrónico es inválido.",
   "authErrorWrongPassword": "La contraseña no coincide con esta cuenta.",
+  "authErrorInvalidCredentials": "Error en los datos ingresados. Verifica tu correo y contraseña.",
   "authErrorUserDisabled": "Esta cuenta fue deshabilitada. Contacta a tu administrador.",
   "authErrorCredentialConflict": "Este correo ya está vinculado a otro proveedor.",
   "authErrorGoogleCancelled": "Se canceló el acceso con Google.",

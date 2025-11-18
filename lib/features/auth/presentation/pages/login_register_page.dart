@@ -20,6 +20,7 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
   late final TextEditingController _passwordController;
   final FocusNode _passwordFocusNode = FocusNode();
   bool _autoValidate = false;
+  bool _obscurePassword = true;
   ProviderSubscription<AuthState>? _authSubscription;
 
   @override
@@ -302,7 +303,7 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
         return l10n.authErrorInvalidEmail;
       case AuthErrorCodes.wrongPassword:
       case AuthErrorCodes.userNotFound:
-        return l10n.authErrorWrongPassword;
+        return l10n.authErrorInvalidCredentials;
       case AuthErrorCodes.userDisabled:
         return l10n.authErrorUserDisabled;
       case AuthErrorCodes.credentialConflict:
@@ -440,13 +441,25 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                   TextFormField(
                     controller: _passwordController,
                     focusNode: _passwordFocusNode,
-                    obscureText: true,
+                    obscureText: _obscurePassword,
                     textInputAction: TextInputAction.done,
                     autofillHints: const [AutofillHints.password],
                     decoration: InputDecoration(
                       labelText: l10n.passwordFieldLabel,
                       hintText: l10n.passwordFieldHint,
                       prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
                     ),
                     validator: (value) => _validatePassword(value, l10n),
                     onFieldSubmitted: (_) => _onSubmit(l10n),

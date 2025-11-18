@@ -72,6 +72,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The password does not match this account.';
 
   @override
+  String get authErrorInvalidCredentials =>
+      'Error in the entered data. Please check your email and password.';
+
+  @override
   String get authErrorUserDisabled =>
       'This account has been disabled. Contact your administrator.';
 

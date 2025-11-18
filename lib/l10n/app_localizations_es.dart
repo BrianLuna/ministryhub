@@ -74,6 +74,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'La contraseña no coincide con esta cuenta.';
 
   @override
+  String get authErrorInvalidCredentials =>
+      'Error en los datos ingresados. Verifica tu correo y contraseña.';
+
+  @override
   String get authErrorUserDisabled =>
       'Esta cuenta fue deshabilitada. Contacta a tu administrador.';
 
