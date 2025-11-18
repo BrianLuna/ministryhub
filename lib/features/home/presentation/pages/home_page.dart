@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -106,7 +107,7 @@ class _MenuRow extends StatelessWidget {
   }
 }
 
-class _ProfileAvatar extends StatelessWidget {
+class _ProfileAvatar extends StatefulWidget {
   const _ProfileAvatar({
     required this.user,
     required this.foregroundColor,
@@ -118,16 +119,37 @@ class _ProfileAvatar extends StatelessWidget {
   final Color backgroundColor;
 
   @override
+  State<_ProfileAvatar> createState() => _ProfileAvatarState();
+}
+
+class _ProfileAvatarState extends State<_ProfileAvatar> {
+  bool _hasError = false;
+
+  @override
   Widget build(BuildContext context) {
-    final photoUrl = user?.photoUrl;
+    final photoUrl = widget.user?.photoUrl;
+    final shouldShowImage =
+        photoUrl != null && photoUrl.isNotEmpty && !_hasError;
+
     return CircleAvatar(
       radius: 17,
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
-      backgroundImage: photoUrl != null && photoUrl.isNotEmpty
-          ? NetworkImage(photoUrl)
+      backgroundColor: widget.backgroundColor,
+      foregroundColor: widget.foregroundColor,
+      backgroundImage: shouldShowImage ? NetworkImage(photoUrl) : null,
+      onBackgroundImageError: shouldShowImage
+          ? (exception, stackTrace) {
+              if (mounted) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    setState(() {
+                      _hasError = true;
+                    });
+                  }
+                });
+              }
+            }
           : null,
-      child: photoUrl == null || photoUrl.isEmpty
+      child: !shouldShowImage
           ? Text(
               _initials,
               style: Theme.of(
@@ -139,7 +161,7 @@ class _ProfileAvatar extends StatelessWidget {
   }
 
   String get _initials {
-    final source = user?.displayName?.trim();
+    final source = widget.user?.displayName?.trim();
     if (source != null && source.isNotEmpty) {
       final parts = source
           .split(' ')
@@ -150,7 +172,7 @@ class _ProfileAvatar extends StatelessWidget {
       }
       return parts.first[0].toUpperCase();
     }
-    final email = user?.email;
+    final email = widget.user?.email;
     if (email != null && email.isNotEmpty) {
       return email.substring(0, 1).toUpperCase();
     }

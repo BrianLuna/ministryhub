@@ -21,6 +21,8 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
   final FocusNode _passwordFocusNode = FocusNode();
   bool _autoValidate = false;
   bool _obscurePassword = true;
+  bool _isEmailLoading = false;
+  bool _isGoogleLoading = false;
   ProviderSubscription<AuthState>? _authSubscription;
 
   @override
@@ -32,6 +34,13 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
       authControllerProvider,
       _handleAuthStateUpdates,
     );
+    // Check if user is already authenticated and redirect
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authState = ref.read(authControllerProvider);
+      if (authState.status == AuthStatus.authenticated && mounted) {
+        context.goNamed('home');
+      }
+    });
   }
 
   @override
@@ -46,6 +55,15 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
   void _handleAuthStateUpdates(AuthState? previous, AuthState next) {
     if (!mounted) {
       return;
+    }
+    // Reset loading states when status changes
+    if (next.status != AuthStatus.loading) {
+      if (_isEmailLoading || _isGoogleLoading) {
+        setState(() {
+          _isEmailLoading = false;
+          _isGoogleLoading = false;
+        });
+      }
     }
     if (next.status == AuthStatus.authenticated &&
         previous?.status != AuthStatus.authenticated) {
@@ -74,6 +92,9 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
       return;
     }
     FocusScope.of(context).unfocus();
+    setState(() {
+      _isEmailLoading = true;
+    });
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     ref
@@ -83,6 +104,9 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
 
   void _onGoogleSignIn() {
     FocusScope.of(context).unfocus();
+    setState(() {
+      _isGoogleLoading = true;
+    });
     ref.read(authControllerProvider.notifier).signInWithGoogle();
   }
 
@@ -480,7 +504,7 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 18),
                     ),
-                    child: isLoading
+                    child: _isEmailLoading
                         ? _buildProgressIndicator(colorScheme.onPrimary)
                         : Text(l10n.primaryAuthButton),
                   ),
@@ -545,14 +569,16 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                       const SizedBox(height: 20),
                       OutlinedButton.icon(
                         onPressed: isLoading ? null : _onGoogleSignIn,
-                        icon: SvgPicture.asset(
-                          'assets/google.svg',
-                          height: 20,
-                          width: 20,
-                          semanticsLabel: l10n.googleAuthButton,
-                        ),
-                        label: isLoading
+                        icon: _isGoogleLoading
                             ? _buildProgressIndicator(colorScheme.primary)
+                            : SvgPicture.asset(
+                                'assets/google.svg',
+                                height: 20,
+                                width: 20,
+                                semanticsLabel: l10n.googleAuthButton,
+                              ),
+                        label: _isGoogleLoading
+                            ? const SizedBox.shrink()
                             : Text(l10n.googleAuthButton),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 18),

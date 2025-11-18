@@ -5,6 +5,7 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._datasource);
 
   final FirebaseAuthDatasource _datasource;
+  final _firebaseAuth = FirebaseAuth.instance;
 
   @override
   Stream<AuthUser?> authStateChanges() {
@@ -37,7 +38,19 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AuthUser?> signInWithGoogle() async {
     try {
       final credential = await _datasource.signInWithGoogle();
-      return _mapUser(credential.user);
+      // After reload in datasource, try to get the current user
+      // which should have the updated photoURL after reload
+      final currentUser = _firebaseAuth.currentUser;
+      if (currentUser != null) {
+        // Use currentUser which should have the reloaded data including photoURL
+        return _mapUser(currentUser);
+      }
+      // Fallback to credential user if currentUser is null
+      final user = credential.user;
+      if (user != null) {
+        return _mapUser(user);
+      }
+      return null;
     } on AuthFailure {
       rethrow;
     } catch (error) {
