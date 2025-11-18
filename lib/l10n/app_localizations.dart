@@ -121,6 +121,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Login/Register form'**
   String get loginRegisterFormPlaceholder;
+
+  /// Short subtitle for the auth hero section
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry administration, modernized'**
+  String get authSubtitle;
+
+  /// Supportive description for the hero section
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinate campuses, teams, and resources from a single hub designed for scale.'**
+  String get authDescription;
+
+  /// Label for the email text field
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get emailFieldLabel;
+
+  /// Hint text for the email field
+  ///
+  /// In en, this message translates to:
+  /// **'name@ministry.org'**
+  String get emailFieldHint;
+
+  /// Label for the password text field
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordFieldLabel;
+
+  /// Hint text for the password field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get passwordFieldHint;
+
+  /// Label for the main auth button
+  ///
+  /// In en, this message translates to:
+  /// **'Enter MinistryHub'**
+  String get primaryAuthButton;
+
+  /// Label for the Google auth button
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get googleAuthButton;
+
+  /// Text shown between dividers
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get dividerLabel;
+
+  /// Footer hint explaining the create account flow
+  ///
+  /// In en, this message translates to:
+  /// **'If the email is new, we will guide you to create an account.'**
+  String get authFooterHint;
+
+  /// Validation error for empty email field
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email.'**
+  String get emailRequiredError;
+
+  /// Validation error for invalid email format
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get invalidEmailFormatError;
+
+  /// Validation error for empty password field
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password.'**
+  String get passwordRequiredError;
+
+  /// Validation error for short passwords
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters.'**
+  String get passwordLengthError;
+
+  /// Shown when Firebase reports invalid email
+  ///
+  /// In en, this message translates to:
+  /// **'The email address is invalid.'**
+  String get authErrorInvalidEmail;
+
+  /// Shown when user enters wrong password
+  ///
+  /// In en, this message translates to:
+  /// **'The password does not match this account.'**
+  String get authErrorWrongPassword;
+
+  /// Shown when authentication fails without revealing if email or password is wrong
+  ///
+  /// In en, this message translates to:
+  /// **'Error in the entered data. Please check your email and password.'**
+  String get authErrorInvalidCredentials;
+
+  /// Shown when Firebase reports disabled user
+  ///
+  /// In en, this message translates to:
+  /// **'This account has been disabled. Contact your administrator.'**
+  String get authErrorUserDisabled;
+
+  /// Shown when there is a credential conflict
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already linked to another provider.'**
+  String get authErrorCredentialConflict;
+
+  /// Shown when the Google popup is dismissed
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in was cancelled.'**
+  String get authErrorGoogleCancelled;
+
+  /// Fallback auth error message
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t complete the action. Please try again.'**
+  String get authErrorGeneric;
+
+  /// Tooltip/label for the profile menu trigger in home
+  ///
+  /// In en, this message translates to:
+  /// **'Account options'**
+  String get homeProfileMenuLabel;
+
+  /// Label for the sign out entry in the profile menu
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get homeProfileMenuSignOut;
+
+  /// Label for the user settings entry in the profile menu
+  ///
+  /// In en, this message translates to:
+  /// **'Account settings'**
+  String get homeProfileMenuSettings;
+
+  /// Button label used to continue email verification
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueButtonLabel;
+
+  /// Label displayed when no account is associated with an email
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find an account with that email.'**
+  String get accountNotFoundLabel;
+
+  /// Button label to open the registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get accountNotFoundAction;
+
+  /// Title for the registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Create MinistryHub account'**
+  String get registerDialogTitle;
+
+  /// Subtitle explaining the registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Complete the information below to create your access.'**
+  String get registerDialogSubtitle;
+
+  /// Label for the first name field in registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get registerFirstNameLabel;
+
+  /// Label for the last name field in registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Last name'**
+  String get registerLastNameLabel;
+
+  /// Label for the email field in registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get registerEmailLabel;
+
+  /// Primary action in the registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get registerPrimaryButton;
+
+  /// Cancel button in the registration dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get registerCancelButton;
+
+  /// Validation error for missing first name
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your first name.'**
+  String get firstNameRequiredError;
+
+  /// Validation error for missing last name
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your last name.'**
+  String get lastNameRequiredError;
+
+  /// Button label to trigger password reset flow
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPasswordButton;
+
+  /// Confirmation message after sending password reset email
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent. Check your inbox.'**
+  String get passwordResetEmailSent;
 }
 
 class _AppLocalizationsDelegate

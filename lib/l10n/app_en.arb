@@ -15,6 +15,157 @@
   "loginRegisterFormPlaceholder": "Login/Register form",
   "@loginRegisterFormPlaceholder": {
     "description": "Placeholder text for login/register form"
+  },
+  "authSubtitle": "Ministry administration, modernized",
+  "@authSubtitle": {
+    "description": "Short subtitle for the auth hero section"
+  },
+  "authDescription": "Coordinate campuses, teams, and resources from a single hub designed for scale.",
+  "@authDescription": {
+    "description": "Supportive description for the hero section"
+  },
+  "emailFieldLabel": "Email address",
+  "@emailFieldLabel": {
+    "description": "Label for the email text field"
+  },
+  "emailFieldHint": "name@ministry.org",
+  "@emailFieldHint": {
+    "description": "Hint text for the email field"
+  },
+  "passwordFieldLabel": "Password",
+  "@passwordFieldLabel": {
+    "description": "Label for the password text field"
+  },
+  "passwordFieldHint": "Enter your password",
+  "@passwordFieldHint": {
+    "description": "Hint text for the password field"
+  },
+  "primaryAuthButton": "Enter MinistryHub",
+  "@primaryAuthButton": {
+    "description": "Label for the main auth button"
+  },
+  "googleAuthButton": "Continue with Google",
+  "@googleAuthButton": {
+    "description": "Label for the Google auth button"
+  },
+  "dividerLabel": "or",
+  "@dividerLabel": {
+    "description": "Text shown between dividers"
+  },
+  "authFooterHint": "If the email is new, we will guide you to create an account.",
+  "@authFooterHint": {
+    "description": "Footer hint explaining the create account flow"
+  },
+  "emailRequiredError": "Please enter your email.",
+  "@emailRequiredError": {
+    "description": "Validation error for empty email field"
+  },
+  "invalidEmailFormatError": "Enter a valid email address.",
+  "@invalidEmailFormatError": {
+    "description": "Validation error for invalid email format"
+  },
+  "passwordRequiredError": "Please enter your password.",
+  "@passwordRequiredError": {
+    "description": "Validation error for empty password field"
+  },
+  "passwordLengthError": "Password must be at least 8 characters.",
+  "@passwordLengthError": {
+    "description": "Validation error for short passwords"
+  },
+  "authErrorInvalidEmail": "The email address is invalid.",
+  "@authErrorInvalidEmail": {
+    "description": "Shown when Firebase reports invalid email"
+  },
+  "authErrorWrongPassword": "The password does not match this account.",
+  "@authErrorWrongPassword": {
+    "description": "Shown when user enters wrong password"
+  },
+  "authErrorInvalidCredentials": "Error in the entered data. Please check your email and password.",
+  "@authErrorInvalidCredentials": {
+    "description": "Shown when authentication fails without revealing if email or password is wrong"
+  },
+  "authErrorUserDisabled": "This account has been disabled. Contact your administrator.",
+  "@authErrorUserDisabled": {
+    "description": "Shown when Firebase reports disabled user"
+  },
+  "authErrorCredentialConflict": "This email is already linked to another provider.",
+  "@authErrorCredentialConflict": {
+    "description": "Shown when there is a credential conflict"
+  },
+  "authErrorGoogleCancelled": "Google sign-in was cancelled.",
+  "@authErrorGoogleCancelled": {
+    "description": "Shown when the Google popup is dismissed"
+  },
+  "authErrorGeneric": "We couldn't complete the action. Please try again.",
+  "@authErrorGeneric": {
+    "description": "Fallback auth error message"
+  },
+  "homeProfileMenuLabel": "Account options",
+  "@homeProfileMenuLabel": {
+    "description": "Tooltip/label for the profile menu trigger in home"
+  },
+  "homeProfileMenuSignOut": "Sign out",
+  "@homeProfileMenuSignOut": {
+    "description": "Label for the sign out entry in the profile menu"
+  },
+  "homeProfileMenuSettings": "Account settings",
+  "@homeProfileMenuSettings": {
+    "description": "Label for the user settings entry in the profile menu"
+  },
+  "continueButtonLabel": "Continue",
+  "@continueButtonLabel": {
+    "description": "Button label used to continue email verification"
+  },
+  "accountNotFoundLabel": "We couldn't find an account with that email.",
+  "@accountNotFoundLabel": {
+    "description": "Label displayed when no account is associated with an email"
+  },
+  "accountNotFoundAction": "Create account",
+  "@accountNotFoundAction": {
+    "description": "Button label to open the registration dialog"
+  },
+  "registerDialogTitle": "Create MinistryHub account",
+  "@registerDialogTitle": {
+    "description": "Title for the registration dialog"
+  },
+  "registerDialogSubtitle": "Complete the information below to create your access.",
+  "@registerDialogSubtitle": {
+    "description": "Subtitle explaining the registration dialog"
+  },
+  "registerFirstNameLabel": "First name",
+  "@registerFirstNameLabel": {
+    "description": "Label for the first name field in registration dialog"
+  },
+  "registerLastNameLabel": "Last name",
+  "@registerLastNameLabel": {
+    "description": "Label for the last name field in registration dialog"
+  },
+  "registerEmailLabel": "Email",
+  "@registerEmailLabel": {
+    "description": "Label for the email field in registration dialog"
+  },
+  "registerPrimaryButton": "Create account",
+  "@registerPrimaryButton": {
+    "description": "Primary action in the registration dialog"
+  },
+  "registerCancelButton": "Cancel",
+  "@registerCancelButton": {
+    "description": "Cancel button in the registration dialog"
+  },
+  "firstNameRequiredError": "Please enter your first name.",
+  "@firstNameRequiredError": {
+    "description": "Validation error for missing first name"
+  },
+  "lastNameRequiredError": "Please enter your last name.",
+  "@lastNameRequiredError": {
+    "description": "Validation error for missing last name"
+  },
+  "forgotPasswordButton": "Forgot password?",
+  "@forgotPasswordButton": {
+    "description": "Button label to trigger password reset flow"
+  },
+  "passwordResetEmailSent": "Password reset email sent. Check your inbox.",
+  "@passwordResetEmailSent": {
+    "description": "Confirmation message after sending password reset email"
   }
 }
-
