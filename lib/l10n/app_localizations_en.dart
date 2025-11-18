@@ -143,4 +143,95 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get passwordResetEmailSent =>
       'Password reset email sent. Check your inbox.';
+
+  @override
+  String get settingsTitle => 'Account Settings';
+
+  @override
+  String get settingsProfileSection => 'Profile';
+
+  @override
+  String get settingsThemeSection => 'Theme';
+
+  @override
+  String get settingsLanguageSection => 'Language';
+
+  @override
+  String get settingsFirstNameLabel => 'First name';
+
+  @override
+  String get settingsLastNameLabel => 'Last name';
+
+  @override
+  String get settingsEmailLabel => 'Email';
+
+  @override
+  String get settingsPhotoLabel => 'Profile photo';
+
+  @override
+  String get settingsChangePhoto => 'Change photo';
+
+  @override
+  String get settingsTakePhoto => 'Take photo';
+
+  @override
+  String get settingsSelectPhoto => 'Select photo';
+
+  @override
+  String get settingsThemeLight => 'Light';
+
+  @override
+  String get settingsThemeDark => 'Dark';
+
+  @override
+  String get settingsThemeSystem => 'System';
+
+  @override
+  String get settingsLanguageSpanish => 'Spanish';
+
+  @override
+  String get settingsLanguageEnglish => 'English';
+
+  @override
+  String get settingsManageGoogleAccount => 'Manage my Google account';
+
+  @override
+  String get settingsSaveButton => 'Save changes';
+
+  @override
+  String get settingsCancelButton => 'Cancel';
+
+  @override
+  String get settingsDeleteAccountButton => 'Delete account';
+
+  @override
+  String get settingsDeleteAccountTitle => 'Delete account';
+
+  @override
+  String get settingsDeleteAccountMessage =>
+      'Are you sure you want to delete your account? This action cannot be undone and all your data will be deleted.';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'Delete';
+
+  @override
+  String get settingsDeleteAccountCancel => 'Cancel';
+
+  @override
+  String get settingsProfileUpdated => 'Profile updated successfully';
+
+  @override
+  String get settingsProfileUpdateError => 'Error updating profile';
+
+  @override
+  String get settingsAccountDeleted => 'Account deleted successfully';
+
+  @override
+  String get settingsAccountDeleteError => 'Error deleting account';
+
+  @override
+  String get settingsPhotoUploadError => 'Error uploading photo';
+
+  @override
+  String get settingsPhotoSelectionCancelled => 'Photo selection cancelled';
 }

@@ -96,13 +96,18 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> signOut({PreferencesService? preferencesService}) async {
     state = state.copyWith(
       status: AuthStatus.loading,
       resetError: true,
       showRegistrationPrompt: false,
     );
     try {
+      // Clear user preferences before signing out
+      final userId = state.user?.uid;
+      if (userId != null && preferencesService != null) {
+        await preferencesService.clearUserPreferences(userId);
+      }
       await _signOutUseCase();
       state = state.copyWith(
         status: AuthStatus.idle,

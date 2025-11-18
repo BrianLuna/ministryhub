@@ -42,10 +42,15 @@ class HomePage extends ConsumerWidget {
               onSelected: (action) async {
                 switch (action) {
                   case _HomeMenuAction.settings:
-                    // TODO(brian): Navigate to user settings when implemented.
+                    AccountSettingsOverlay.show(context);
                     break;
                   case _HomeMenuAction.signOut:
-                    await ref.read(authControllerProvider.notifier).signOut();
+                    final preferencesService = ref.read(
+                      preferencesServiceProvider,
+                    );
+                    await ref
+                        .read(authControllerProvider.notifier)
+                        .signOut(preferencesService: preferencesService);
                     if (context.mounted) {
                       context.goNamed('login');
                     }

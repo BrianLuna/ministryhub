@@ -167,5 +167,125 @@
   "passwordResetEmailSent": "Password reset email sent. Check your inbox.",
   "@passwordResetEmailSent": {
     "description": "Confirmation message after sending password reset email"
+  },
+  "settingsTitle": "Account Settings",
+  "@settingsTitle": {
+    "description": "Title for the account settings overlay"
+  },
+  "settingsProfileSection": "Profile",
+  "@settingsProfileSection": {
+    "description": "Section title for profile settings"
+  },
+  "settingsThemeSection": "Theme",
+  "@settingsThemeSection": {
+    "description": "Section title for theme settings"
+  },
+  "settingsLanguageSection": "Language",
+  "@settingsLanguageSection": {
+    "description": "Section title for language settings"
+  },
+  "settingsFirstNameLabel": "First name",
+  "@settingsFirstNameLabel": {
+    "description": "Label for first name field in settings"
+  },
+  "settingsLastNameLabel": "Last name",
+  "@settingsLastNameLabel": {
+    "description": "Label for last name field in settings"
+  },
+  "settingsEmailLabel": "Email",
+  "@settingsEmailLabel": {
+    "description": "Label for email field in settings"
+  },
+  "settingsPhotoLabel": "Profile photo",
+  "@settingsPhotoLabel": {
+    "description": "Label for profile photo in settings"
+  },
+  "settingsChangePhoto": "Change photo",
+  "@settingsChangePhoto": {
+    "description": "Button label to change profile photo"
+  },
+  "settingsTakePhoto": "Take photo",
+  "@settingsTakePhoto": {
+    "description": "Option to take a new photo"
+  },
+  "settingsSelectPhoto": "Select photo",
+  "@settingsSelectPhoto": {
+    "description": "Option to select photo from gallery"
+  },
+  "settingsThemeLight": "Light",
+  "@settingsThemeLight": {
+    "description": "Light theme option"
+  },
+  "settingsThemeDark": "Dark",
+  "@settingsThemeDark": {
+    "description": "Dark theme option"
+  },
+  "settingsThemeSystem": "System",
+  "@settingsThemeSystem": {
+    "description": "System theme option (follows device setting)"
+  },
+  "settingsLanguageSpanish": "Spanish",
+  "@settingsLanguageSpanish": {
+    "description": "Spanish language option"
+  },
+  "settingsLanguageEnglish": "English",
+  "@settingsLanguageEnglish": {
+    "description": "English language option"
+  },
+  "settingsManageGoogleAccount": "Manage my Google account",
+  "@settingsManageGoogleAccount": {
+    "description": "Button label to open Google account management"
+  },
+  "settingsSaveButton": "Save changes",
+  "@settingsSaveButton": {
+    "description": "Button label to save settings changes"
+  },
+  "settingsCancelButton": "Cancel",
+  "@settingsCancelButton": {
+    "description": "Button label to cancel settings changes"
+  },
+  "settingsDeleteAccountButton": "Delete account",
+  "@settingsDeleteAccountButton": {
+    "description": "Button label to delete account"
+  },
+  "settingsDeleteAccountTitle": "Delete account",
+  "@settingsDeleteAccountTitle": {
+    "description": "Title for delete account confirmation dialog"
+  },
+  "settingsDeleteAccountMessage": "Are you sure you want to delete your account? This action cannot be undone and all your data will be deleted.",
+  "@settingsDeleteAccountMessage": {
+    "description": "Message in delete account confirmation dialog"
+  },
+  "settingsDeleteAccountConfirm": "Delete",
+  "@settingsDeleteAccountConfirm": {
+    "description": "Confirm button in delete account dialog"
+  },
+  "settingsDeleteAccountCancel": "Cancel",
+  "@settingsDeleteAccountCancel": {
+    "description": "Cancel button in delete account dialog"
+  },
+  "settingsProfileUpdated": "Profile updated successfully",
+  "@settingsProfileUpdated": {
+    "description": "Success message after updating profile"
+  },
+  "settingsProfileUpdateError": "Error updating profile",
+  "@settingsProfileUpdateError": {
+    "description": "Error message when profile update fails"
+  },
+  "settingsAccountDeleted": "Account deleted successfully",
+  "@settingsAccountDeleted": {
+    "description": "Success message after deleting account"
+  },
+  "settingsAccountDeleteError": "Error deleting account",
+  "@settingsAccountDeleteError": {
+    "description": "Error message when account deletion fails"
+  },
+  "settingsPhotoUploadError": "Error uploading photo",
+  "@settingsPhotoUploadError": {
+    "description": "Error message when photo upload fails"
+  },
+  "settingsPhotoSelectionCancelled": "Photo selection cancelled",
+  "@settingsPhotoSelectionCancelled": {
+    "description": "Message when user cancels photo selection"
   }
 }
