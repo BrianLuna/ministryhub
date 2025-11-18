@@ -10,7 +10,11 @@
   "emailFieldHint": "nombre@ministerio.org",
   "passwordFieldLabel": "Contraseña",
   "passwordFieldHint": "Ingresa tu contraseña",
+  "confirmPasswordFieldLabel": "Confirmar contraseña",
+  "confirmPasswordFieldHint": "Reingresa tu contraseña",
   "primaryAuthButton": "Entrar a MinistryHub",
+  "authModeLoginLabel": "Iniciar sesión",
+  "authModeRegisterLabel": "Registrarse",
   "googleAuthButton": "Continuar con Google",
   "dividerLabel": "o",
   "authFooterHint": "Si el correo es nuevo, te guiaremos para crear una cuenta.",
@@ -18,6 +22,8 @@
   "invalidEmailFormatError": "Ingresa un correo válido.",
   "passwordRequiredError": "Ingresa tu contraseña.",
   "passwordLengthError": "La contraseña debe tener al menos 8 caracteres.",
+  "confirmPasswordRequiredError": "Confirma tu contraseña.",
+  "confirmPasswordMismatchError": "Las contraseñas no coinciden.",
   "authErrorInvalidEmail": "El correo electrónico es inválido.",
   "authErrorWrongPassword": "La contraseña no coincide con esta cuenta.",
   "authErrorInvalidCredentials": "Error en los datos ingresados. Verifica tu correo y contraseña.",
@@ -72,5 +78,6 @@
   "settingsAccountDeleteError": "Error al eliminar la cuenta",
   "settingsPhotoUploadError": "Error al subir la foto",
   "settingsPhotoSelectionCancelled": "Selección de foto cancelada",
-  "settingsCannotOpenUrl": "No se puede abrir la URL. Por favor, visita https://myaccount.google.com manualmente."
+  "settingsCannotOpenUrl": "No se puede abrir la URL. Por favor, visita https://myaccount.google.com manualmente.",
+  "settingsGoogleDisplayNameHint": "Nombre mostrado de la cuenta de Google"
 }

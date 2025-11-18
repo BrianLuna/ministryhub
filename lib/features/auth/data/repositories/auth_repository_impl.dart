@@ -2,9 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ministryhub/ministryhub.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl(this._datasource);
+  AuthRepositoryImpl(
+    this._datasource, {
+    FirestoreDatasource? firestoreDatasource,
+  }) : _firestoreDatasource = firestoreDatasource ?? FirestoreDatasource();
 
   final FirebaseAuthDatasource _datasource;
+  final FirestoreDatasource _firestoreDatasource;
   final _firebaseAuth = FirebaseAuth.instance;
 
   @override
@@ -22,7 +26,27 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email,
         password: password,
       );
-      return _mapUser(credential.user);
+      final user = credential.user;
+      if (user != null) {
+        // Ensure email is up to date in Firestore (but don't overwrite existing profile data)
+        try {
+          final existingProfile = await _firestoreDatasource.getUserProfile(
+            user.uid,
+          );
+
+          // Only update email if it's different or if profile doesn't exist
+          if (existingProfile == null || existingProfile['email'] != email) {
+            await _firestoreDatasource.saveUserProfile(
+              uid: user.uid,
+              data: {'email': email},
+            );
+          }
+        } catch (e) {
+          // Log but don't fail sign-in if Firestore update fails
+          // User is already authenticated
+        }
+      }
+      return _mapUser(user);
     } on AuthFailure {
       rethrow;
     } catch (error) {
@@ -41,13 +65,60 @@ class AuthRepositoryImpl implements AuthRepository {
       // After reload in datasource, try to get the current user
       // which should have the updated photoURL after reload
       final currentUser = _firebaseAuth.currentUser;
-      if (currentUser != null) {
-        // Use currentUser which should have the reloaded data including photoURL
-        return _mapUser(currentUser);
-      }
-      // Fallback to credential user if currentUser is null
-      final user = credential.user;
+      final user = currentUser ?? credential.user;
       if (user != null) {
+        // Save or update user profile in Firestore
+        try {
+          // Check if profile already exists
+          final existingProfile = await _firestoreDatasource.getUserProfile(
+            user.uid,
+          );
+
+          // Only save if profile doesn't exist or if email/displayName changed
+          // But never overwrite existing firstName/lastName
+          final needsUpdate =
+              existingProfile == null ||
+              existingProfile['email'] != user.email ||
+              (user.displayName != null &&
+                  existingProfile['displayName'] != user.displayName);
+
+          if (needsUpdate) {
+            final profileData = <String, dynamic>{'email': user.email};
+
+            // Add displayName if available
+            if (user.displayName != null && user.displayName!.isNotEmpty) {
+              profileData['displayName'] = user.displayName;
+            }
+
+            // Only extract firstName/lastName from displayName if profile doesn't exist
+            // Never overwrite existing firstName/lastName (they won't be in profileData if existingProfile != null)
+            if (existingProfile == null && user.displayName != null) {
+              final nameParts = user.displayName!
+                  .trim()
+                  .split(' ')
+                  .where((p) => p.isNotEmpty)
+                  .toList();
+              if (nameParts.isNotEmpty) {
+                profileData['firstName'] = nameParts.first;
+                if (nameParts.length > 1) {
+                  profileData['lastName'] = nameParts.skip(1).join(' ');
+                }
+              }
+            }
+            // If existingProfile != null, we don't add firstName/lastName to profileData
+            // This ensures we never overwrite existing firstName/lastName when using merge: true
+
+            await _firestoreDatasource.saveUserProfile(
+              uid: user.uid,
+              data: profileData,
+            );
+          }
+        } catch (e) {
+          // Log but don't fail sign-in if Firestore save fails
+          // User is already authenticated
+        }
+
+        // Use currentUser which should have the reloaded data including photoURL
         return _mapUser(user);
       }
       return null;
@@ -84,7 +155,24 @@ class AuthRepositoryImpl implements AuthRepository {
         firstName: firstName,
         lastName: lastName,
       );
-      return _mapUser(credential.user);
+      final user = credential.user;
+      if (user != null) {
+        // Save user profile to Firestore
+        try {
+          await _firestoreDatasource.saveUserProfile(
+            uid: user.uid,
+            data: {
+              'firstName': firstName,
+              'lastName': lastName,
+              'email': email,
+            },
+          );
+        } catch (e) {
+          // Log but don't fail registration if Firestore save fails
+          // User is already created in Firebase Auth
+        }
+      }
+      return _mapUser(user);
     } on AuthFailure {
       rethrow;
     } catch (error) {

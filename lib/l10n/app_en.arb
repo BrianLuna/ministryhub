@@ -40,9 +40,25 @@
   "@passwordFieldHint": {
     "description": "Hint text for the password field"
   },
+  "confirmPasswordFieldLabel": "Confirm password",
+  "@confirmPasswordFieldLabel": {
+    "description": "Label for the confirm password text field"
+  },
+  "confirmPasswordFieldHint": "Re-enter your password",
+  "@confirmPasswordFieldHint": {
+    "description": "Hint text for the confirm password field"
+  },
   "primaryAuthButton": "Enter MinistryHub",
   "@primaryAuthButton": {
     "description": "Label for the main auth button"
+  },
+  "authModeLoginLabel": "Login",
+  "@authModeLoginLabel": {
+    "description": "Label for the login toggle segment"
+  },
+  "authModeRegisterLabel": "Register",
+  "@authModeRegisterLabel": {
+    "description": "Label for the register toggle segment"
   },
   "googleAuthButton": "Continue with Google",
   "@googleAuthButton": {
@@ -71,6 +87,14 @@
   "passwordLengthError": "Password must be at least 8 characters.",
   "@passwordLengthError": {
     "description": "Validation error for short passwords"
+  },
+  "confirmPasswordRequiredError": "Please confirm your password.",
+  "@confirmPasswordRequiredError": {
+    "description": "Validation error for missing confirm password"
+  },
+  "confirmPasswordMismatchError": "Passwords do not match.",
+  "@confirmPasswordMismatchError": {
+    "description": "Validation error when passwords differ"
   },
   "authErrorInvalidEmail": "The email address is invalid.",
   "@authErrorInvalidEmail": {
@@ -291,5 +315,9 @@
   "settingsCannotOpenUrl": "Cannot open URL. Please visit https://myaccount.google.com manually.",
   "@settingsCannotOpenUrl": {
     "description": "Error message when URL cannot be opened"
+  },
+  "settingsGoogleDisplayNameHint": "Display name from Google account",
+  "@settingsGoogleDisplayNameHint": {
+    "description": "Helper text for Google account display name field"
   }
 }
