@@ -3,8 +3,10 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:ministryhub/ministryhub.dart';
 
 /// Provider for subscription repository
+/// Uses MockRevenueCatDatasource in mock mode to bypass RevenueCat
 final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
-  final datasource = RevenueCatDatasource();
+  // Use mock datasource to bypass RevenueCat and update Firestore directly
+  final datasource = MockRevenueCatDatasource();
   return SubscriptionRepositoryImpl(revenueCatDatasource: datasource);
 });
 

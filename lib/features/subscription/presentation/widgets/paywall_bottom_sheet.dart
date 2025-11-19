@@ -50,7 +50,19 @@ class _PaywallBottomSheetState extends ConsumerState<PaywallBottomSheet> {
   }
 
   Future<void> _handlePurchase() async {
-    if (_selectedPackage == null || _selectedSubscriptionType == null) {
+    if (_selectedSubscriptionType == null) {
+      return;
+    }
+
+    // In mock mode, we don't need a package
+    // Just proceed with the selected subscription type
+    if (_selectedPackage == null &&
+        _selectedSubscriptionType != SubscriptionType.free) {
+      // This is mock mode - proceed directly
+    } else if (_selectedPackage == null &&
+        _selectedSubscriptionType == SubscriptionType.free) {
+      // Free tier doesn't need a package
+    } else if (_selectedPackage == null) {
       return;
     }
 
@@ -69,15 +81,30 @@ class _PaywallBottomSheetState extends ConsumerState<PaywallBottomSheet> {
     });
 
     try {
-      final controller = ref.read(subscriptionControllerProvider.notifier);
-      final customerInfo = await controller.purchasePackage(_selectedPackage!);
+      // Capture ref values before async operations to avoid disposed widget issues
+      final subscriptionController = ref.read(
+        subscriptionControllerProvider.notifier,
+      );
+      final subscriptionRepository = ref.read(subscriptionRepositoryProvider);
+
+      // In mock mode, if there's no package, use the subscription type directly
+      if (_selectedPackage == null && _selectedSubscriptionType != null) {
+        // Mock mode - update directly without RevenueCat
+        if (mounted) {
+          widget.onSubscriptionSelected(_selectedSubscriptionType!);
+          Navigator.of(context).pop(_selectedSubscriptionType);
+        }
+        return;
+      }
+
+      final customerInfo = await subscriptionController.purchasePackage(
+        _selectedPackage!,
+      );
 
       if (customerInfo != null && mounted) {
         // Verify the subscription was successful
-        final repository = ref.read(subscriptionRepositoryProvider);
-        final subscriptionType = repository.getActiveSubscriptionType(
-          customerInfo,
-        );
+        final subscriptionType = subscriptionRepository
+            .getActiveSubscriptionType(customerInfo);
 
         if (subscriptionType != null) {
           widget.onSubscriptionSelected(subscriptionType);
@@ -85,14 +112,33 @@ class _PaywallBottomSheetState extends ConsumerState<PaywallBottomSheet> {
           return;
         }
       } else if (mounted) {
-        // Show error
+        // Check if this is mock mode (MOCK_MODE_DIRECT_UPDATE exception)
+        // Re-read state after async operation, but check mounted first
         final state = ref.read(subscriptionControllerProvider);
         if (state.error != null) {
+          // In mock mode, use the selected subscription type directly
+          if (state.error == 'MOCK_MODE_DIRECT_UPDATE' &&
+              _selectedSubscriptionType != null) {
+            widget.onSubscriptionSelected(_selectedSubscriptionType!);
+            Navigator.of(context).pop(_selectedSubscriptionType);
+            return;
+          }
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.error!)));
         }
       }
+    } on SubscriptionException catch (e) {
+      // Handle mock mode exception
+      if (e.message == 'MOCK_MODE_DIRECT_UPDATE' &&
+          _selectedSubscriptionType != null &&
+          mounted) {
+        widget.onSubscriptionSelected(_selectedSubscriptionType!);
+        Navigator.of(context).pop(_selectedSubscriptionType);
+        return;
+      }
+      // Re-throw other exceptions
+      rethrow;
     } finally {
       if (mounted) {
         setState(() {
@@ -156,22 +202,18 @@ class _PaywallBottomSheetState extends ConsumerState<PaywallBottomSheet> {
             child: subscriptionState.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : offerings?.current == null
-                ? Center(
-                    child: Text(
-                      l10n.subscriptionNoOfferings,
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  )
+                ? _buildSubscriptionOptionsMock(context)
                 : _buildSubscriptionOptions(context, offerings!.current!),
           ),
           // Bottom actions
-          if (!subscriptionState.isLoading && offerings?.current != null)
+          if (!subscriptionState.isLoading)
             _buildBottomActions(context, subscriptionState),
         ],
       ),
     );
   }
 
+  /// Build subscription options when offerings are available (normal mode)
   Widget _buildSubscriptionOptions(BuildContext context, Offering offering) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -246,6 +288,83 @@ class _PaywallBottomSheetState extends ConsumerState<PaywallBottomSheet> {
                 });
               },
               price: _getPackagePrice(offering, SubscriptionType.premium),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  /// Build subscription options in mock mode (without offerings)
+  Widget _buildSubscriptionOptionsMock(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        children: [
+          // Free tier
+          FadeInUp(
+            delay: const Duration(milliseconds: 100),
+            child: _SubscriptionOptionCard(
+              title: l10n.subscriptionFreeTitle,
+              description: l10n.subscriptionFreeDescription,
+              features: [
+                l10n.subscriptionFreeFeature1,
+                l10n.subscriptionFreeFeature2,
+              ],
+              isSelected: _selectedSubscriptionType == SubscriptionType.free,
+              onTap: () {
+                setState(() {
+                  _selectedSubscriptionType = SubscriptionType.free;
+                  _selectedPackage = null;
+                });
+              },
+              price: '\$0.00',
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Pro tier
+          FadeInUp(
+            delay: const Duration(milliseconds: 200),
+            child: _SubscriptionOptionCard(
+              title: l10n.subscriptionProTitle,
+              description: l10n.subscriptionProDescription,
+              features: [
+                l10n.subscriptionProFeature1,
+                l10n.subscriptionProFeature2,
+              ],
+              isSelected: _selectedSubscriptionType == SubscriptionType.pro,
+              onTap: () {
+                setState(() {
+                  _selectedSubscriptionType = SubscriptionType.pro;
+                  _selectedPackage = null; // No package in mock mode
+                });
+              },
+              price: '', // No price in mock mode
+              isPopular: true,
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Premium tier
+          FadeInUp(
+            delay: const Duration(milliseconds: 300),
+            child: _SubscriptionOptionCard(
+              title: l10n.subscriptionPremiumTitle,
+              description: l10n.subscriptionPremiumDescription,
+              features: [
+                l10n.subscriptionPremiumFeature1,
+                l10n.subscriptionPremiumFeature2,
+              ],
+              isSelected: _selectedSubscriptionType == SubscriptionType.premium,
+              onTap: () {
+                setState(() {
+                  _selectedSubscriptionType = SubscriptionType.premium;
+                  _selectedPackage = null; // No package in mock mode
+                });
+              },
+              price: '', // No price in mock mode
             ),
           ),
           const SizedBox(height: 24),
@@ -352,9 +471,7 @@ class _PaywallBottomSheetState extends ConsumerState<PaywallBottomSheet> {
               onPressed:
                   state.isPurchasing ||
                       _isProcessingPurchase ||
-                      _selectedSubscriptionType == null ||
-                      (_selectedSubscriptionType != SubscriptionType.free &&
-                          _selectedPackage == null)
+                      _selectedSubscriptionType == null
                   ? null
                   : _selectedSubscriptionType == SubscriptionType.free
                   ? () {

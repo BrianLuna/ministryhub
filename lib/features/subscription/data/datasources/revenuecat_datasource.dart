@@ -3,8 +3,9 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:ministryhub/ministryhub.dart';
 
 /// Data source for RevenueCat operations
-class RevenueCatDatasource {
+class RevenueCatDatasource implements RevenueCatDatasourceInterface {
   /// Configure RevenueCat with API key
+  @override
   Future<void> configure(String apiKey) async {
     try {
       // Configure RevenueCat first
@@ -23,6 +24,7 @@ class RevenueCatDatasource {
   }
 
   /// Set user ID for RevenueCat
+  @override
   Future<void> setUserId(String userId) async {
     try {
       await Purchases.logIn(userId);
@@ -35,6 +37,7 @@ class RevenueCatDatasource {
   }
 
   /// Get available offerings
+  @override
   Future<Offerings> getOfferings() async {
     try {
       // Check if RevenueCat is configured
@@ -62,6 +65,7 @@ class RevenueCatDatasource {
   }
 
   /// Purchase a package
+  @override
   Future<CustomerInfo> purchasePackage(Package package) async {
     if (!RevenueCatService.isInitialized) {
       throw SubscriptionException(
@@ -95,6 +99,7 @@ class RevenueCatDatasource {
   }
 
   /// Restore purchases
+  @override
   Future<CustomerInfo> restorePurchases() async {
     if (!RevenueCatService.isInitialized) {
       throw SubscriptionException(
@@ -117,6 +122,7 @@ class RevenueCatDatasource {
   }
 
   /// Get current customer info
+  @override
   Future<CustomerInfo> getCustomerInfo() async {
     if (!RevenueCatService.isInitialized) {
       throw SubscriptionException(

@@ -429,7 +429,6 @@ class _SubscriptionSectionState extends ConsumerState<_SubscriptionSection> {
   Future<void> _showSubscriptionChangeDialog(BuildContext context) async {
     if (!context.mounted) return;
 
-    final l10n = AppLocalizations.of(context)!;
     final subscriptionState = ref.read(subscriptionControllerProvider);
 
     // Load offerings if not loaded
@@ -442,13 +441,8 @@ class _SubscriptionSectionState extends ConsumerState<_SubscriptionSection> {
     final updatedState = ref.read(subscriptionControllerProvider);
     final offerings = updatedState.offerings;
 
-    if (offerings?.current == null) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.subscriptionNoOfferings)));
-      return;
-    }
+    // In mock mode, offerings will be null but we can still proceed
+    // The PaywallBottomSheet will handle mock mode gracefully
 
     if (!context.mounted) return;
 
@@ -460,8 +454,10 @@ class _SubscriptionSectionState extends ConsumerState<_SubscriptionSection> {
         if (!context.mounted) return;
 
         // Find package for the selected subscription
+        // In mock mode, offerings will be null, so package will be null
         Package? package;
-        if (subscriptionType != SubscriptionType.free) {
+        if (subscriptionType != SubscriptionType.free &&
+            offerings?.current != null) {
           package = _findPackageForSubscription(
             offerings!.current!,
             subscriptionType,
@@ -469,6 +465,7 @@ class _SubscriptionSectionState extends ConsumerState<_SubscriptionSection> {
         }
 
         // Update subscription
+        // In mock mode, package will be null and updateSubscription will handle it
         final success = await ref
             .read(ministryControllerProvider.notifier)
             .updateSubscription(

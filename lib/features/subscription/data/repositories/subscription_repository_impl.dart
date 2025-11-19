@@ -4,10 +4,10 @@ import 'package:ministryhub/ministryhub.dart';
 /// Implementation of SubscriptionRepository
 class SubscriptionRepositoryImpl implements SubscriptionRepository {
   SubscriptionRepositoryImpl({
-    required RevenueCatDatasource revenueCatDatasource,
+    required RevenueCatDatasourceInterface revenueCatDatasource,
   }) : _revenueCatDatasource = revenueCatDatasource;
 
-  final RevenueCatDatasource _revenueCatDatasource;
+  final RevenueCatDatasourceInterface _revenueCatDatasource;
 
   @override
   Future<Offerings> getOfferings() async {

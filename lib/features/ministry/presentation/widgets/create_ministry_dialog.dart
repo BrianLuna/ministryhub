@@ -57,22 +57,28 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
 
     if (mounted) {
       if (ministry != null) {
+        // Capture ref before closing the dialog to avoid disposed widget issues
+        final ministryController = ref.read(
+          ministryControllerProvider.notifier,
+        );
+
         // Close the create dialog first
         Navigator.of(context).pop(ministry);
 
         // Show paywall bottom sheet
+        // Use the controller directly instead of ref to avoid disposed widget issues
         await PaywallBottomSheet.show(
           context,
           ministryId: ministry.id,
           onSubscriptionSelected: (subscriptionType) async {
-            // Update ministry with selected subscription
+            // Update ministry with selected subscription using the controller
+            // This avoids using ref after widget disposal
             if (subscriptionType != SubscriptionType.free) {
-              await ref
-                  .read(ministryRepositoryProvider)
-                  .updateMinistrySubscriptionType(
-                    ministryId: ministry.id,
-                    subscriptionType: subscriptionType,
-                  );
+              await ministryController.updateSubscription(
+                ministryId: ministry.id,
+                subscriptionType: subscriptionType,
+                package: null, // No package in mock mode
+              );
             }
           },
         );
