@@ -435,5 +435,101 @@
   "ministryDeleteError": "Error deleting ministry",
   "@ministryDeleteError": {
     "description": "Error message when ministry deletion fails"
+  },
+  "subscriptionPaywallTitle": "Choose Your Plan",
+  "@subscriptionPaywallTitle": {
+    "description": "Title for the subscription paywall"
+  },
+  "subscriptionPaywallSubtitle": "Select a subscription plan for your ministry",
+  "@subscriptionPaywallSubtitle": {
+    "description": "Subtitle for the subscription paywall"
+  },
+  "subscriptionNoOfferings": "No subscription options available at this time",
+  "@subscriptionNoOfferings": {
+    "description": "Message when no subscription offerings are available"
+  },
+  "subscriptionFreeTitle": "Free",
+  "@subscriptionFreeTitle": {
+    "description": "Title for free subscription tier"
+  },
+  "subscriptionFreeDescription": "Perfect for getting started",
+  "@subscriptionFreeDescription": {
+    "description": "Description for free subscription tier"
+  },
+  "subscriptionFreeFeature1": "1 church maximum",
+  "@subscriptionFreeFeature1": {
+    "description": "Feature description for free tier"
+  },
+  "subscriptionFreeFeature2": "Up to 50 people per church",
+  "@subscriptionFreeFeature2": {
+    "description": "Feature description for free tier"
+  },
+  "subscriptionFreePrice": "Free",
+  "@subscriptionFreePrice": {
+    "description": "Price label for free subscription"
+  },
+  "subscriptionProTitle": "Pro",
+  "@subscriptionProTitle": {
+    "description": "Title for pro subscription tier"
+  },
+  "subscriptionProDescription": "For growing ministries",
+  "@subscriptionProDescription": {
+    "description": "Description for pro subscription tier"
+  },
+  "subscriptionProFeature1": "Up to 5 churches",
+  "@subscriptionProFeature1": {
+    "description": "Feature description for pro tier"
+  },
+  "subscriptionProFeature2": "Up to 300 people per church",
+  "@subscriptionProFeature2": {
+    "description": "Feature description for pro tier"
+  },
+  "subscriptionPremiumTitle": "Premium",
+  "@subscriptionPremiumTitle": {
+    "description": "Title for premium subscription tier"
+  },
+  "subscriptionPremiumDescription": "Unlimited growth potential",
+  "@subscriptionPremiumDescription": {
+    "description": "Description for premium subscription tier"
+  },
+  "subscriptionPremiumFeature1": "Unlimited churches",
+  "@subscriptionPremiumFeature1": {
+    "description": "Feature description for premium tier"
+  },
+  "subscriptionPremiumFeature2": "Unlimited people per church",
+  "@subscriptionPremiumFeature2": {
+    "description": "Feature description for premium tier"
+  },
+  "subscriptionContinueFree": "Continue with Free",
+  "@subscriptionContinueFree": {
+    "description": "Button label to continue with free plan"
+  },
+  "subscriptionSubscribe": "Subscribe",
+  "@subscriptionSubscribe": {
+    "description": "Button label to subscribe to a paid plan"
+  },
+  "subscriptionMaybeLater": "Maybe Later",
+  "@subscriptionMaybeLater": {
+    "description": "Button label to dismiss paywall"
+  },
+  "ministrySubscriptionLabel": "Subscription",
+  "@ministrySubscriptionLabel": {
+    "description": "Label for subscription section in ministry settings"
+  },
+  "ministryCurrentSubscription": "Current Plan",
+  "@ministryCurrentSubscription": {
+    "description": "Label for current subscription plan"
+  },
+  "ministryChangeSubscription": "Change",
+  "@ministryChangeSubscription": {
+    "description": "Button label to change subscription"
+  },
+  "ministrySubscriptionUpdated": "Subscription updated successfully",
+  "@ministrySubscriptionUpdated": {
+    "description": "Success message after updating subscription"
+  },
+  "ministrySubscriptionUpdateError": "Error updating subscription",
+  "@ministrySubscriptionUpdateError": {
+    "description": "Error message when subscription update fails"
   }
 }

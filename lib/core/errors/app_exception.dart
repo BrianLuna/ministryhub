@@ -32,3 +32,9 @@ class MinistryException extends AppException {
   const MinistryException({required super.message, super.cause})
     : super(code: 'ministry_error');
 }
+
+/// Specialized exception for subscription operations failures.
+class SubscriptionException extends AppException {
+  const SubscriptionException({required super.message, super.cause})
+    : super(code: 'subscription_error');
+}

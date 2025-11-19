@@ -350,4 +350,78 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ministryDeleteError => 'Error deleting ministry';
+
+  @override
+  String get subscriptionPaywallTitle => 'Choose Your Plan';
+
+  @override
+  String get subscriptionPaywallSubtitle =>
+      'Select a subscription plan for your ministry';
+
+  @override
+  String get subscriptionNoOfferings =>
+      'No subscription options available at this time';
+
+  @override
+  String get subscriptionFreeTitle => 'Free';
+
+  @override
+  String get subscriptionFreeDescription => 'Perfect for getting started';
+
+  @override
+  String get subscriptionFreeFeature1 => '1 church maximum';
+
+  @override
+  String get subscriptionFreeFeature2 => 'Up to 50 people per church';
+
+  @override
+  String get subscriptionFreePrice => 'Free';
+
+  @override
+  String get subscriptionProTitle => 'Pro';
+
+  @override
+  String get subscriptionProDescription => 'For growing ministries';
+
+  @override
+  String get subscriptionProFeature1 => 'Up to 5 churches';
+
+  @override
+  String get subscriptionProFeature2 => 'Up to 300 people per church';
+
+  @override
+  String get subscriptionPremiumTitle => 'Premium';
+
+  @override
+  String get subscriptionPremiumDescription => 'Unlimited growth potential';
+
+  @override
+  String get subscriptionPremiumFeature1 => 'Unlimited churches';
+
+  @override
+  String get subscriptionPremiumFeature2 => 'Unlimited people per church';
+
+  @override
+  String get subscriptionContinueFree => 'Continue with Free';
+
+  @override
+  String get subscriptionSubscribe => 'Subscribe';
+
+  @override
+  String get subscriptionMaybeLater => 'Maybe Later';
+
+  @override
+  String get ministrySubscriptionLabel => 'Subscription';
+
+  @override
+  String get ministryCurrentSubscription => 'Current Plan';
+
+  @override
+  String get ministryChangeSubscription => 'Change';
+
+  @override
+  String get ministrySubscriptionUpdated => 'Subscription updated successfully';
+
+  @override
+  String get ministrySubscriptionUpdateError => 'Error updating subscription';
 }

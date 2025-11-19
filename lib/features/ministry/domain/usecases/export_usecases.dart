@@ -4,6 +4,7 @@ export 'delete_ministry.dart';
 export 'get_ministries_by_administrator.dart';
 export 'get_ministries_by_user.dart';
 export 'update_ministry.dart';
+export 'update_ministry_subscription.dart';
 export 'upload_ministry_logo.dart';
 export 'watch_ministries_by_user.dart';
 export 'watch_ministry.dart';

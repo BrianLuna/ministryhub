@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:ministryhub/ministryhub.dart';
 
 /// Ministry settings overlay shown as a bottom sheet
@@ -174,6 +175,9 @@ class _MinistrySettingsOverlayState
                     nameController: _nameController,
                     nameChanged: _nameChanged,
                   ),
+                  const SizedBox(height: 24),
+                  // Subscription Section
+                  _SubscriptionSection(ministry: ministry),
                   const SizedBox(height: 24),
                   // Save button
                   ElevatedButton(
@@ -355,6 +359,176 @@ class _NameSection extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+/// Subscription section widget
+class _SubscriptionSection extends ConsumerStatefulWidget {
+  const _SubscriptionSection({required this.ministry});
+
+  final Ministry ministry;
+
+  @override
+  ConsumerState<_SubscriptionSection> createState() =>
+      _SubscriptionSectionState();
+}
+
+class _SubscriptionSectionState extends ConsumerState<_SubscriptionSection> {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final ministryState = ref.watch(ministryControllerProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.ministrySubscriptionLabel, style: theme.textTheme.titleLarge),
+        const SizedBox(height: 16),
+        // Current subscription display
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: theme.colorScheme.outline.withAlpha(77)),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.ministryCurrentSubscription,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    SubscriptionPlanBadge(
+                      subscriptionType: widget.ministry.subscriptionType,
+                    ),
+                  ],
+                ),
+              ),
+              TextButton.icon(
+                onPressed: ministryState.isSaving
+                    ? null
+                    : () => _showSubscriptionChangeDialog(context),
+                icon: const Icon(Icons.edit, size: 18),
+                label: Text(l10n.ministryChangeSubscription),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showSubscriptionChangeDialog(BuildContext context) async {
+    if (!context.mounted) return;
+
+    final subscriptionState = ref.read(subscriptionControllerProvider);
+
+    // Load offerings if not loaded
+    if (subscriptionState.offerings == null) {
+      await ref.read(subscriptionControllerProvider.notifier).loadOfferings();
+    }
+
+    if (!context.mounted) return;
+
+    final updatedState = ref.read(subscriptionControllerProvider);
+    final offerings = updatedState.offerings;
+
+    // In mock mode, offerings will be null but we can still proceed
+    // The PaywallBottomSheet will handle mock mode gracefully
+
+    if (!context.mounted) return;
+
+    // Show paywall to change subscription
+    await PaywallBottomSheet.show(
+      context,
+      ministryId: widget.ministry.id,
+      onSubscriptionSelected: (subscriptionType) async {
+        if (!context.mounted) return;
+
+        // Find package for the selected subscription
+        // In mock mode, offerings will be null, so package will be null
+        Package? package;
+        if (subscriptionType != SubscriptionType.free &&
+            offerings?.current != null) {
+          package = _findPackageForSubscription(
+            offerings!.current!,
+            subscriptionType,
+          );
+        }
+
+        // Update subscription
+        // In mock mode, package will be null and updateSubscription will handle it
+        final success = await ref
+            .read(ministryControllerProvider.notifier)
+            .updateSubscription(
+              ministryId: widget.ministry.id,
+              subscriptionType: subscriptionType,
+              package: package,
+            );
+
+        if (!context.mounted) return;
+
+        // Get l10n after async gap to avoid BuildContext issues
+        final callbackL10n = AppLocalizations.of(context)!;
+
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(callbackL10n.ministrySubscriptionUpdated)),
+          );
+          Navigator.of(context).pop(); // Close settings overlay
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(callbackL10n.ministrySubscriptionUpdateError),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Package? _findPackageForSubscription(
+    Offering offering,
+    SubscriptionType subscriptionType,
+  ) {
+    final entitlementId = subscriptionType == SubscriptionType.pro
+        ? 'pro'
+        : 'premium';
+
+    // Try to find monthly first, then yearly
+    for (final package in offering.availablePackages) {
+      if (package.storeProduct.identifier.contains('monthly') ||
+          package.packageType == PackageType.monthly) {
+        if (package.storeProduct.identifier.toLowerCase().contains(
+          entitlementId.toLowerCase(),
+        )) {
+          return package;
+        }
+      }
+    }
+    // If no monthly found, try yearly
+    for (final package in offering.availablePackages) {
+      if (package.storeProduct.identifier.contains('yearly') ||
+          package.packageType == PackageType.annual) {
+        if (package.storeProduct.identifier.toLowerCase().contains(
+          entitlementId.toLowerCase(),
+        )) {
+          return package;
+        }
+      }
+    }
+    // Return first package that might match
+    return offering.availablePackages.isNotEmpty
+        ? offering.availablePackages.first
+        : null;
   }
 }
 

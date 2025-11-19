@@ -15,6 +15,9 @@ Future<void> main() async {
         : ProdFirebaseOptions.currentPlatform,
   );
 
+  // Initialize RevenueCat (will handle .env loading internally)
+  await RevenueCatService.initialize();
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

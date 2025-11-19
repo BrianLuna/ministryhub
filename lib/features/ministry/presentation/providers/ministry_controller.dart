@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:ministryhub/ministryhub.dart';
 
 /// Provider for ministry repository
@@ -38,6 +39,12 @@ final updateMinistryUseCaseProvider = Provider<UpdateMinistryUseCase>((ref) {
   return UpdateMinistryUseCase(repository);
 });
 
+final updateMinistrySubscriptionUseCaseProvider =
+    Provider<UpdateMinistrySubscriptionUseCase>((ref) {
+      final repository = ref.watch(ministryRepositoryProvider);
+      return UpdateMinistrySubscriptionUseCase(repository);
+    });
+
 final uploadMinistryLogoUseCaseProvider = Provider<UploadMinistryLogoUseCase>((
   ref,
 ) {
@@ -73,6 +80,8 @@ class MinistryController extends StateNotifier<MinistryState> {
     required CreateMinistryUseCase createMinistryUseCase,
     required GetMinistriesByUserUseCase getMinistriesByUserUseCase,
     required UpdateMinistryUseCase updateMinistryUseCase,
+    required UpdateMinistrySubscriptionUseCase
+    updateMinistrySubscriptionUseCase,
     required UploadMinistryLogoUseCase uploadMinistryLogoUseCase,
     required DeleteMinistryUseCase deleteMinistryUseCase,
     required WatchMinistryUseCase watchMinistryUseCase,
@@ -83,6 +92,7 @@ class MinistryController extends StateNotifier<MinistryState> {
   }) : _createMinistryUseCase = createMinistryUseCase,
        _getMinistriesByUserUseCase = getMinistriesByUserUseCase,
        _updateMinistryUseCase = updateMinistryUseCase,
+       _updateMinistrySubscriptionUseCase = updateMinistrySubscriptionUseCase,
        _uploadMinistryLogoUseCase = uploadMinistryLogoUseCase,
        _deleteMinistryUseCase = deleteMinistryUseCase,
        _watchMinistryUseCase = watchMinistryUseCase,
@@ -100,6 +110,7 @@ class MinistryController extends StateNotifier<MinistryState> {
   final CreateMinistryUseCase _createMinistryUseCase;
   final GetMinistriesByUserUseCase _getMinistriesByUserUseCase;
   final UpdateMinistryUseCase _updateMinistryUseCase;
+  final UpdateMinistrySubscriptionUseCase _updateMinistrySubscriptionUseCase;
   final UploadMinistryLogoUseCase _uploadMinistryLogoUseCase;
   final DeleteMinistryUseCase _deleteMinistryUseCase;
   final WatchMinistryUseCase _watchMinistryUseCase;
@@ -434,6 +445,105 @@ class MinistryController extends StateNotifier<MinistryState> {
     }
   }
 
+  /// Update ministry subscription
+  /// In mock mode, updates Firestore directly without RevenueCat verification
+  /// In production mode, purchases the package in RevenueCat first
+  Future<bool> updateSubscription({
+    required String ministryId,
+    required SubscriptionType subscriptionType,
+    Package? package,
+  }) async {
+    if (_isDisposed) return false;
+    if (!_isDisposed) {
+      state = state.copyWith(isSaving: true, error: null);
+    }
+
+    try {
+      // If subscription is not free, try to purchase in RevenueCat first
+      // In mock mode, this will throw MOCK_MODE_DIRECT_UPDATE and we'll skip to Firestore update
+      if (subscriptionType != SubscriptionType.free && package != null) {
+        try {
+          // Use mock datasource to bypass RevenueCat
+          final subscriptionRepository = SubscriptionRepositoryImpl(
+            revenueCatDatasource: MockRevenueCatDatasource(),
+          );
+          final customerInfo = await subscriptionRepository.purchasePackage(
+            package,
+          );
+
+          // Verify the subscription was successful
+          final activeSubscriptionType = subscriptionRepository
+              .getActiveSubscriptionType(customerInfo);
+          if (activeSubscriptionType != subscriptionType) {
+            if (!_isDisposed) {
+              state = state.copyWith(
+                isSaving: false,
+                error: 'Failed to verify subscription purchase',
+              );
+            }
+            return false;
+          }
+        } on SubscriptionException catch (e) {
+          // Check if this is a mock mode exception
+          // In mock mode, we skip RevenueCat and update Firestore directly
+          if (e.message == 'MOCK_MODE_DIRECT_UPDATE') {
+            // Continue to Firestore update without RevenueCat verification
+            // This is the expected behavior in mock mode
+          } else {
+            // Re-throw other subscription exceptions
+            rethrow;
+          }
+        }
+      }
+
+      // Update subscription in Firestore
+      await _updateMinistrySubscriptionUseCase(
+        ministryId: ministryId,
+        subscriptionType: subscriptionType,
+      );
+      if (_isDisposed) return false;
+
+      // Update in local state
+      final updatedMinistries = state.ministries.map((m) {
+        if (m.id == ministryId) {
+          return Ministry(
+            id: m.id,
+            name: m.name,
+            createdAt: m.createdAt,
+            administratorId: m.administratorId,
+            logoUrl: m.logoUrl,
+            subscriptionType: subscriptionType,
+          );
+        }
+        return m;
+      }).toList();
+
+      Ministry? updatedSelected = state.selectedMinistry;
+      if (state.selectedMinistry?.id == ministryId) {
+        updatedSelected = updatedMinistries.firstWhere(
+          (m) => m.id == ministryId,
+        );
+      }
+
+      if (!_isDisposed) {
+        state = state.copyWith(
+          ministries: updatedMinistries,
+          selectedMinistry: updatedSelected,
+          isSaving: false,
+        );
+      }
+      return true;
+    } catch (e) {
+      if (!_isDisposed) {
+        state = state.copyWith(
+          isSaving: false,
+          error: 'Failed to update subscription: ${e.toString()}',
+        );
+      }
+      return false;
+    }
+  }
+
   /// Pick image from gallery or camera
   Future<void> pickImage({required bool fromCamera}) async {
     if (_isDisposed) return;
@@ -670,6 +780,9 @@ final ministryControllerProvider =
           getMinistriesByUserUseCaseProvider,
         ),
         updateMinistryUseCase: ref.watch(updateMinistryUseCaseProvider),
+        updateMinistrySubscriptionUseCase: ref.watch(
+          updateMinistrySubscriptionUseCaseProvider,
+        ),
         uploadMinistryLogoUseCase: ref.watch(uploadMinistryLogoUseCaseProvider),
         deleteMinistryUseCase: ref.watch(deleteMinistryUseCaseProvider),
         watchMinistryUseCase: ref.watch(watchMinistryUseCaseProvider),

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:ministryhub/ministryhub.dart';
 
 /// Domain entity representing a ministry
 class Ministry extends Equatable {
@@ -8,6 +9,7 @@ class Ministry extends Equatable {
     required this.createdAt,
     required this.administratorId,
     this.logoUrl,
+    this.subscriptionType = SubscriptionType.free,
   });
 
   final String id;
@@ -15,7 +17,15 @@ class Ministry extends Equatable {
   final DateTime createdAt;
   final String administratorId;
   final String? logoUrl;
+  final SubscriptionType subscriptionType;
 
   @override
-  List<Object?> get props => [id, name, createdAt, administratorId, logoUrl];
+  List<Object?> get props => [
+    id,
+    name,
+    createdAt,
+    administratorId,
+    logoUrl,
+    subscriptionType,
+  ];
 }

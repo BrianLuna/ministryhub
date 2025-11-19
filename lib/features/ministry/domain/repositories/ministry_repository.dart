@@ -45,6 +45,12 @@ abstract class MinistryRepository {
   /// Delete ministry logo from Firebase Storage
   Future<void> deleteMinistryLogo(String logoPath);
 
+  /// Update ministry subscription type
+  Future<void> updateMinistrySubscriptionType({
+    required String ministryId,
+    required SubscriptionType subscriptionType,
+  });
+
   /// Delete ministry and all associated data
   Future<void> deleteMinistry(String ministryId);
 }
