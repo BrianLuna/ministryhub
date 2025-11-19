@@ -4,10 +4,6 @@
   "@appTitle": {
     "description": "Application title"
   },
-  "loginRegisterTitle": "Login / Register",
-  "@loginRegisterTitle": {
-    "description": "Title for login and register page"
-  },
   "welcome": "Welcome",
   "@welcome": {
     "description": "Welcome message"
@@ -67,10 +63,6 @@
   "dividerLabel": "or",
   "@dividerLabel": {
     "description": "Text shown between dividers"
-  },
-  "authFooterHint": "If the email is new, we will guide you to create an account.",
-  "@authFooterHint": {
-    "description": "Footer hint explaining the create account flow"
   },
   "emailRequiredError": "Please enter your email.",
   "@emailRequiredError": {

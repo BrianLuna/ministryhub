@@ -1,7 +1,6 @@
 {
   "@@locale": "es",
   "appTitle": "MinistryHub",
-  "loginRegisterTitle": "Inicio de Sesión / Registro",
   "welcome": "Bienvenido",
   "loginRegisterFormPlaceholder": "Formulario de inicio de sesión/registro",
   "authSubtitle": "Administración ministerial, modernizada",
@@ -17,7 +16,6 @@
   "authModeRegisterLabel": "Registrarse",
   "googleAuthButton": "Continuar con Google",
   "dividerLabel": "o",
-  "authFooterHint": "Si el correo es nuevo, te guiaremos para crear una cuenta.",
   "emailRequiredError": "Ingresa tu correo electrónico.",
   "invalidEmailFormatError": "Ingresa un correo válido.",
   "passwordRequiredError": "Ingresa tu contraseña.",

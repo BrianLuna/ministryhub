@@ -104,12 +104,6 @@ abstract class AppLocalizations {
   /// **'MinistryHub'**
   String get appTitle;
 
-  /// Title for login and register page
-  ///
-  /// In en, this message translates to:
-  /// **'Login / Register'**
-  String get loginRegisterTitle;
-
   /// Welcome message
   ///
   /// In en, this message translates to:
@@ -199,12 +193,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'or'**
   String get dividerLabel;
-
-  /// Footer hint explaining the create account flow
-  ///
-  /// In en, this message translates to:
-  /// **'If the email is new, we will guide you to create an account.'**
-  String get authFooterHint;
 
   /// Validation error for empty email field
   ///

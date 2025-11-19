@@ -12,9 +12,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'MinistryHub';
 
   @override
-  String get loginRegisterTitle => 'Login / Register';
-
-  @override
   String get welcome => 'Welcome';
 
   @override
@@ -59,10 +56,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dividerLabel => 'or';
-
-  @override
-  String get authFooterHint =>
-      'If the email is new, we will guide you to create an account.';
 
   @override
   String get emailRequiredError => 'Please enter your email.';
