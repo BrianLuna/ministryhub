@@ -247,6 +247,31 @@ class MinistryRepositoryImpl implements MinistryRepository {
   }
 
   @override
+  Future<void> removeMinistryLogo(String ministryId) async {
+    try {
+      // Get ministry to find logo URL
+      final ministryData = await _firestoreDatasource.getMinistry(ministryId);
+      if (ministryData != null) {
+        final logoUrl = ministryData['logoUrl'] as String?;
+        if (logoUrl != null && logoUrl.isNotEmpty) {
+          // Delete logo from storage
+          await _storageDatasource.deleteMinistryLogo(logoUrl);
+        }
+      }
+      // Remove logo URL from Firestore
+      await _firestoreDatasource.removeMinistryLogoUrl(ministryId);
+    } catch (e) {
+      if (e is MinistryException) {
+        rethrow;
+      }
+      throw MinistryException(
+        message: 'Failed to remove ministry logo: ${e.toString()}',
+        cause: e,
+      );
+    }
+  }
+
+  @override
   Future<void> updateMinistrySubscriptionType({
     required String ministryId,
     required SubscriptionType subscriptionType,

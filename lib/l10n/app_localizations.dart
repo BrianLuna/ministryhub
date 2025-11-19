@@ -710,6 +710,42 @@ abstract class AppLocalizations {
   /// **'Error uploading logo'**
   String get ministryLogoUploadError;
 
+  /// Success message when logo is uploaded
+  ///
+  /// In en, this message translates to:
+  /// **'Logo uploaded successfully'**
+  String get ministryLogoUploadSuccess;
+
+  /// Button tooltip to delete ministry logo
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Logo'**
+  String get ministryLogoDelete;
+
+  /// Title for delete logo confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Logo'**
+  String get ministryLogoDeleteTitle;
+
+  /// Confirmation message for deleting ministry logo
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this logo? This action cannot be undone.'**
+  String get ministryLogoDeleteMessage;
+
+  /// Success message after deleting logo
+  ///
+  /// In en, this message translates to:
+  /// **'Logo deleted successfully'**
+  String get ministryLogoDeleteSuccess;
+
+  /// Error message when logo deletion fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting logo'**
+  String get ministryLogoDeleteError;
+
   /// Button label to delete ministry
   ///
   /// In en, this message translates to:

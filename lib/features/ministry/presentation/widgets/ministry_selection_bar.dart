@@ -147,26 +147,38 @@ class _MinistryDropdown extends StatelessWidget {
                 if (ministry.logoUrl != null) ...[
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      ministry.logoUrl!,
+                    child: Container(
                       width: 24,
                       height: 24,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Icon(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          // Default placeholder icon
+                          Icon(
                             Icons.church,
                             size: 16,
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
-                        );
-                      },
+                          // Image that fades in when loaded
+                          Image.network(
+                            ministry.logoUrl!,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              return const SizedBox.shrink();
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -220,26 +232,38 @@ class _MinistryDropdown extends StatelessWidget {
                 if (selectedMinistry?.logoUrl != null) ...[
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      selectedMinistry!.logoUrl!,
+                    child: Container(
                       width: 24,
                       height: 24,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Icon(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          // Default placeholder icon
+                          Icon(
                             Icons.church,
                             size: 16,
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
-                        );
-                      },
+                          // Image that fades in when loaded
+                          Image.network(
+                            selectedMinistry!.logoUrl!,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              return const SizedBox.shrink();
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),

@@ -5,6 +5,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:ministryhub/ministryhub.dart';
 
+// Sentinel value for copyWith to distinguish between null and not provided
+const _undefined = Object();
+
 /// Provider for ministry repository
 final ministryRepositoryProvider = Provider<MinistryRepository>((ref) {
   final firestoreDatasource = MinistryFirestoreDatasource();
@@ -86,6 +89,7 @@ class MinistryController extends StateNotifier<MinistryState> {
     required DeleteMinistryUseCase deleteMinistryUseCase,
     required WatchMinistryUseCase watchMinistryUseCase,
     required WatchMinistriesByUserUseCase watchMinistriesByUserUseCase,
+    required MinistryRepository repository,
     required ImagePicker imagePicker,
     required PreferencesService preferencesService,
     String? userId,
@@ -97,6 +101,7 @@ class MinistryController extends StateNotifier<MinistryState> {
        _deleteMinistryUseCase = deleteMinistryUseCase,
        _watchMinistryUseCase = watchMinistryUseCase,
        _watchMinistriesByUserUseCase = watchMinistriesByUserUseCase,
+       _repository = repository,
        _imagePicker = imagePicker,
        _preferencesService = preferencesService,
        _userId = userId,
@@ -115,6 +120,7 @@ class MinistryController extends StateNotifier<MinistryState> {
   final DeleteMinistryUseCase _deleteMinistryUseCase;
   final WatchMinistryUseCase _watchMinistryUseCase;
   final WatchMinistriesByUserUseCase _watchMinistriesByUserUseCase;
+  final MinistryRepository _repository;
   final ImagePicker _imagePicker;
   final PreferencesService _preferencesService;
   String? _userId;
@@ -414,6 +420,7 @@ class MinistryController extends StateNotifier<MinistryState> {
             createdAt: m.createdAt,
             administratorId: m.administratorId,
             logoUrl: m.logoUrl,
+            subscriptionType: m.subscriptionType, // Preserve subscription type
           );
         }
         return m;
@@ -574,8 +581,59 @@ class MinistryController extends StateNotifier<MinistryState> {
     }
   }
 
+  /// Delete ministry logo
+  Future<bool> deleteLogo(String ministryId) async {
+    if (_isDisposed) return false;
+    if (!_isDisposed) {
+      state = state.copyWith(isSaving: true, error: null);
+    }
+    try {
+      await _repository.removeMinistryLogo(ministryId);
+      if (_isDisposed) return false;
+
+      // Update in local state
+      final updatedMinistries = state.ministries.map((m) {
+        if (m.id == ministryId) {
+          return Ministry(
+            id: m.id,
+            name: m.name,
+            createdAt: m.createdAt,
+            administratorId: m.administratorId,
+            logoUrl: null, // Remove logo
+            subscriptionType: m.subscriptionType, // Preserve subscription type
+          );
+        }
+        return m;
+      }).toList();
+
+      Ministry? updatedSelected = state.selectedMinistry;
+      if (state.selectedMinistry?.id == ministryId) {
+        updatedSelected = updatedMinistries.firstWhere(
+          (m) => m.id == ministryId,
+        );
+      }
+
+      if (!_isDisposed) {
+        state = state.copyWith(
+          ministries: updatedMinistries,
+          selectedMinistry: updatedSelected,
+          isSaving: false,
+        );
+      }
+      return true;
+    } catch (e) {
+      if (!_isDisposed) {
+        state = state.copyWith(
+          isSaving: false,
+          error: 'Failed to delete logo: ${e.toString()}',
+        );
+      }
+      return false;
+    }
+  }
+
   /// Upload ministry logo
-  Future<bool> uploadLogo(String ministryId) async {
+  Future<bool> uploadLogo(String ministryId, {Ministry? baseMinistry}) async {
     if (_isDisposed) return false;
     if (state.selectedImage == null) {
       return false;
@@ -592,24 +650,62 @@ class MinistryController extends StateNotifier<MinistryState> {
       if (_isDisposed) return false;
 
       // Update in local state
-      final updatedMinistries = state.ministries.map((m) {
-        if (m.id == ministryId) {
-          return Ministry(
-            id: m.id,
-            name: m.name,
-            createdAt: m.createdAt,
-            administratorId: m.administratorId,
-            logoUrl: logoUrl,
-          );
-        }
-        return m;
-      }).toList();
+      // First, try to find and update existing ministry
+      final ministryExists = state.ministries.any((m) => m.id == ministryId);
+      List<Ministry> updatedMinistries;
 
+      if (ministryExists) {
+        // Ministry exists in list, update it
+        updatedMinistries = state.ministries.map((m) {
+          if (m.id == ministryId) {
+            return Ministry(
+              id: m.id,
+              name: m.name,
+              createdAt: m.createdAt,
+              administratorId: m.administratorId,
+              logoUrl: logoUrl,
+              subscriptionType:
+                  m.subscriptionType, // Preserve subscription type
+            );
+          }
+          return m;
+        }).toList();
+      } else {
+        // Ministry doesn't exist in list, add it with the updated logo
+        // Try to get the ministry from selectedMinistry or baseMinistry parameter
+        final ministryToUse = state.selectedMinistry?.id == ministryId
+            ? state.selectedMinistry!
+            : baseMinistry;
+
+        if (ministryToUse != null) {
+          updatedMinistries = [
+            ...state.ministries,
+            Ministry(
+              id: ministryToUse.id,
+              name: ministryToUse.name,
+              createdAt: ministryToUse.createdAt,
+              administratorId: ministryToUse.administratorId,
+              logoUrl: logoUrl,
+              subscriptionType: ministryToUse.subscriptionType,
+            ),
+          ];
+        } else {
+          updatedMinistries = state.ministries;
+        }
+      }
+
+      // Update selectedMinistry if it matches the ministry we just updated
       Ministry? updatedSelected = state.selectedMinistry;
-      if (state.selectedMinistry?.id == ministryId) {
-        updatedSelected = updatedMinistries.firstWhere(
-          (m) => m.id == ministryId,
-        );
+      if (state.selectedMinistry?.id == ministryId ||
+          (baseMinistry != null && baseMinistry.id == ministryId)) {
+        try {
+          updatedSelected = updatedMinistries.firstWhere(
+            (m) => m.id == ministryId,
+          );
+        } catch (e) {
+          // Ministry not found in list, keep current selectedMinistry
+          updatedSelected = state.selectedMinistry;
+        }
       }
 
       if (!_isDisposed) {
@@ -680,6 +776,12 @@ class MinistryController extends StateNotifier<MinistryState> {
     state = state.copyWith(error: null);
   }
 
+  /// Clear selected image
+  void clearSelectedImage() {
+    if (_isDisposed) return;
+    state = state.copyWith(selectedImage: null, selectedImagePath: null);
+  }
+
   /// Reset state
   void reset() {
     _ministrySubscription?.cancel();
@@ -748,9 +850,9 @@ class MinistryState {
     List<Ministry>? ministries,
     Ministry? selectedMinistry,
     String? preferredMinistryId,
-    List<int>? selectedImage,
-    String? selectedImagePath,
-    String? error,
+    Object? selectedImage = _undefined,
+    Object? selectedImagePath = _undefined,
+    Object? error = _undefined,
   }) {
     return MinistryState(
       isLoading: isLoading ?? this.isLoading,
@@ -760,9 +862,13 @@ class MinistryState {
       ministries: ministries ?? this.ministries,
       selectedMinistry: selectedMinistry ?? this.selectedMinistry,
       preferredMinistryId: preferredMinistryId ?? this.preferredMinistryId,
-      selectedImage: selectedImage ?? this.selectedImage,
-      selectedImagePath: selectedImagePath ?? this.selectedImagePath,
-      error: error,
+      selectedImage: selectedImage == _undefined
+          ? this.selectedImage
+          : selectedImage as List<int>?,
+      selectedImagePath: selectedImagePath == _undefined
+          ? this.selectedImagePath
+          : selectedImagePath as String?,
+      error: error == _undefined ? this.error : error as String?,
     );
   }
 }
@@ -789,6 +895,7 @@ final ministryControllerProvider =
         watchMinistriesByUserUseCase: ref.watch(
           watchMinistriesByUserUseCaseProvider,
         ),
+        repository: ref.watch(ministryRepositoryProvider),
         imagePicker: ImagePicker(),
         preferencesService: preferencesService,
         userId: userId,

@@ -46,6 +46,12 @@ class _MinistrySettingsOverlayState
         });
       }
     });
+
+    // Clear any previously selected image when opening the dialog
+    // Use addPostFrameCallback to avoid modifying provider during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(ministryControllerProvider.notifier).clearSelectedImage();
+    });
   }
 
   @override
@@ -85,7 +91,7 @@ class _MinistrySettingsOverlayState
     if (ministryState.selectedImage != null) {
       final success = await ref
           .read(ministryControllerProvider.notifier)
-          .uploadLogo(ministry.id);
+          .uploadLogo(ministry.id, baseMinistry: ministry);
       if (!success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -222,12 +228,35 @@ class _LogoSection extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final ministryState = ref.watch(ministryControllerProvider);
 
+    // Use ministry from state if available, otherwise use widget.ministry
+    // Always prefer state over widget.ministry to get latest updates
+    // Check selectedMinistry first, then ministries list, then fallback to widget.ministry
+    // But merge any updates from state (like logoUrl) into the ministry
+    Ministry currentMinistry;
+    if (ministryState.selectedMinistry?.id == ministry.id) {
+      currentMinistry = ministryState.selectedMinistry!;
+    } else {
+      try {
+        final ministryInList = ministryState.ministries.firstWhere(
+          (m) => m.id == ministry.id,
+        );
+        currentMinistry = ministryInList;
+      } catch (e) {
+        // Ministry not found in state, use widget.ministry as fallback
+        // But check if there's a selectedImagePath that was just cleared,
+        // which means logo was just uploaded - in that case, the state should have it
+        // For now, use widget.ministry but the state should update via stream
+        currentMinistry = ministry;
+      }
+    }
+
     ImageProvider? getLogoImage() {
       if (ministryState.selectedImagePath != null) {
         return FileImage(File(ministryState.selectedImagePath!));
       }
-      if (ministry.logoUrl != null && ministry.logoUrl!.isNotEmpty) {
-        return NetworkImage(ministry.logoUrl!);
+      if (currentMinistry.logoUrl != null &&
+          currentMinistry.logoUrl!.isNotEmpty) {
+        return NetworkImage(currentMinistry.logoUrl!);
       }
       return null;
     }
@@ -267,6 +296,15 @@ class _LogoSection extends ConsumerWidget {
                 right: 0,
                 child: _buildCameraButton(context, ref, theme),
               ),
+              // Delete button (only show if logo exists)
+              if (currentMinistry.logoUrl != null &&
+                  currentMinistry.logoUrl!.isNotEmpty &&
+                  ministryState.selectedImagePath == null)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: _buildDeleteButton(context, ref, theme),
+                ),
             ],
           ),
         ),
@@ -280,16 +318,101 @@ class _LogoSection extends ConsumerWidget {
     ThemeData theme,
   ) {
     return Container(
+      width: 32,
+      height: 32,
       decoration: BoxDecoration(
         color: theme.colorScheme.primary,
         shape: BoxShape.circle,
       ),
       child: IconButton(
-        icon: const Icon(Icons.camera_alt, size: 20),
+        icon: const Icon(Icons.camera_alt, size: 16),
+        iconSize: 16,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
         color: theme.colorScheme.onPrimary,
         onPressed: () => _showImageSourceDialog(context, ref),
       ),
     );
+  }
+
+  Widget _buildDeleteButton(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeData theme,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.error,
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.delete, size: 16),
+        iconSize: 16,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        color: theme.colorScheme.onError,
+        tooltip: l10n.ministryLogoDelete,
+        onPressed: () => _showDeleteLogoDialog(context, ref),
+      ),
+    );
+  }
+
+  Future<void> _showDeleteLogoDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final ministryState = ref.read(ministryControllerProvider);
+
+    // Get current ministry from state
+    final currentMinistry =
+        ministryState.selectedMinistry ??
+        ministryState.ministries.firstWhere(
+          (m) => m.id == ministry.id,
+          orElse: () => ministry,
+        );
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.ministryLogoDeleteTitle),
+        content: Text(l10n.ministryLogoDeleteMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.ministryCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: Text(l10n.ministryDeleteConfirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final success = await ref
+          .read(ministryControllerProvider.notifier)
+          .deleteLogo(currentMinistry.id);
+
+      if (context.mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.ministryLogoDeleteSuccess)),
+          );
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.ministryLogoDeleteError)));
+        }
+      }
+    }
   }
 
   Future<void> _showImageSourceDialog(

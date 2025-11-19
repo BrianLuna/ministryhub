@@ -333,6 +333,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get ministryLogoUploadError => 'Error al subir el logo';
 
   @override
+  String get ministryLogoUploadSuccess => 'Logo subido correctamente';
+
+  @override
+  String get ministryLogoDelete => 'Eliminar Logo';
+
+  @override
+  String get ministryLogoDeleteTitle => 'Eliminar Logo';
+
+  @override
+  String get ministryLogoDeleteMessage =>
+      '¿Estás seguro de que deseas eliminar este logo? Esta acción no se puede deshacer.';
+
+  @override
+  String get ministryLogoDeleteSuccess => 'Logo eliminado correctamente';
+
+  @override
+  String get ministryLogoDeleteError => 'Error al eliminar el logo';
+
+  @override
   String get ministryDeleteButton => 'Eliminar Ministerio';
 
   @override

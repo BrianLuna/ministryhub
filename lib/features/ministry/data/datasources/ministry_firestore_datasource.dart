@@ -207,6 +207,20 @@ class MinistryFirestoreDatasource {
     }
   }
 
+  /// Remove ministry logo URL (set to null)
+  Future<void> removeMinistryLogoUrl(String ministryId) async {
+    try {
+      await _firestore.collection('ministries').doc(ministryId).update({
+        'logoUrl': null,
+      });
+    } catch (e) {
+      throw MinistryException(
+        message: 'Failed to remove ministry logo: ${e.toString()}',
+        cause: e,
+      );
+    }
+  }
+
   /// Update ministry subscription type
   Future<void> updateMinistrySubscriptionType({
     required String ministryId,

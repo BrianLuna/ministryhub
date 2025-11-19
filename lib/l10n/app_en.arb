@@ -408,6 +408,30 @@
   "@ministryLogoUploadError": {
     "description": "Error message when logo upload fails"
   },
+  "ministryLogoUploadSuccess": "Logo uploaded successfully",
+  "@ministryLogoUploadSuccess": {
+    "description": "Success message when logo is uploaded"
+  },
+  "ministryLogoDelete": "Delete Logo",
+  "@ministryLogoDelete": {
+    "description": "Button tooltip to delete ministry logo"
+  },
+  "ministryLogoDeleteTitle": "Delete Logo",
+  "@ministryLogoDeleteTitle": {
+    "description": "Title for delete logo confirmation dialog"
+  },
+  "ministryLogoDeleteMessage": "Are you sure you want to delete this logo? This action cannot be undone.",
+  "@ministryLogoDeleteMessage": {
+    "description": "Confirmation message for deleting ministry logo"
+  },
+  "ministryLogoDeleteSuccess": "Logo deleted successfully",
+  "@ministryLogoDeleteSuccess": {
+    "description": "Success message after deleting logo"
+  },
+  "ministryLogoDeleteError": "Error deleting logo",
+  "@ministryLogoDeleteError": {
+    "description": "Error message when logo deletion fails"
+  },
   "ministryDeleteButton": "Delete Ministry",
   "@ministryDeleteButton": {
     "description": "Button label to delete ministry"
