@@ -59,9 +59,11 @@ class MinistrySelectionBar extends ConsumerWidget {
               foregroundColor: theme.colorScheme.primary,
             ),
           ),
-          // Settings button (only enabled when ministry is selected)
+          // Settings button (only enabled when ministry is selected and exists in list)
           IconButton(
-            onPressed: selectedMinistry == null
+            onPressed:
+                selectedMinistry == null ||
+                    !ministries.any((m) => m.id == selectedMinistry.id)
                 ? null
                 : () {
                     MinistrySettingsOverlay.show(context, selectedMinistry);

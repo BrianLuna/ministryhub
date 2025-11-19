@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -137,10 +138,13 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   bool _controllersInitialized = false;
+  bool _hasImageError = false;
+  String? _lastPhotoUrl;
 
   @override
   void initState() {
     super.initState();
+    _lastPhotoUrl = widget.user.photoUrl;
     _initializeControllers();
   }
 
@@ -152,6 +156,25 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
     if (!_controllersInitialized &&
         oldWidget.settingsState.profile != widget.settingsState.profile) {
       _initializeControllers();
+    }
+    // Reset image error if photo URL changed
+    final currentPhotoUrl = widget.user.photoUrl;
+    if (_lastPhotoUrl != currentPhotoUrl) {
+      _lastPhotoUrl = currentPhotoUrl;
+      if (_hasImageError) {
+        setState(() {
+          _hasImageError = false;
+        });
+      }
+    }
+    // Reset image error if a new local image was selected
+    if (oldWidget.settingsState.selectedImagePath !=
+        widget.settingsState.selectedImagePath) {
+      if (_hasImageError) {
+        setState(() {
+          _hasImageError = false;
+        });
+      }
     }
   }
 
@@ -202,6 +225,19 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
                 radius: 50,
                 backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 backgroundImage: _getPhotoImage(),
+                onBackgroundImageError: _getPhotoImage() != null
+                    ? (exception, stackTrace) {
+                        if (mounted) {
+                          SchedulerBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              setState(() {
+                                _hasImageError = true;
+                              });
+                            }
+                          });
+                        }
+                      }
+                    : null,
                 child: _getPhotoImage() == null
                     ? Text(
                         _getInitials(),
@@ -293,7 +329,9 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
     if (settingsState.selectedImagePath != null) {
       return FileImage(File(settingsState.selectedImagePath!));
     }
-    if (widget.user.photoUrl != null && widget.user.photoUrl!.isNotEmpty) {
+    if (widget.user.photoUrl != null &&
+        widget.user.photoUrl!.isNotEmpty &&
+        !_hasImageError) {
       return NetworkImage(widget.user.photoUrl!);
     }
     return null;
