@@ -31,7 +31,6 @@ void main() {
 
       // Two SVGs: MinistryHub logotype + Google logo
       expect(find.byType(SvgPicture), findsNWidgets(2));
-      expect(find.text('Login / Register'), findsOneWidget);
       expect(find.text('Login'), findsOneWidget);
       expect(find.text('Register'), findsOneWidget);
       expect(find.text('Enter MinistryHub'), findsOneWidget);

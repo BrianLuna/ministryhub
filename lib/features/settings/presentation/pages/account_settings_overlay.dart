@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -106,6 +107,9 @@ class _AccountSettingsOverlayState
                   // Language Section
                   _LanguageSection(),
                   const SizedBox(height: 24),
+                  // Preferred Ministry Section
+                  _PreferredMinistrySection(),
+                  const SizedBox(height: 24),
                   // Delete Account Button
                   _DeleteAccountSection(user: user),
                   const SizedBox(height: 32),
@@ -134,10 +138,13 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   bool _controllersInitialized = false;
+  bool _hasImageError = false;
+  String? _lastPhotoUrl;
 
   @override
   void initState() {
     super.initState();
+    _lastPhotoUrl = widget.user.photoUrl;
     _initializeControllers();
   }
 
@@ -149,6 +156,25 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
     if (!_controllersInitialized &&
         oldWidget.settingsState.profile != widget.settingsState.profile) {
       _initializeControllers();
+    }
+    // Reset image error if photo URL changed
+    final currentPhotoUrl = widget.user.photoUrl;
+    if (_lastPhotoUrl != currentPhotoUrl) {
+      _lastPhotoUrl = currentPhotoUrl;
+      if (_hasImageError) {
+        setState(() {
+          _hasImageError = false;
+        });
+      }
+    }
+    // Reset image error if a new local image was selected
+    if (oldWidget.settingsState.selectedImagePath !=
+        widget.settingsState.selectedImagePath) {
+      if (_hasImageError) {
+        setState(() {
+          _hasImageError = false;
+        });
+      }
     }
   }
 
@@ -199,6 +225,19 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
                 radius: 50,
                 backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 backgroundImage: _getPhotoImage(),
+                onBackgroundImageError: _getPhotoImage() != null
+                    ? (exception, stackTrace) {
+                        if (mounted) {
+                          SchedulerBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              setState(() {
+                                _hasImageError = true;
+                              });
+                            }
+                          });
+                        }
+                      }
+                    : null,
                 child: _getPhotoImage() == null
                     ? Text(
                         _getInitials(),
@@ -290,7 +329,9 @@ class _ProfileSectionState extends ConsumerState<_ProfileSection> {
     if (settingsState.selectedImagePath != null) {
       return FileImage(File(settingsState.selectedImagePath!));
     }
-    if (widget.user.photoUrl != null && widget.user.photoUrl!.isNotEmpty) {
+    if (widget.user.photoUrl != null &&
+        widget.user.photoUrl!.isNotEmpty &&
+        !_hasImageError) {
       return NetworkImage(widget.user.photoUrl!);
     }
     return null;
@@ -530,6 +571,103 @@ class _LanguageSection extends ConsumerWidget {
   }
 }
 
+/// Preferred ministry section widget
+class _PreferredMinistrySection extends ConsumerStatefulWidget {
+  const _PreferredMinistrySection();
+
+  @override
+  ConsumerState<_PreferredMinistrySection> createState() =>
+      _PreferredMinistrySectionState();
+}
+
+class _PreferredMinistrySectionState
+    extends ConsumerState<_PreferredMinistrySection> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authState = ref.read(authControllerProvider);
+      final uid = authState.user?.uid;
+      if (uid != null) {
+        ref.read(ministryControllerProvider.notifier).loadMinistries(uid);
+      }
+    });
+  }
+
+  /// Get a valid preferred ministry ID that exists in the ministries list
+  String? _getValidPreferredMinistryId(
+    String? preferredMinistryId,
+    List<Ministry> ministries,
+  ) {
+    if (preferredMinistryId == null) {
+      return ministries.isNotEmpty ? ministries.first.id : null;
+    }
+    // Check if preferred ministry ID exists in the list
+    final exists = ministries.any((m) => m.id == preferredMinistryId);
+    if (exists) {
+      return preferredMinistryId;
+    }
+    // If preferred ministry doesn't exist, return first or null
+    return ministries.isNotEmpty ? ministries.first.id : null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final ministryState = ref.watch(ministryControllerProvider);
+    final authState = ref.watch(authControllerProvider);
+    final user = authState.user;
+    final ministries = ministryState.ministries;
+
+    if (user == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.settingsPreferredMinistrySection,
+          style: theme.textTheme.titleLarge,
+        ),
+        const SizedBox(height: 16),
+        if (ministries.isEmpty)
+          Text(
+            l10n.settingsNoMinistriesAvailable,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          )
+        else
+          DropdownButtonFormField<String>(
+            value: _getValidPreferredMinistryId(
+              ministryState.preferredMinistryId,
+              ministries,
+            ),
+            decoration: InputDecoration(
+              labelText: l10n.settingsPreferredMinistryLabel,
+              hintText: l10n.settingsPreferredMinistryHint,
+            ),
+            items: ministries.map((ministry) {
+              return DropdownMenuItem<String>(
+                value: ministry.id,
+                child: Text(ministry.name),
+              );
+            }).toList(),
+            onChanged: (ministryId) {
+              if (ministryId != null) {
+                ref
+                    .read(ministryControllerProvider.notifier)
+                    .setPreferredMinistry(ministryId, user.uid);
+              }
+            },
+          ),
+      ],
+    );
+  }
+}
+
 /// Delete account section widget
 class _DeleteAccountSection extends ConsumerWidget {
   const _DeleteAccountSection({required this.user});
@@ -541,31 +679,50 @@ class _DeleteAccountSection extends ConsumerWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final settingsState = ref.watch(settingsControllerProvider);
+    final ministryState = ref.watch(ministryControllerProvider);
+
+    // Check if user is administrator
+    final isAdministrator = ministryState.ministries.any(
+      (m) => m.administratorId == user.uid,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Divider(),
         const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: settingsState.isDeleting
-              ? null
-              : () => _showDeleteConfirmation(context, ref),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.error,
-            foregroundColor: theme.colorScheme.onError,
+        if (isAdministrator)
+          Tooltip(
+            message: l10n.settingsDeleteAccountAdministratorRestriction,
+            child: ElevatedButton(
+              onPressed: null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.errorContainer,
+                foregroundColor: theme.colorScheme.onErrorContainer,
+              ),
+              child: Text(l10n.settingsDeleteAccountButton),
+            ),
+          )
+        else
+          ElevatedButton(
+            onPressed: settingsState.isDeleting
+                ? null
+                : () => _showDeleteConfirmation(context, ref),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
+            ),
+            child: settingsState.isDeleting
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text(l10n.settingsDeleteAccountButton),
           ),
-          child: settingsState.isDeleting
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : Text(l10n.settingsDeleteAccountButton),
-        ),
       ],
     );
   }

@@ -12,9 +12,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appTitle => 'MinistryHub';
 
   @override
-  String get loginRegisterTitle => 'Inicio de Sesión / Registro';
-
-  @override
   String get welcome => 'Bienvenido';
 
   @override
@@ -60,10 +57,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dividerLabel => 'o';
-
-  @override
-  String get authFooterHint =>
-      'Si el correo es nuevo, te guiaremos para crear una cuenta.';
 
   @override
   String get emailRequiredError => 'Ingresa tu correo electrónico.';
@@ -262,4 +255,102 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settingsGoogleDisplayNameHint =>
       'Nombre mostrado de la cuenta de Google';
+
+  @override
+  String get settingsPreferredMinistrySection => 'Ministerio Preferido';
+
+  @override
+  String get settingsPreferredMinistryLabel => 'Ministerio Preferido';
+
+  @override
+  String get settingsPreferredMinistryHint =>
+      'Selecciona tu ministerio preferido';
+
+  @override
+  String get settingsNoMinistriesAvailable =>
+      'No hay ministerios disponibles. Crea un ministerio para establecer uno preferido.';
+
+  @override
+  String get settingsDeleteAccountAdministratorRestriction =>
+      'No puedes eliminar tu cuenta mientras seas administrador de un ministerio. Por favor, transfiere los derechos de administración a otro usuario primero.';
+
+  @override
+  String get ministryCreateTitle => 'Crear Ministerio';
+
+  @override
+  String get ministryNameLabel => 'Nombre del Ministerio';
+
+  @override
+  String get ministryNameHint => 'Ingresa el nombre del ministerio';
+
+  @override
+  String get ministryNameRequired => 'El nombre del ministerio es requerido';
+
+  @override
+  String get ministryNameTooShort =>
+      'El nombre del ministerio debe tener al menos 2 caracteres';
+
+  @override
+  String get ministryCancel => 'Cancelar';
+
+  @override
+  String get ministryCreate => 'Crear';
+
+  @override
+  String get ministrySelectMinistry => 'Seleccionar Ministerio';
+
+  @override
+  String get ministryNoMinistries => 'No hay ministerios disponibles';
+
+  @override
+  String get ministrySettings => 'Configuración del Ministerio';
+
+  @override
+  String get ministrySettingsTitle => 'Configuración del Ministerio';
+
+  @override
+  String get ministryLogoLabel => 'Logo';
+
+  @override
+  String get ministryLogoSourceTitle => 'Seleccionar Fuente del Logo';
+
+  @override
+  String get ministryLogoSourceGallery => 'Galería';
+
+  @override
+  String get ministryLogoSourceCamera => 'Cámara';
+
+  @override
+  String get ministrySave => 'Guardar';
+
+  @override
+  String get ministryUpdateSuccess => 'Ministerio actualizado correctamente';
+
+  @override
+  String get ministryUpdateError => 'Error al actualizar el ministerio';
+
+  @override
+  String get ministryLogoUploadError => 'Error al subir el logo';
+
+  @override
+  String get ministryDeleteButton => 'Eliminar Ministerio';
+
+  @override
+  String get ministryDeleteTitle => 'Eliminar Ministerio';
+
+  @override
+  String get ministryDeleteMessage =>
+      '¿Estás seguro de que deseas eliminar este ministerio? Esta acción no se puede deshacer y se eliminarán todos los datos del ministerio.';
+
+  @override
+  String get ministryDeleteConfirm => 'Eliminar';
+
+  @override
+  String get ministryDeleteCancel => 'Cancelar';
+
+  @override
+  String get ministryDeleteSuccess => 'Ministerio eliminado correctamente';
+
+  @override
+  String get ministryDeleteError => 'Error al eliminar el ministerio';
 }

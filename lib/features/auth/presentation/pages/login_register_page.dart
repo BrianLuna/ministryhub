@@ -641,18 +641,6 @@ class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      l10n.loginRegisterTitle,
-                      style: theme.textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.authFooterHint,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
                     formFields,
                     const SizedBox(height: 8),
                     divider,

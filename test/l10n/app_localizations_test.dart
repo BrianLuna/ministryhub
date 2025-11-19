@@ -48,7 +48,7 @@ void main() {
           child: Builder(
             builder: (context) {
               final l10n = AppLocalizations.of(context)!;
-              return Text(l10n.loginRegisterTitle);
+              return Text(l10n.welcome);
             },
           ),
         ),
@@ -56,7 +56,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Inicio de Sesión / Registro'), findsOneWidget);
+      expect(find.text('Bienvenido'), findsOneWidget);
     });
 
     testWidgets('should have correct English translations', (
@@ -71,7 +71,6 @@ void main() {
               return Column(
                 children: [
                   Text(l10n.appTitle),
-                  Text(l10n.loginRegisterTitle),
                   Text(l10n.welcome),
                   Text(l10n.loginRegisterFormPlaceholder),
                 ],
@@ -84,7 +83,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('MinistryHub'), findsOneWidget);
-      expect(find.text('Login / Register'), findsOneWidget);
       expect(find.text('Welcome'), findsOneWidget);
       expect(find.text('Login/Register form'), findsOneWidget);
     });
@@ -101,7 +99,6 @@ void main() {
               return Column(
                 children: [
                   Text(l10n.appTitle),
-                  Text(l10n.loginRegisterTitle),
                   Text(l10n.welcome),
                   Text(l10n.loginRegisterFormPlaceholder),
                 ],
@@ -114,7 +111,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('MinistryHub'), findsOneWidget);
-      expect(find.text('Inicio de Sesión / Registro'), findsOneWidget);
       expect(find.text('Bienvenido'), findsOneWidget);
       expect(
         find.text('Formulario de inicio de sesión/registro'),

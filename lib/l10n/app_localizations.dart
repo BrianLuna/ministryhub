@@ -104,12 +104,6 @@ abstract class AppLocalizations {
   /// **'MinistryHub'**
   String get appTitle;
 
-  /// Title for login and register page
-  ///
-  /// In en, this message translates to:
-  /// **'Login / Register'**
-  String get loginRegisterTitle;
-
   /// Welcome message
   ///
   /// In en, this message translates to:
@@ -199,12 +193,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'or'**
   String get dividerLabel;
-
-  /// Footer hint explaining the create account flow
-  ///
-  /// In en, this message translates to:
-  /// **'If the email is new, we will guide you to create an account.'**
-  String get authFooterHint;
 
   /// Validation error for empty email field
   ///
@@ -577,6 +565,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Display name from Google account'**
   String get settingsGoogleDisplayNameHint;
+
+  /// Title for preferred ministry section in account settings
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Ministry'**
+  String get settingsPreferredMinistrySection;
+
+  /// Label for preferred ministry dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Ministry'**
+  String get settingsPreferredMinistryLabel;
+
+  /// Hint text for preferred ministry dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Select your preferred ministry'**
+  String get settingsPreferredMinistryHint;
+
+  /// Message shown when no ministries are available
+  ///
+  /// In en, this message translates to:
+  /// **'No ministries available. Create a ministry to set a preferred one.'**
+  String get settingsNoMinistriesAvailable;
+
+  /// Tooltip message explaining why account deletion is disabled for administrators
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot delete your account while you are an administrator of a ministry. Please transfer administration rights to another user first.'**
+  String get settingsDeleteAccountAdministratorRestriction;
+
+  /// Title for create ministry dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Create Ministry'**
+  String get ministryCreateTitle;
+
+  /// Label for ministry name field
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry Name'**
+  String get ministryNameLabel;
+
+  /// Hint text for ministry name field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter ministry name'**
+  String get ministryNameHint;
+
+  /// Error message when ministry name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry name is required'**
+  String get ministryNameRequired;
+
+  /// Error message when ministry name is too short
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry name must be at least 2 characters'**
+  String get ministryNameTooShort;
+
+  /// Cancel button label
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get ministryCancel;
+
+  /// Create button label
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get ministryCreate;
+
+  /// Placeholder text for ministry selector when no ministry is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Select Ministry'**
+  String get ministrySelectMinistry;
+
+  /// Message shown when user has no ministries
+  ///
+  /// In en, this message translates to:
+  /// **'No ministries available'**
+  String get ministryNoMinistries;
+
+  /// Tooltip for ministry settings button
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry Settings'**
+  String get ministrySettings;
+
+  /// Title for ministry settings overlay
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry Settings'**
+  String get ministrySettingsTitle;
+
+  /// Label for ministry logo section
+  ///
+  /// In en, this message translates to:
+  /// **'Logo'**
+  String get ministryLogoLabel;
+
+  /// Title for logo source selection dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Select Logo Source'**
+  String get ministryLogoSourceTitle;
+
+  /// Option to select logo from gallery
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get ministryLogoSourceGallery;
+
+  /// Option to take logo photo with camera
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get ministryLogoSourceCamera;
+
+  /// Save button label in ministry settings
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get ministrySave;
+
+  /// Success message after updating ministry
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry updated successfully'**
+  String get ministryUpdateSuccess;
+
+  /// Error message when ministry update fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating ministry'**
+  String get ministryUpdateError;
+
+  /// Error message when logo upload fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error uploading logo'**
+  String get ministryLogoUploadError;
+
+  /// Button label to delete ministry
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Ministry'**
+  String get ministryDeleteButton;
+
+  /// Title for delete ministry confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Ministry'**
+  String get ministryDeleteTitle;
+
+  /// Message in delete ministry confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this ministry? This action cannot be undone and all ministry data will be deleted.'**
+  String get ministryDeleteMessage;
+
+  /// Confirm button in delete ministry dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get ministryDeleteConfirm;
+
+  /// Cancel button in delete ministry dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get ministryDeleteCancel;
+
+  /// Success message after deleting ministry
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry deleted successfully'**
+  String get ministryDeleteSuccess;
+
+  /// Error message when ministry deletion fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting ministry'**
+  String get ministryDeleteError;
 }
 
 class _AppLocalizationsDelegate

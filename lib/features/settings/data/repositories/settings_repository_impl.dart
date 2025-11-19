@@ -128,6 +128,22 @@ class SettingsRepositoryImpl implements SettingsRepository {
         throw const SettingsException(message: 'User not authenticated');
       }
 
+      // Check if user is administrator of any ministry
+      // Import ministry repository to check
+      final ministryRepository = MinistryRepositoryImpl(
+        firestoreDatasource: MinistryFirestoreDatasource(),
+        storageDatasource: MinistryStorageDatasource(),
+      );
+      final checkAdminUseCase = CheckUserIsAdministratorUseCase(
+        ministryRepository,
+      );
+      final isAdministrator = await checkAdminUseCase(uid);
+      if (isAdministrator) {
+        throw const SettingsException(
+          message: 'Cannot delete account: user is administrator of a ministry',
+        );
+      }
+
       // Get profile to check for photo path
       final profile = await getUserProfile(uid);
 

@@ -24,5 +24,11 @@ class AuthFailure extends AppException {
 /// Specialized exception for settings operations failures.
 class SettingsException extends AppException {
   const SettingsException({required super.message, super.cause})
-      : super(code: 'settings_error');
+    : super(code: 'settings_error');
+}
+
+/// Specialized exception for ministry operations failures.
+class MinistryException extends AppException {
+  const MinistryException({required super.message, super.cause})
+    : super(code: 'ministry_error');
 }

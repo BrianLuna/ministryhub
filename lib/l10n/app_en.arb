@@ -4,10 +4,6 @@
   "@appTitle": {
     "description": "Application title"
   },
-  "loginRegisterTitle": "Login / Register",
-  "@loginRegisterTitle": {
-    "description": "Title for login and register page"
-  },
   "welcome": "Welcome",
   "@welcome": {
     "description": "Welcome message"
@@ -67,10 +63,6 @@
   "dividerLabel": "or",
   "@dividerLabel": {
     "description": "Text shown between dividers"
-  },
-  "authFooterHint": "If the email is new, we will guide you to create an account.",
-  "@authFooterHint": {
-    "description": "Footer hint explaining the create account flow"
   },
   "emailRequiredError": "Please enter your email.",
   "@emailRequiredError": {
@@ -319,5 +311,129 @@
   "settingsGoogleDisplayNameHint": "Display name from Google account",
   "@settingsGoogleDisplayNameHint": {
     "description": "Helper text for Google account display name field"
+  },
+  "settingsPreferredMinistrySection": "Preferred Ministry",
+  "@settingsPreferredMinistrySection": {
+    "description": "Title for preferred ministry section in account settings"
+  },
+  "settingsPreferredMinistryLabel": "Preferred Ministry",
+  "@settingsPreferredMinistryLabel": {
+    "description": "Label for preferred ministry dropdown"
+  },
+  "settingsPreferredMinistryHint": "Select your preferred ministry",
+  "@settingsPreferredMinistryHint": {
+    "description": "Hint text for preferred ministry dropdown"
+  },
+  "settingsNoMinistriesAvailable": "No ministries available. Create a ministry to set a preferred one.",
+  "@settingsNoMinistriesAvailable": {
+    "description": "Message shown when no ministries are available"
+  },
+  "settingsDeleteAccountAdministratorRestriction": "You cannot delete your account while you are an administrator of a ministry. Please transfer administration rights to another user first.",
+  "@settingsDeleteAccountAdministratorRestriction": {
+    "description": "Tooltip message explaining why account deletion is disabled for administrators"
+  },
+  "ministryCreateTitle": "Create Ministry",
+  "@ministryCreateTitle": {
+    "description": "Title for create ministry dialog"
+  },
+  "ministryNameLabel": "Ministry Name",
+  "@ministryNameLabel": {
+    "description": "Label for ministry name field"
+  },
+  "ministryNameHint": "Enter ministry name",
+  "@ministryNameHint": {
+    "description": "Hint text for ministry name field"
+  },
+  "ministryNameRequired": "Ministry name is required",
+  "@ministryNameRequired": {
+    "description": "Error message when ministry name is empty"
+  },
+  "ministryNameTooShort": "Ministry name must be at least 2 characters",
+  "@ministryNameTooShort": {
+    "description": "Error message when ministry name is too short"
+  },
+  "ministryCancel": "Cancel",
+  "@ministryCancel": {
+    "description": "Cancel button label"
+  },
+  "ministryCreate": "Create",
+  "@ministryCreate": {
+    "description": "Create button label"
+  },
+  "ministrySelectMinistry": "Select Ministry",
+  "@ministrySelectMinistry": {
+    "description": "Placeholder text for ministry selector when no ministry is selected"
+  },
+  "ministryNoMinistries": "No ministries available",
+  "@ministryNoMinistries": {
+    "description": "Message shown when user has no ministries"
+  },
+  "ministrySettings": "Ministry Settings",
+  "@ministrySettings": {
+    "description": "Tooltip for ministry settings button"
+  },
+  "ministrySettingsTitle": "Ministry Settings",
+  "@ministrySettingsTitle": {
+    "description": "Title for ministry settings overlay"
+  },
+  "ministryLogoLabel": "Logo",
+  "@ministryLogoLabel": {
+    "description": "Label for ministry logo section"
+  },
+  "ministryLogoSourceTitle": "Select Logo Source",
+  "@ministryLogoSourceTitle": {
+    "description": "Title for logo source selection dialog"
+  },
+  "ministryLogoSourceGallery": "Gallery",
+  "@ministryLogoSourceGallery": {
+    "description": "Option to select logo from gallery"
+  },
+  "ministryLogoSourceCamera": "Camera",
+  "@ministryLogoSourceCamera": {
+    "description": "Option to take logo photo with camera"
+  },
+  "ministrySave": "Save",
+  "@ministrySave": {
+    "description": "Save button label in ministry settings"
+  },
+  "ministryUpdateSuccess": "Ministry updated successfully",
+  "@ministryUpdateSuccess": {
+    "description": "Success message after updating ministry"
+  },
+  "ministryUpdateError": "Error updating ministry",
+  "@ministryUpdateError": {
+    "description": "Error message when ministry update fails"
+  },
+  "ministryLogoUploadError": "Error uploading logo",
+  "@ministryLogoUploadError": {
+    "description": "Error message when logo upload fails"
+  },
+  "ministryDeleteButton": "Delete Ministry",
+  "@ministryDeleteButton": {
+    "description": "Button label to delete ministry"
+  },
+  "ministryDeleteTitle": "Delete Ministry",
+  "@ministryDeleteTitle": {
+    "description": "Title for delete ministry confirmation dialog"
+  },
+  "ministryDeleteMessage": "Are you sure you want to delete this ministry? This action cannot be undone and all ministry data will be deleted.",
+  "@ministryDeleteMessage": {
+    "description": "Message in delete ministry confirmation dialog"
+  },
+  "ministryDeleteConfirm": "Delete",
+  "@ministryDeleteConfirm": {
+    "description": "Confirm button in delete ministry dialog"
+  },
+  "ministryDeleteCancel": "Cancel",
+  "@ministryDeleteCancel": {
+    "description": "Cancel button in delete ministry dialog"
+  },
+  "ministryDeleteSuccess": "Ministry deleted successfully",
+  "@ministryDeleteSuccess": {
+    "description": "Success message after deleting ministry"
+  },
+  "ministryDeleteError": "Error deleting ministry",
+  "@ministryDeleteError": {
+    "description": "Error message when ministry deletion fails"
   }
 }
