@@ -145,11 +145,13 @@ class _MinistrySettingsOverlayState
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Row(
               children: [
-                Text(
-                  l10n.ministrySettingsTitle,
-                  style: theme.textTheme.headlineSmall,
+                Expanded(
+                  child: Text(
+                    l10n.ministrySettingsTitle,
+                    style: theme.textTheme.titleLarge,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.of(context).pop(),

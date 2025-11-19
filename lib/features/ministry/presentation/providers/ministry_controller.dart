@@ -109,17 +109,23 @@ class MinistryController extends StateNotifier<MinistryState> {
   String? _userId;
   StreamSubscription<Ministry?>? _ministrySubscription;
   StreamSubscription<List<Ministry>>? _ministriesListSubscription;
+  bool _isDisposed = false;
 
   /// Load ministries for the current user
   Future<void> loadMinistries(String userId) async {
+    if (_isDisposed) return;
     _userId = userId;
-    state = state.copyWith(isLoading: true);
+    if (!_isDisposed) {
+      state = state.copyWith(isLoading: true);
+    }
     try {
       final ministries = await _getMinistriesByUserUseCase(userId);
+      if (_isDisposed) return;
 
       // Load preferred ministry if not already set
-      if (state.selectedMinistry == null) {
+      if (state.selectedMinistry == null && !_isDisposed) {
         await _loadPreferredMinistry(userId);
+        if (_isDisposed) return;
       }
 
       // If preferred ministry is set, try to select it
@@ -128,34 +134,44 @@ class MinistryController extends StateNotifier<MinistryState> {
           (m) => m.id == state.preferredMinistryId,
           orElse: () => ministries.first,
         );
-        state = state.copyWith(
-          ministries: ministries,
-          selectedMinistry: preferred,
-          isLoading: false,
-        );
-        // Start watching the selected ministry
-        _watchSelectedMinistry(preferred.id);
+        if (!_isDisposed) {
+          state = state.copyWith(
+            ministries: ministries,
+            selectedMinistry: preferred,
+            isLoading: false,
+          );
+          // Start watching the selected ministry
+          _watchSelectedMinistry(preferred.id);
+        }
       } else if (ministries.isNotEmpty) {
         // Select first ministry if no preference
-        state = state.copyWith(
-          ministries: ministries,
-          selectedMinistry: ministries.first,
-          isLoading: false,
-        );
-        // Start watching the selected ministry
-        _watchSelectedMinistry(ministries.first.id);
+        if (!_isDisposed) {
+          state = state.copyWith(
+            ministries: ministries,
+            selectedMinistry: ministries.first,
+            isLoading: false,
+          );
+          // Start watching the selected ministry
+          _watchSelectedMinistry(ministries.first.id);
+        }
       } else {
-        state = state.copyWith(
-          ministries: ministries,
-          selectedMinistry: null,
-          isLoading: false,
-        );
+        if (!_isDisposed) {
+          state = state.copyWith(
+            ministries: ministries,
+            selectedMinistry: null,
+            isLoading: false,
+          );
+        }
       }
 
       // Start watching the ministries list for real-time updates
-      _watchMinistriesList(userId);
+      if (!_isDisposed) {
+        _watchMinistriesList(userId);
+      }
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      if (!_isDisposed) {
+        state = state.copyWith(isLoading: false, error: e.toString());
+      }
     }
   }
 
@@ -164,6 +180,7 @@ class MinistryController extends StateNotifier<MinistryState> {
     _ministriesListSubscription?.cancel();
     _ministriesListSubscription = _watchMinistriesByUserUseCase(userId).listen(
       (updatedMinistries) {
+        if (_isDisposed) return;
         // Update the ministries list
         // If selected ministry still exists, update it; otherwise select first
         Ministry? updatedSelected = state.selectedMinistry;
@@ -180,7 +197,7 @@ class MinistryController extends StateNotifier<MinistryState> {
                 ? updatedMinistries.first
                 : null;
             // Update watching subscription if needed
-            if (updatedSelected != null) {
+            if (updatedSelected != null && !_isDisposed) {
               _watchSelectedMinistry(updatedSelected.id);
             } else {
               _ministrySubscription?.cancel();
@@ -190,18 +207,21 @@ class MinistryController extends StateNotifier<MinistryState> {
             // Selected ministry still exists, update it
             updatedSelected = found;
           }
-        } else if (updatedMinistries.isNotEmpty) {
+        } else if (updatedMinistries.isNotEmpty && !_isDisposed) {
           // No selected ministry, select first
           updatedSelected = updatedMinistries.first;
           _watchSelectedMinistry(updatedSelected.id);
         }
 
-        state = state.copyWith(
-          ministries: updatedMinistries,
-          selectedMinistry: updatedSelected,
-        );
+        if (!_isDisposed) {
+          state = state.copyWith(
+            ministries: updatedMinistries,
+            selectedMinistry: updatedSelected,
+          );
+        }
       },
       onError: (error) {
+        if (_isDisposed) return;
         state = state.copyWith(
           error: 'Failed to watch ministries list: ${error.toString()}',
         );
@@ -211,13 +231,17 @@ class MinistryController extends StateNotifier<MinistryState> {
 
   /// Load preferred ministry from preferences
   Future<void> _loadPreferredMinistry(String userId) async {
+    if (_isDisposed) return;
     try {
       final preferredId = await _preferencesService.getStringForUser(
         'preferredMinistryId',
         userId,
       );
+      if (_isDisposed) return;
       if (preferredId != null && preferredId.isNotEmpty) {
-        state = state.copyWith(preferredMinistryId: preferredId);
+        if (!_isDisposed) {
+          state = state.copyWith(preferredMinistryId: preferredId);
+        }
       }
     } catch (e) {
       // Ignore errors loading preference
@@ -226,6 +250,7 @@ class MinistryController extends StateNotifier<MinistryState> {
 
   /// Set preferred ministry
   Future<void> setPreferredMinistry(String? ministryId, String userId) async {
+    if (_isDisposed) return;
     try {
       if (ministryId != null) {
         await _preferencesService.setStringForUser(
@@ -238,7 +263,9 @@ class MinistryController extends StateNotifier<MinistryState> {
         final userKey = 'preferredMinistryId_$userId';
         await _preferencesService.prefs?.remove(userKey);
       }
-      state = state.copyWith(preferredMinistryId: ministryId);
+      if (!_isDisposed) {
+        state = state.copyWith(preferredMinistryId: ministryId);
+      }
     } catch (e) {
       // Ignore errors saving preference
     }
@@ -254,37 +281,41 @@ class MinistryController extends StateNotifier<MinistryState> {
     required String name,
     required String administratorId,
   }) async {
-    state = state.copyWith(isCreating: true, error: null);
+    if (_isDisposed) return null;
+    if (!_isDisposed) {
+      state = state.copyWith(isCreating: true, error: null);
+    }
     try {
       final ministry = await _createMinistryUseCase(
         name: name,
         administratorId: administratorId,
       );
+      if (_isDisposed) return null;
 
-      // Add to ministries list
-      final updatedMinistries = [...state.ministries, ministry];
+      // Don't add to ministries list locally - let the stream handle it
+      // This prevents duplicates when Firestore emits the update
+      // Select the new ministry temporarily - the stream will update the list
+      if (!_isDisposed) {
+        state = state.copyWith(selectedMinistry: ministry, isCreating: false);
 
-      // Select the new ministry
-      state = state.copyWith(
-        ministries: updatedMinistries,
-        selectedMinistry: ministry,
-        isCreating: false,
-      );
+        // Start watching the new ministry
+        _watchSelectedMinistry(ministry.id);
 
-      // Start watching the new ministry
-      _watchSelectedMinistry(ministry.id);
-
-      // If this is the first ministry, set it as preferred
-      if (updatedMinistries.length == 1 && _userId != null) {
-        await setPreferredMinistry(ministry.id, _userId!);
+        // If this is the first ministry, set it as preferred
+        // Check if list will be empty after creation (before stream updates)
+        if (state.ministries.isEmpty && _userId != null) {
+          await setPreferredMinistry(ministry.id, _userId!);
+        }
       }
 
       return ministry;
     } catch (e) {
-      state = state.copyWith(
-        isCreating: false,
-        error: 'Failed to create ministry: ${e.toString()}',
-      );
+      if (!_isDisposed) {
+        state = state.copyWith(
+          isCreating: false,
+          error: 'Failed to create ministry: ${e.toString()}',
+        );
+      }
       return null;
     }
   }
@@ -310,17 +341,20 @@ class MinistryController extends StateNotifier<MinistryState> {
     _ministrySubscription?.cancel();
     _ministrySubscription = _watchMinistryUseCase(ministryId).listen(
       (updatedMinistry) {
+        if (_isDisposed) return;
         if (updatedMinistry == null) {
           // Ministry was deleted, remove from selection
           final updatedMinistries = state.ministries
               .where((m) => m.id != ministryId)
               .toList();
-          state = state.copyWith(
-            ministries: updatedMinistries,
-            selectedMinistry: updatedMinistries.isNotEmpty
-                ? updatedMinistries.first
-                : null,
-          );
+          if (!_isDisposed) {
+            state = state.copyWith(
+              ministries: updatedMinistries,
+              selectedMinistry: updatedMinistries.isNotEmpty
+                  ? updatedMinistries.first
+                  : null,
+            );
+          }
         } else {
           // Update ministry in the list and selected ministry
           final updatedMinistries = state.ministries.map((m) {
@@ -330,13 +364,16 @@ class MinistryController extends StateNotifier<MinistryState> {
             return m;
           }).toList();
 
-          state = state.copyWith(
-            ministries: updatedMinistries,
-            selectedMinistry: updatedMinistry,
-          );
+          if (!_isDisposed) {
+            state = state.copyWith(
+              ministries: updatedMinistries,
+              selectedMinistry: updatedMinistry,
+            );
+          }
         }
       },
       onError: (error) {
+        if (_isDisposed) return;
         state = state.copyWith(
           error: 'Failed to watch ministry: ${error.toString()}',
         );
@@ -349,9 +386,13 @@ class MinistryController extends StateNotifier<MinistryState> {
     required String ministryId,
     required String name,
   }) async {
-    state = state.copyWith(isSaving: true, error: null);
+    if (_isDisposed) return false;
+    if (!_isDisposed) {
+      state = state.copyWith(isSaving: true, error: null);
+    }
     try {
       await _updateMinistryUseCase(ministryId: ministryId, name: name);
+      if (_isDisposed) return false;
 
       // Update in local state
       final updatedMinistries = state.ministries.map((m) {
@@ -374,55 +415,71 @@ class MinistryController extends StateNotifier<MinistryState> {
         );
       }
 
-      state = state.copyWith(
-        ministries: updatedMinistries,
-        selectedMinistry: updatedSelected,
-        isSaving: false,
-      );
+      if (!_isDisposed) {
+        state = state.copyWith(
+          ministries: updatedMinistries,
+          selectedMinistry: updatedSelected,
+          isSaving: false,
+        );
+      }
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isSaving: false,
-        error: 'Failed to update ministry: ${e.toString()}',
-      );
+      if (!_isDisposed) {
+        state = state.copyWith(
+          isSaving: false,
+          error: 'Failed to update ministry: ${e.toString()}',
+        );
+      }
       return false;
     }
   }
 
   /// Pick image from gallery or camera
   Future<void> pickImage({required bool fromCamera}) async {
+    if (_isDisposed) return;
     try {
       final XFile? image = fromCamera
           ? await _imagePicker.pickImage(source: ImageSource.camera)
           : await _imagePicker.pickImage(source: ImageSource.gallery);
+      if (_isDisposed) return;
 
       if (image == null) {
-        state = state.copyWith(error: 'Photo selection cancelled');
+        if (!_isDisposed) {
+          state = state.copyWith(error: 'Photo selection cancelled');
+        }
         return;
       }
 
       final imageBytes = await image.readAsBytes();
-      state = state.copyWith(
-        selectedImage: imageBytes,
-        selectedImagePath: image.path,
-      );
+      if (!_isDisposed) {
+        state = state.copyWith(
+          selectedImage: imageBytes,
+          selectedImagePath: image.path,
+        );
+      }
     } catch (e) {
-      state = state.copyWith(error: 'Failed to pick image: ${e.toString()}');
+      if (!_isDisposed) {
+        state = state.copyWith(error: 'Failed to pick image: ${e.toString()}');
+      }
     }
   }
 
   /// Upload ministry logo
   Future<bool> uploadLogo(String ministryId) async {
+    if (_isDisposed) return false;
     if (state.selectedImage == null) {
       return false;
     }
 
-    state = state.copyWith(isSaving: true, error: null);
+    if (!_isDisposed) {
+      state = state.copyWith(isSaving: true, error: null);
+    }
     try {
       final logoUrl = await _uploadMinistryLogoUseCase(
         ministryId: ministryId,
         imageData: state.selectedImage!,
       );
+      if (_isDisposed) return false;
 
       // Update in local state
       final updatedMinistries = state.ministries.map((m) {
@@ -445,28 +502,36 @@ class MinistryController extends StateNotifier<MinistryState> {
         );
       }
 
-      state = state.copyWith(
-        ministries: updatedMinistries,
-        selectedMinistry: updatedSelected,
-        selectedImage: null,
-        selectedImagePath: null,
-        isSaving: false,
-      );
+      if (!_isDisposed) {
+        state = state.copyWith(
+          ministries: updatedMinistries,
+          selectedMinistry: updatedSelected,
+          selectedImage: null,
+          selectedImagePath: null,
+          isSaving: false,
+        );
+      }
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isSaving: false,
-        error: 'Failed to upload logo: ${e.toString()}',
-      );
+      if (!_isDisposed) {
+        state = state.copyWith(
+          isSaving: false,
+          error: 'Failed to upload logo: ${e.toString()}',
+        );
+      }
       return false;
     }
   }
 
   /// Delete ministry
   Future<bool> deleteMinistry(String ministryId) async {
-    state = state.copyWith(isDeleting: true, error: null);
+    if (_isDisposed) return false;
+    if (!_isDisposed) {
+      state = state.copyWith(isDeleting: true, error: null);
+    }
     try {
       await _deleteMinistryUseCase(ministryId);
+      if (_isDisposed) return false;
 
       // Remove from local state
       final updatedMinistries = state.ministries
@@ -481,17 +546,21 @@ class MinistryController extends StateNotifier<MinistryState> {
             : null;
       }
 
-      state = state.copyWith(
-        ministries: updatedMinistries,
-        selectedMinistry: updatedSelected,
-        isDeleting: false,
-      );
+      if (!_isDisposed) {
+        state = state.copyWith(
+          ministries: updatedMinistries,
+          selectedMinistry: updatedSelected,
+          isDeleting: false,
+        );
+      }
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isDeleting: false,
-        error: 'Failed to delete ministry: ${e.toString()}',
-      );
+      if (!_isDisposed) {
+        state = state.copyWith(
+          isDeleting: false,
+          error: 'Failed to delete ministry: ${e.toString()}',
+        );
+      }
       return false;
     }
   }
@@ -507,13 +576,18 @@ class MinistryController extends StateNotifier<MinistryState> {
     _ministrySubscription = null;
     _ministriesListSubscription?.cancel();
     _ministriesListSubscription = null;
-    state = const MinistryState.initial();
+    if (!_isDisposed) {
+      state = const MinistryState.initial();
+    }
   }
 
   @override
   void dispose() {
+    _isDisposed = true;
     _ministrySubscription?.cancel();
+    _ministrySubscription = null;
     _ministriesListSubscription?.cancel();
+    _ministriesListSubscription = null;
     super.dispose();
   }
 }
