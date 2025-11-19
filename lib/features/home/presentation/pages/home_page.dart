@@ -44,10 +44,29 @@ class _HomePageState extends ConsumerState<HomePage> {
             theme.appBarTheme.backgroundColor ?? colorScheme.surface,
         elevation: 0,
         titleSpacing: 16,
-        title: SvgPicture.asset(
-          'assets/logotype.svg',
-          height: 26,
-          colorFilter: ColorFilter.mode(foregroundColor, BlendMode.srcIn),
+        title: Row(
+          children: [
+            SvgPicture.asset(
+              'assets/logotype.svg',
+              height: 26,
+              colorFilter: ColorFilter.mode(foregroundColor, BlendMode.srcIn),
+            ),
+            const SizedBox(width: 12),
+            Consumer(
+              builder: (context, ref, _) {
+                final ministryState = ref.watch(ministryControllerProvider);
+                final selectedMinistry = ministryState.selectedMinistry;
+
+                if (selectedMinistry == null) {
+                  return const SizedBox.shrink();
+                }
+
+                return SubscriptionPlanBadge(
+                  subscriptionType: selectedMinistry.subscriptionType,
+                );
+              },
+            ),
+          ],
         ),
         actions: [
           Padding(

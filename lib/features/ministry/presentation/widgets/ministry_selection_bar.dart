@@ -43,6 +43,21 @@ class MinistrySelectionBar extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 12),
+          // Settings button (only enabled when ministry is selected and exists in list)
+          IconButton(
+            onPressed:
+                selectedMinistry == null ||
+                    !ministries.any((m) => m.id == selectedMinistry.id)
+                ? null
+                : () {
+                    MinistrySettingsOverlay.show(context, selectedMinistry);
+                  },
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: l10n.ministrySettings,
+            style: IconButton.styleFrom(
+              foregroundColor: theme.colorScheme.primary,
+            ),
+          ),
           // Create ministry button
           IconButton(
             onPressed: () async {
@@ -55,21 +70,6 @@ class MinistrySelectionBar extends ConsumerWidget {
             },
             icon: const Icon(Icons.add_circle_outline),
             tooltip: l10n.ministryCreate,
-            style: IconButton.styleFrom(
-              foregroundColor: theme.colorScheme.primary,
-            ),
-          ),
-          // Settings button (only enabled when ministry is selected and exists in list)
-          IconButton(
-            onPressed:
-                selectedMinistry == null ||
-                    !ministries.any((m) => m.id == selectedMinistry.id)
-                ? null
-                : () {
-                    MinistrySettingsOverlay.show(context, selectedMinistry);
-                  },
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: l10n.ministrySettings,
             style: IconButton.styleFrom(
               foregroundColor: theme.colorScheme.primary,
             ),

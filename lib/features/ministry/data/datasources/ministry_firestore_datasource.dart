@@ -12,6 +12,7 @@ class MinistryFirestoreDatasource {
   Future<String> createMinistry({
     required String name,
     required String administratorId,
+    SubscriptionType subscriptionType = SubscriptionType.free,
   }) async {
     try {
       final docRef = _firestore.collection('ministries').doc();
@@ -20,6 +21,7 @@ class MinistryFirestoreDatasource {
         'name': name,
         'createdAt': Timestamp.fromDate(now),
         'administratorId': administratorId,
+        'subscriptionType': subscriptionType.toFirestoreValue(),
       });
       return docRef.id;
     } catch (e) {
@@ -200,6 +202,23 @@ class MinistryFirestoreDatasource {
     } catch (e) {
       throw MinistryException(
         message: 'Failed to update ministry logo URL: ${e.toString()}',
+        cause: e,
+      );
+    }
+  }
+
+  /// Update ministry subscription type
+  Future<void> updateMinistrySubscriptionType({
+    required String ministryId,
+    required SubscriptionType subscriptionType,
+  }) async {
+    try {
+      await _firestore.collection('ministries').doc(ministryId).update({
+        'subscriptionType': subscriptionType.toFirestoreValue(),
+      });
+    } catch (e) {
+      throw MinistryException(
+        message: 'Failed to update ministry subscription: ${e.toString()}',
         cause: e,
       );
     }

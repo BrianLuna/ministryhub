@@ -247,6 +247,27 @@ class MinistryRepositoryImpl implements MinistryRepository {
   }
 
   @override
+  Future<void> updateMinistrySubscriptionType({
+    required String ministryId,
+    required SubscriptionType subscriptionType,
+  }) async {
+    try {
+      await _firestoreDatasource.updateMinistrySubscriptionType(
+        ministryId: ministryId,
+        subscriptionType: subscriptionType,
+      );
+    } catch (e) {
+      if (e is MinistryException) {
+        rethrow;
+      }
+      throw MinistryException(
+        message: 'Failed to update ministry subscription: ${e.toString()}',
+        cause: e,
+      );
+    }
+  }
+
+  @override
   Future<void> deleteMinistry(String ministryId) async {
     try {
       // Get ministry to check for logo
@@ -297,12 +318,18 @@ class MinistryRepositoryImpl implements MinistryRepository {
       );
     }
 
+    final subscriptionTypeString = data['subscriptionType'] as String?;
+    final subscriptionType = subscriptionTypeString != null
+        ? SubscriptionType.fromString(subscriptionTypeString)
+        : SubscriptionType.free;
+
     return Ministry(
       id: data['id'] as String,
       name: data['name'] as String,
       createdAt: createdAtDate,
       administratorId: data['administratorId'] as String,
       logoUrl: data['logoUrl'] as String?,
+      subscriptionType: subscriptionType,
     );
   }
 }

@@ -353,4 +353,81 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get ministryDeleteError => 'Error al eliminar el ministerio';
+
+  @override
+  String get subscriptionPaywallTitle => 'Elige Tu Plan';
+
+  @override
+  String get subscriptionPaywallSubtitle =>
+      'Selecciona un plan de suscripción para tu ministerio';
+
+  @override
+  String get subscriptionNoOfferings =>
+      'No hay opciones de suscripción disponibles en este momento';
+
+  @override
+  String get subscriptionFreeTitle => 'Gratis';
+
+  @override
+  String get subscriptionFreeDescription => 'Perfecto para comenzar';
+
+  @override
+  String get subscriptionFreeFeature1 => 'Máximo 1 iglesia';
+
+  @override
+  String get subscriptionFreeFeature2 => 'Hasta 50 personas por iglesia';
+
+  @override
+  String get subscriptionFreePrice => 'Gratis';
+
+  @override
+  String get subscriptionProTitle => 'Pro';
+
+  @override
+  String get subscriptionProDescription => 'Para ministerios en crecimiento';
+
+  @override
+  String get subscriptionProFeature1 => 'Hasta 5 iglesias';
+
+  @override
+  String get subscriptionProFeature2 => 'Hasta 300 personas por iglesia';
+
+  @override
+  String get subscriptionPremiumTitle => 'Premium';
+
+  @override
+  String get subscriptionPremiumDescription =>
+      'Potencial de crecimiento ilimitado';
+
+  @override
+  String get subscriptionPremiumFeature1 => 'Iglesias ilimitadas';
+
+  @override
+  String get subscriptionPremiumFeature2 => 'Personas ilimitadas por iglesia';
+
+  @override
+  String get subscriptionContinueFree => 'Continuar con Gratis';
+
+  @override
+  String get subscriptionSubscribe => 'Suscribirse';
+
+  @override
+  String get subscriptionMaybeLater => 'Tal Vez Más Tarde';
+
+  @override
+  String get ministrySubscriptionLabel => 'Suscripción';
+
+  @override
+  String get ministryCurrentSubscription => 'Plan Actual';
+
+  @override
+  String get ministryChangeSubscription => 'Cambiar';
+
+  @override
+  String get ministrySubscriptionUpdated =>
+      'Suscripción actualizada correctamente';
+
+  @override
+  String get ministrySubscriptionUpdateError =>
+      'Error al actualizar la suscripción';
 }

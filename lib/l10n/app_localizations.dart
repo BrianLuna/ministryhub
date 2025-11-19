@@ -751,6 +751,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error deleting ministry'**
   String get ministryDeleteError;
+
+  /// Title for the subscription paywall
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Your Plan'**
+  String get subscriptionPaywallTitle;
+
+  /// Subtitle for the subscription paywall
+  ///
+  /// In en, this message translates to:
+  /// **'Select a subscription plan for your ministry'**
+  String get subscriptionPaywallSubtitle;
+
+  /// Message when no subscription offerings are available
+  ///
+  /// In en, this message translates to:
+  /// **'No subscription options available at this time'**
+  String get subscriptionNoOfferings;
+
+  /// Title for free subscription tier
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get subscriptionFreeTitle;
+
+  /// Description for free subscription tier
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect for getting started'**
+  String get subscriptionFreeDescription;
+
+  /// Feature description for free tier
+  ///
+  /// In en, this message translates to:
+  /// **'1 church maximum'**
+  String get subscriptionFreeFeature1;
+
+  /// Feature description for free tier
+  ///
+  /// In en, this message translates to:
+  /// **'Up to 50 people per church'**
+  String get subscriptionFreeFeature2;
+
+  /// Price label for free subscription
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get subscriptionFreePrice;
+
+  /// Title for pro subscription tier
+  ///
+  /// In en, this message translates to:
+  /// **'Pro'**
+  String get subscriptionProTitle;
+
+  /// Description for pro subscription tier
+  ///
+  /// In en, this message translates to:
+  /// **'For growing ministries'**
+  String get subscriptionProDescription;
+
+  /// Feature description for pro tier
+  ///
+  /// In en, this message translates to:
+  /// **'Up to 5 churches'**
+  String get subscriptionProFeature1;
+
+  /// Feature description for pro tier
+  ///
+  /// In en, this message translates to:
+  /// **'Up to 300 people per church'**
+  String get subscriptionProFeature2;
+
+  /// Title for premium subscription tier
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get subscriptionPremiumTitle;
+
+  /// Description for premium subscription tier
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited growth potential'**
+  String get subscriptionPremiumDescription;
+
+  /// Feature description for premium tier
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited churches'**
+  String get subscriptionPremiumFeature1;
+
+  /// Feature description for premium tier
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited people per church'**
+  String get subscriptionPremiumFeature2;
+
+  /// Button label to continue with free plan
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Free'**
+  String get subscriptionContinueFree;
+
+  /// Button label to subscribe to a paid plan
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get subscriptionSubscribe;
+
+  /// Button label to dismiss paywall
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe Later'**
+  String get subscriptionMaybeLater;
+
+  /// Label for subscription section in ministry settings
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription'**
+  String get ministrySubscriptionLabel;
+
+  /// Label for current subscription plan
+  ///
+  /// In en, this message translates to:
+  /// **'Current Plan'**
+  String get ministryCurrentSubscription;
+
+  /// Button label to change subscription
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get ministryChangeSubscription;
+
+  /// Success message after updating subscription
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription updated successfully'**
+  String get ministrySubscriptionUpdated;
+
+  /// Error message when subscription update fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating subscription'**
+  String get ministrySubscriptionUpdateError;
 }
 
 class _AppLocalizationsDelegate
