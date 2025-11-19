@@ -6,11 +6,28 @@ import 'package:go_router/go_router.dart';
 import 'package:ministryhub/ministryhub.dart';
 
 /// Simple scaffold that hosts the first authenticated surface.
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authState = ref.read(authControllerProvider);
+      final user = authState.user;
+      if (user != null) {
+        ref.read(ministryControllerProvider.notifier).loadMinistries(user.uid);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final foregroundColor =
@@ -84,7 +101,12 @@ class HomePage extends ConsumerWidget {
           ),
         ],
       ),
-      body: const SizedBox.shrink(),
+      body: Column(
+        children: [
+          const MinistrySelectionBar(),
+          const Expanded(child: SizedBox.shrink()),
+        ],
+      ),
     );
   }
 }
