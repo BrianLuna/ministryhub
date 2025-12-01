@@ -31,6 +31,7 @@ class _LocationPickerState extends State<LocationPicker> {
   List<PlacePrediction> _predictions = [];
   bool _isLoadingPredictions = false;
   Location? _selectedLocation;
+  String? _selectedPlaceName;
   Position? _currentPosition;
   bool _isRequestingLocation = false;
 
@@ -324,6 +325,7 @@ class _LocationPickerState extends State<LocationPicker> {
           // Search field
           TextField(
             controller: _searchController,
+            keyboardType: TextInputType.streetAddress,
             decoration: InputDecoration(
               labelText: l10n.churchLocationSearchLabel,
               hintText: l10n.churchLocationSearchHint,
@@ -398,6 +400,10 @@ class _LocationPickerState extends State<LocationPicker> {
                       position: LatLng(
                         _selectedLocation!.latitude,
                         _selectedLocation!.longitude,
+                      ),
+                      infoWindow: InfoWindow(
+                        title: _selectedPlaceName ?? _selectedLocation!.address,
+                        snippet: _selectedLocation!.address,
                       ),
                       draggable: true,
                       onDragEnd: (position) => _onMapTap(position),

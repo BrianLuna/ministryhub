@@ -210,6 +210,7 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
                               ? l10n.ministryNameHint
                               : l10n.churchNameHint,
                         ),
+                        keyboardType: TextInputType.text,
                         textCapitalization: TextCapitalization.words,
                         enabled: !_isCreating,
                         autofocus: true,
