@@ -71,7 +71,9 @@ class _LocationPickerState extends State<LocationPicker> {
       }
 
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
       if (mounted) {
         setState(() {
@@ -225,6 +227,9 @@ class _LocationPickerState extends State<LocationPicker> {
             _searchController.text = address;
             _isLoadingPredictions = false;
           });
+
+          // Notify parent so the dialog can capture the selected location
+          widget.onLocationSelected(selectedLocation);
 
           // Move map to selected location after it's created
           if (_mapController != null) {

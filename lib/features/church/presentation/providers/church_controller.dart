@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ministryhub/ministryhub.dart';
 
@@ -107,12 +108,16 @@ class ChurchController extends StateNotifier<ChurchState> {
 
   /// Load churches for the current user
   Future<void> loadChurches(String userId) async {
+    debugPrint('ChurchController: Loading churches for $userId...');
     if (_isDisposed) return;
     if (!_isDisposed) {
       state = state.copyWith(isLoading: true);
     }
     try {
-      final churches = await _getChurchesByUserUseCase(userId);
+      final churches = await _getChurchesByUserUseCase(
+        userId,
+      ).timeout(const Duration(seconds: 5));
+      debugPrint('ChurchController: Loaded ${churches.length} churches.');
       if (_isDisposed) return;
 
       if (!_isDisposed) {
@@ -125,7 +130,8 @@ class ChurchController extends StateNotifier<ChurchState> {
 
       // Start watching for real-time updates
       _watchChurchesList(userId);
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('ChurchController: Error loading churches: $e\n$stack');
       if (!_isDisposed) {
         state = state.copyWith(
           isLoading: false,

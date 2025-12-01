@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -131,13 +132,17 @@ class MinistryController extends StateNotifier<MinistryState> {
 
   /// Load ministries for the current user
   Future<void> loadMinistries(String userId) async {
+    debugPrint('MinistryController: Loading ministries for $userId...');
     if (_isDisposed) return;
     _userId = userId;
     if (!_isDisposed) {
       state = state.copyWith(isLoading: true);
     }
     try {
-      final ministries = await _getMinistriesByUserUseCase(userId);
+      final ministries = await _getMinistriesByUserUseCase(
+        userId,
+      ).timeout(const Duration(seconds: 5));
+      debugPrint('MinistryController: Loaded ${ministries.length} ministries.');
       if (_isDisposed) return;
 
       // Load preferred ministry if not already set
@@ -148,6 +153,11 @@ class MinistryController extends StateNotifier<MinistryState> {
 
       // If preferred entity is set, try to select it
       if (state.preferredEntity != null && ministries.isNotEmpty) {
+        // Update list and stop loading first
+        if (!_isDisposed) {
+          state = state.copyWith(ministries: ministries, isLoading: false);
+        }
+
         if (state.preferredEntity!.type == EntityType.ministry) {
           try {
             final preferred = ministries.firstWhere(
@@ -206,7 +216,8 @@ class MinistryController extends StateNotifier<MinistryState> {
       if (!_isDisposed) {
         _watchMinistriesList(userId);
       }
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('MinistryController: Error loading ministries: $e\n$stack');
       if (!_isDisposed) {
         state = state.copyWith(isLoading: false, error: e.toString());
       }
