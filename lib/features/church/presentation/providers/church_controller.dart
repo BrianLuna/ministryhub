@@ -183,6 +183,9 @@ class ChurchController extends StateNotifier<ChurchState> {
     required Location location,
     required String ministryId,
   }) async {
+    debugPrint(
+      'ChurchController: Creating church $name in ministry $ministryId',
+    );
     if (_isDisposed) return null;
     if (!_isDisposed) {
       state = state.copyWith(isCreating: true, error: null);
@@ -193,19 +196,35 @@ class ChurchController extends StateNotifier<ChurchState> {
         location: location,
         ministryId: ministryId,
       );
+      debugPrint('ChurchController: Church created successfully: ${church.id}');
       if (_isDisposed) return null;
 
       if (!_isDisposed) {
-        state = state.copyWith(selectedChurch: church, isCreating: false);
+        // Optimistically add/update church in local list so UI (dropdown) updates immediately
+        final existing = state.churches;
+        final updatedChurches = [
+          for (final c in existing)
+            if (c.id != church.id) c,
+          church,
+        ];
+
+        state = state.copyWith(
+          churches: updatedChurches,
+          selectedChurch: church,
+          isCreating: false,
+        );
       }
 
       return church;
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('ChurchController: Error creating church: $e\n$stack');
+      // Extract a user-friendly message
+      String userMessage = 'Failed to create church';
+      if (e is AppException && e.message != null && e.message!.isNotEmpty) {
+        userMessage = e.message!;
+      }
       if (!_isDisposed) {
-        state = state.copyWith(
-          isCreating: false,
-          error: 'Failed to create church: ${e.toString()}',
-        );
+        state = state.copyWith(isCreating: false, error: userMessage);
       }
       return null;
     }

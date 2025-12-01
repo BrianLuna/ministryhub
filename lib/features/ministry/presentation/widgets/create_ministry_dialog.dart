@@ -130,13 +130,12 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
       _isCreating = true;
     });
 
-    final church = await ref
-        .read(churchControllerProvider.notifier)
-        .createChurch(
-          name: _nameController.text.trim(),
-          location: _selectedLocation!,
-          ministryId: _selectedMinistry!.id,
-        );
+    final churchController = ref.read(churchControllerProvider.notifier);
+    final church = await churchController.createChurch(
+      name: _nameController.text.trim(),
+      location: _selectedLocation!,
+      ministryId: _selectedMinistry!.id,
+    );
 
     if (mounted) {
       if (church != null) {
@@ -145,8 +144,77 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
         setState(() {
           _isCreating = false;
         });
+
+        final churchState = ref.read(churchControllerProvider);
+        final error = churchState.error;
+        if (error != null && _selectedMinistry != null) {
+          await _showSubscriptionUpgradeDialog(error, _selectedMinistry!);
+        }
       }
     }
+  }
+
+  Future<void> _showSubscriptionUpgradeDialog(
+    String errorMessage,
+    Ministry ministry,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final ministryController = ref.read(ministryControllerProvider.notifier);
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(l10n.churchUpdateError),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                errorMessage,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l10n.settingsPreferredEntitySection,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.churchCancel),
+            ),
+            FilledButton(
+              onPressed: () async {
+                Navigator.of(ctx).pop();
+                await PaywallBottomSheet.show(
+                  context,
+                  ministryId: ministry.id,
+                  onSubscriptionSelected: (subscriptionType) async {
+                    if (subscriptionType != SubscriptionType.free) {
+                      await ministryController.updateSubscription(
+                        ministryId: ministry.id,
+                        subscriptionType: subscriptionType,
+                        package: null,
+                      );
+                    }
+                  },
+                );
+              },
+              child: Text(l10n.entitySettings),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -154,6 +222,14 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
     final l10n = AppLocalizations.of(context)!;
     final ministryState = ref.watch(ministryControllerProvider);
     final ministries = ministryState.ministries;
+    // Deduplicate ministries to avoid duplicate dropdown values
+    final uniqueMinistries = ministries.toSet().toList();
+
+    // Ensure selected ministry is part of the current list; otherwise reset
+    if (_selectedMinistry != null &&
+        !uniqueMinistries.contains(_selectedMinistry)) {
+      _selectedMinistry = null;
+    }
 
     final theme = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
@@ -233,12 +309,12 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
                       if (_selectedType == _EntityType.church) ...[
                         const SizedBox(height: 16),
                         DropdownButtonFormField<Ministry>(
-                          initialValue: _selectedMinistry,
+                          value: _selectedMinistry,
                           decoration: InputDecoration(
                             labelText: l10n.churchMinistryLabel,
                             hintText: l10n.churchMinistryHint,
                           ),
-                          items: ministries.map((ministry) {
+                          items: uniqueMinistries.map((ministry) {
                             return DropdownMenuItem<Ministry>(
                               value: ministry,
                               child: Text(ministry.name),
