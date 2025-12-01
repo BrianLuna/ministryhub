@@ -309,7 +309,7 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
                       if (_selectedType == _EntityType.church) ...[
                         const SizedBox(height: 16),
                         DropdownButtonFormField<Ministry>(
-                          value: _selectedMinistry,
+                          initialValue: _selectedMinistry,
                           decoration: InputDecoration(
                             labelText: l10n.churchMinistryLabel,
                             hintText: l10n.churchMinistryHint,
