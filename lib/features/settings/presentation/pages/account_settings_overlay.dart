@@ -107,8 +107,8 @@ class _AccountSettingsOverlayState
                   // Language Section
                   _LanguageSection(),
                   const SizedBox(height: 24),
-                  // Preferred Ministry Section
-                  _PreferredMinistrySection(),
+                  // Preferred Entity Section
+                  _PreferredEntitySection(),
                   const SizedBox(height: 24),
                   // Delete Account Button
                   _DeleteAccountSection(user: user),
@@ -571,17 +571,17 @@ class _LanguageSection extends ConsumerWidget {
   }
 }
 
-/// Preferred ministry section widget
-class _PreferredMinistrySection extends ConsumerStatefulWidget {
-  const _PreferredMinistrySection();
+/// Preferred entity section widget
+class _PreferredEntitySection extends ConsumerStatefulWidget {
+  const _PreferredEntitySection();
 
   @override
-  ConsumerState<_PreferredMinistrySection> createState() =>
-      _PreferredMinistrySectionState();
+  ConsumerState<_PreferredEntitySection> createState() =>
+      _PreferredEntitySectionState();
 }
 
-class _PreferredMinistrySectionState
-    extends ConsumerState<_PreferredMinistrySection> {
+class _PreferredEntitySectionState
+    extends ConsumerState<_PreferredEntitySection> {
   @override
   void initState() {
     super.initState();
@@ -590,25 +590,84 @@ class _PreferredMinistrySectionState
       final uid = authState.user?.uid;
       if (uid != null) {
         ref.read(ministryControllerProvider.notifier).loadMinistries(uid);
+        ref.read(churchControllerProvider.notifier).loadChurches(uid);
       }
     });
   }
 
-  /// Get a valid preferred ministry ID that exists in the ministries list
-  String? _getValidPreferredMinistryId(
-    String? preferredMinistryId,
+  /// Get a valid preferred entity that exists in the lists
+  PreferredEntity? _getValidPreferredEntity(
+    PreferredEntity? preferredEntity,
     List<Ministry> ministries,
+    List<Church> churches,
   ) {
-    if (preferredMinistryId == null) {
-      return ministries.isNotEmpty ? ministries.first.id : null;
+    if (preferredEntity == null) {
+      if (ministries.isNotEmpty) {
+        return PreferredEntity(
+          id: ministries.first.id,
+          type: EntityType.ministry,
+        );
+      }
+      if (churches.isNotEmpty) {
+        return PreferredEntity(id: churches.first.id, type: EntityType.church);
+      }
+      return null;
     }
-    // Check if preferred ministry ID exists in the list
-    final exists = ministries.any((m) => m.id == preferredMinistryId);
-    if (exists) {
-      return preferredMinistryId;
+
+    // Check if preferred entity exists
+    if (preferredEntity.type == EntityType.ministry) {
+      final exists = ministries.any((m) => m.id == preferredEntity.id);
+      if (exists) {
+        return preferredEntity;
+      }
+      // If preferred ministry doesn't exist, return first available
+      return ministries.isNotEmpty
+          ? PreferredEntity(id: ministries.first.id, type: EntityType.ministry)
+          : (churches.isNotEmpty
+                ? PreferredEntity(
+                    id: churches.first.id,
+                    type: EntityType.church,
+                  )
+                : null);
+    } else {
+      final exists = churches.any((c) => c.id == preferredEntity.id);
+      if (exists) {
+        return preferredEntity;
+      }
+      // If preferred church doesn't exist, return first available
+      return churches.isNotEmpty
+          ? PreferredEntity(id: churches.first.id, type: EntityType.church)
+          : (ministries.isNotEmpty
+                ? PreferredEntity(
+                    id: ministries.first.id,
+                    type: EntityType.ministry,
+                  )
+                : null);
     }
-    // If preferred ministry doesn't exist, return first or null
-    return ministries.isNotEmpty ? ministries.first.id : null;
+  }
+
+  String _getEntityDisplayId(PreferredEntity? entity) {
+    if (entity == null) return '';
+    return '${entity.type.name}:${entity.id}';
+  }
+
+  PreferredEntity? _parseEntityDisplayId(
+    String? value,
+    List<Ministry> ministries,
+    List<Church> churches,
+  ) {
+    if (value == null || value.isEmpty) return null;
+    final parts = value.split(':');
+    if (parts.length != 2) return null;
+    final type = parts[0] == 'church' ? EntityType.church : EntityType.ministry;
+    final id = parts[1];
+    if (type == EntityType.ministry && ministries.any((m) => m.id == id)) {
+      return PreferredEntity(id: id, type: type);
+    }
+    if (type == EntityType.church && churches.any((c) => c.id == id)) {
+      return PreferredEntity(id: id, type: type);
+    }
+    return null;
   }
 
   @override
@@ -616,50 +675,87 @@ class _PreferredMinistrySectionState
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final ministryState = ref.watch(ministryControllerProvider);
+    final churchState = ref.watch(churchControllerProvider);
     final authState = ref.watch(authControllerProvider);
     final user = authState.user;
     final ministries = ministryState.ministries;
+    final churches = churchState.churches;
 
     if (user == null) {
       return const SizedBox.shrink();
     }
 
+    final allEntities = <ReligiousEntity>[...ministries, ...churches];
+    final preferredEntity = _getValidPreferredEntity(
+      ministryState.preferredEntity,
+      ministries,
+      churches,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          l10n.settingsPreferredMinistrySection,
+          l10n.settingsPreferredEntitySection,
           style: theme.textTheme.titleLarge,
         ),
         const SizedBox(height: 16),
-        if (ministries.isEmpty)
+        if (allEntities.isEmpty)
           Text(
-            l10n.settingsNoMinistriesAvailable,
+            l10n.settingsNoEntitiesAvailable,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           )
         else
           DropdownButtonFormField<String>(
-            value: _getValidPreferredMinistryId(
-              ministryState.preferredMinistryId,
-              ministries,
-            ),
+            initialValue: _getEntityDisplayId(preferredEntity),
             decoration: InputDecoration(
-              labelText: l10n.settingsPreferredMinistryLabel,
-              hintText: l10n.settingsPreferredMinistryHint,
+              labelText: l10n.settingsPreferredEntityLabel,
+              hintText: l10n.settingsPreferredEntityHint,
             ),
-            items: ministries.map((ministry) {
-              return DropdownMenuItem<String>(
-                value: ministry.id,
-                child: Text(ministry.name),
-              );
-            }).toList(),
-            onChanged: (ministryId) {
-              if (ministryId != null) {
+            items: [
+              // Ministries
+              ...ministries.map((ministry) {
+                return DropdownMenuItem<String>(
+                  value: 'ministry:${ministry.id}',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.business,
+                        size: 18,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(ministry.name),
+                    ],
+                  ),
+                );
+              }),
+              // Churches
+              ...churches.map((church) {
+                return DropdownMenuItem<String>(
+                  value: 'church:${church.id}',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.church,
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(church.name),
+                    ],
+                  ),
+                );
+              }),
+            ],
+            onChanged: (value) {
+              final entity = _parseEntityDisplayId(value, ministries, churches);
+              if (entity != null) {
                 ref
                     .read(ministryControllerProvider.notifier)
-                    .setPreferredMinistry(ministryId, user.uid);
+                    .setPreferredEntity(entity, user.uid);
               }
             },
           ),

@@ -555,5 +555,195 @@
   "ministrySubscriptionUpdateError": "Error updating subscription",
   "@ministrySubscriptionUpdateError": {
     "description": "Error message when subscription update fails"
+  },
+  "entityCreateTitle": "Create Entity",
+  "@entityCreateTitle": {
+    "description": "Title for create entity dialog"
+  },
+  "entityTypeMinistry": "Ministry",
+  "@entityTypeMinistry": {
+    "description": "Label for ministry entity type"
+  },
+  "entityTypeChurch": "Church",
+  "@entityTypeChurch": {
+    "description": "Label for church entity type"
+  },
+  "entityNoEntities": "No entities available",
+  "@entityNoEntities": {
+    "description": "Message when no entities are available"
+  },
+  "entitySelectEntity": "Select entity",
+  "@entitySelectEntity": {
+    "description": "Placeholder for entity selection"
+  },
+  "entitySettings": "Entity Settings",
+  "@entitySettings": {
+    "description": "Tooltip for entity settings button"
+  },
+  "entityCreate": "Create Entity",
+  "@entityCreate": {
+    "description": "Tooltip for create entity button"
+  },
+  "churchCreateTitle": "Create Church",
+  "@churchCreateTitle": {
+    "description": "Title for create church dialog"
+  },
+  "churchNameLabel": "Church Name",
+  "@churchNameLabel": {
+    "description": "Label for church name field"
+  },
+  "churchNameHint": "Enter church name",
+  "@churchNameHint": {
+    "description": "Hint for church name field"
+  },
+  "churchNameRequired": "Church name is required",
+  "@churchNameRequired": {
+    "description": "Error message when church name is empty"
+  },
+  "churchNameTooShort": "Church name must be at least 2 characters",
+  "@churchNameTooShort": {
+    "description": "Error message when church name is too short"
+  },
+  "churchLocationLabel": "Location",
+  "@churchLocationLabel": {
+    "description": "Label for church location field"
+  },
+  "churchLocationSearchLabel": "Search location",
+  "@churchLocationSearchLabel": {
+    "description": "Label for location search field"
+  },
+  "churchLocationSearchHint": "Type an address",
+  "@churchLocationSearchHint": {
+    "description": "Hint for location search field"
+  },
+  "churchLocationRequired": "Location is required",
+  "@churchLocationRequired": {
+    "description": "Error message when location is not selected"
+  },
+  "churchMinistryLabel": "Ministry",
+  "@churchMinistryLabel": {
+    "description": "Label for church ministry field"
+  },
+  "churchMinistryHint": "Select ministry",
+  "@churchMinistryHint": {
+    "description": "Hint for church ministry field"
+  },
+  "churchMinistryRequired": "Ministry is required",
+  "@churchMinistryRequired": {
+    "description": "Error message when ministry is not selected"
+  },
+  "churchCreate": "Create",
+  "@churchCreate": {
+    "description": "Button label to create church"
+  },
+  "churchCreateDialogMessage": "Click 'Create' to continue with church details.",
+  "@churchCreateDialogMessage": {
+    "description": "Message shown when church is selected in entity creation dialog"
+  },
+  "churchCancel": "Cancel",
+  "@churchCancel": {
+    "description": "Button label to cancel church creation"
+  },
+  "churchSettingsTitle": "Church Settings",
+  "@churchSettingsTitle": {
+    "description": "Title for church settings overlay"
+  },
+  "churchSave": "Save",
+  "@churchSave": {
+    "description": "Button label to save church changes"
+  },
+  "churchUpdateSuccess": "Church updated successfully",
+  "@churchUpdateSuccess": {
+    "description": "Success message after updating church"
+  },
+  "churchUpdateError": "Error updating church",
+  "@churchUpdateError": {
+    "description": "Error message when church update fails"
+  },
+  "churchDeleteButton": "Delete Church",
+  "@churchDeleteButton": {
+    "description": "Button label to delete church"
+  },
+  "churchDeleteTitle": "Delete Church",
+  "@churchDeleteTitle": {
+    "description": "Title for delete church confirmation dialog"
+  },
+  "churchDeleteMessage": "Are you sure you want to delete this church? This action cannot be undone.",
+  "@churchDeleteMessage": {
+    "description": "Message in delete church confirmation dialog"
+  },
+  "churchDeleteCancel": "Cancel",
+  "@churchDeleteCancel": {
+    "description": "Button label to cancel church deletion"
+  },
+  "churchDeleteConfirm": "Delete",
+  "@churchDeleteConfirm": {
+    "description": "Button label to confirm church deletion"
+  },
+  "churchDeleteSuccess": "Church deleted successfully",
+  "@churchDeleteSuccess": {
+    "description": "Success message after deleting church"
+  },
+  "churchDeleteError": "Error deleting church",
+  "@churchDeleteError": {
+    "description": "Error message when church deletion fails"
+  },
+  "settingsPreferredEntitySection": "Preferred Entity",
+  "@settingsPreferredEntitySection": {
+    "description": "Section title for preferred entity in account settings"
+  },
+  "settingsPreferredEntityLabel": "Preferred Entity",
+  "@settingsPreferredEntityLabel": {
+    "description": "Label for preferred entity dropdown"
+  },
+  "settingsPreferredEntityHint": "Select preferred entity",
+  "@settingsPreferredEntityHint": {
+    "description": "Hint for preferred entity dropdown"
+  },
+  "settingsNoEntitiesAvailable": "No entities available",
+  "@settingsNoEntitiesAvailable": {
+    "description": "Message when no entities are available for selection"
+  },
+  "ministryDeleteWithChurchesTitle": "Delete Ministry",
+  "@ministryDeleteWithChurchesTitle": {
+    "description": "Title for delete ministry dialog when churches exist"
+  },
+  "ministryDeleteWithChurchesMessage": "This ministry has {count} church(es). What would you like to do?",
+  "@ministryDeleteWithChurchesMessage": {
+    "description": "Message in delete ministry dialog when churches exist",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "ministryDeleteChurchesOption": "Delete Churches",
+  "@ministryDeleteChurchesOption": {
+    "description": "Option to delete churches when deleting ministry"
+  },
+  "ministryReassignChurchesOption": "Reassign to Another Ministry",
+  "@ministryReassignChurchesOption": {
+    "description": "Option to reassign churches when deleting ministry"
+  },
+  "ministryReassignTargetLabel": "Target Ministry",
+  "@ministryReassignTargetLabel": {
+    "description": "Label for target ministry selector when reassigning churches"
+  },
+  "ministryReassignTargetHint": "Select ministry",
+  "@ministryReassignTargetHint": {
+    "description": "Hint for target ministry selector"
+  },
+  "ministryReassignTargetRequired": "Please select a target ministry",
+  "@ministryReassignTargetRequired": {
+    "description": "Error message when target ministry is not selected"
+  },
+  "ministryDeleteChurchesOptionDescription": "All churches will be permanently deleted",
+  "@ministryDeleteChurchesOptionDescription": {
+    "description": "Description for delete churches option"
+  },
+  "ministryReassignChurchesOptionDescription": "Churches will be moved to another ministry",
+  "@ministryReassignChurchesOptionDescription": {
+    "description": "Description for reassign churches option"
   }
 }

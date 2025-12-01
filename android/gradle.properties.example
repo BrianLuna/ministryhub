@@ -11,3 +11,8 @@ customMinSdkVersion=23
 # NDK version required by Firebase Core and path_provider_android
 customNdkVersion=27.0.12077973
 
+# Google Maps API Keys (optional - keys are loaded from .env by default)
+# You can uncomment these to override .env values
+# GOOGLE_MAPS_ANDROID_DEV_KEY=your_android_dev_key_here
+# GOOGLE_MAPS_ANDROID_PROD_KEY=your_android_prod_key_here
+

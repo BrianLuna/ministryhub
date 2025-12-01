@@ -3,6 +3,7 @@ export 'create_ministry.dart';
 export 'delete_ministry.dart';
 export 'get_ministries_by_administrator.dart';
 export 'get_ministries_by_user.dart';
+export 'ministry_deletion_strategy.dart';
 export 'update_ministry.dart';
 export 'update_ministry_subscription.dart';
 export 'upload_ministry_logo.dart';

@@ -128,3 +128,6 @@ coverage/
 # AI Agent Instructions
 .cursorrules
 .ai-instructions.md
+
+# FVM Version Cache
+.fvm/

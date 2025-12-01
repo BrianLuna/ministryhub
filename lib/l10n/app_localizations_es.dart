@@ -449,4 +449,149 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get ministrySubscriptionUpdateError =>
       'Error al actualizar la suscripción';
+
+  @override
+  String get entityCreateTitle => 'Crear Entidad';
+
+  @override
+  String get entityTypeMinistry => 'Ministerio';
+
+  @override
+  String get entityTypeChurch => 'Iglesia';
+
+  @override
+  String get entityNoEntities => 'No hay entidades disponibles';
+
+  @override
+  String get entitySelectEntity => 'Seleccionar entidad';
+
+  @override
+  String get entitySettings => 'Configuración de Entidad';
+
+  @override
+  String get entityCreate => 'Crear Entidad';
+
+  @override
+  String get churchCreateTitle => 'Crear Iglesia';
+
+  @override
+  String get churchNameLabel => 'Nombre de la Iglesia';
+
+  @override
+  String get churchNameHint => 'Ingresa el nombre de la iglesia';
+
+  @override
+  String get churchNameRequired => 'El nombre de la iglesia es requerido';
+
+  @override
+  String get churchNameTooShort => 'El nombre debe tener al menos 2 caracteres';
+
+  @override
+  String get churchLocationLabel => 'Ubicación';
+
+  @override
+  String get churchLocationSearchLabel => 'Buscar ubicación';
+
+  @override
+  String get churchLocationSearchHint => 'Escribe una dirección';
+
+  @override
+  String get churchLocationRequired => 'La ubicación es requerida';
+
+  @override
+  String get churchMinistryLabel => 'Ministerio';
+
+  @override
+  String get churchMinistryHint => 'Selecciona un ministerio';
+
+  @override
+  String get churchMinistryRequired => 'El ministerio es requerido';
+
+  @override
+  String get churchCreate => 'Crear';
+
+  @override
+  String get churchCreateDialogMessage =>
+      'Haz clic en \'Crear\' para continuar con los detalles de la iglesia.';
+
+  @override
+  String get churchCancel => 'Cancelar';
+
+  @override
+  String get churchSettingsTitle => 'Configuración de Iglesia';
+
+  @override
+  String get churchSave => 'Guardar';
+
+  @override
+  String get churchUpdateSuccess => 'Iglesia actualizada correctamente';
+
+  @override
+  String get churchUpdateError => 'Error al actualizar la iglesia';
+
+  @override
+  String get churchDeleteButton => 'Eliminar Iglesia';
+
+  @override
+  String get churchDeleteTitle => 'Eliminar Iglesia';
+
+  @override
+  String get churchDeleteMessage =>
+      '¿Estás seguro que deseas eliminar esta iglesia? Esta acción no se puede deshacer.';
+
+  @override
+  String get churchDeleteCancel => 'Cancelar';
+
+  @override
+  String get churchDeleteConfirm => 'Eliminar';
+
+  @override
+  String get churchDeleteSuccess => 'Iglesia eliminada correctamente';
+
+  @override
+  String get churchDeleteError => 'Error al eliminar la iglesia';
+
+  @override
+  String get settingsPreferredEntitySection => 'Entidad Preferida';
+
+  @override
+  String get settingsPreferredEntityLabel => 'Entidad Preferida';
+
+  @override
+  String get settingsPreferredEntityHint => 'Selecciona una entidad preferida';
+
+  @override
+  String get settingsNoEntitiesAvailable => 'No hay entidades disponibles';
+
+  @override
+  String get ministryDeleteWithChurchesTitle => 'Eliminar Ministerio';
+
+  @override
+  String ministryDeleteWithChurchesMessage(int count) {
+    return 'Este ministerio tiene $count iglesia(s). ¿Qué deseas hacer?';
+  }
+
+  @override
+  String get ministryDeleteChurchesOption => 'Eliminar Iglesias';
+
+  @override
+  String get ministryReassignChurchesOption => 'Reasignar a Otro Ministerio';
+
+  @override
+  String get ministryReassignTargetLabel => 'Ministerio Destino';
+
+  @override
+  String get ministryReassignTargetHint => 'Selecciona un ministerio';
+
+  @override
+  String get ministryReassignTargetRequired =>
+      'Por favor selecciona un ministerio destino';
+
+  @override
+  String get ministryDeleteChurchesOptionDescription =>
+      'Todas las iglesias serán eliminadas permanentemente';
+
+  @override
+  String get ministryReassignChurchesOptionDescription =>
+      'Las iglesias serán movidas a otro ministerio';
 }

@@ -36,12 +36,32 @@ android {
     buildTypes {
         debug {
             // Uses google-services.json from src/debug/
+            // Load Google Maps API key for dev environment from gradle.properties
+            val mapsApiKey = (project.findProperty("GOOGLE_MAPS_ANDROID_DEV_KEY") as String?)
+                ?: System.getenv("GOOGLE_MAPS_ANDROID_DEV_KEY")
+                ?: ""
+            
+            if (mapsApiKey.isNullOrEmpty()) {
+                logger.warn("⚠️ GOOGLE_MAPS_ANDROID_DEV_KEY not found. Run scripts/sync_android_maps_keys.ps1 to sync from .env")
+            }
+            
+            manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = mapsApiKey
         }
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
             // Uses google-services.json from src/release/
+            // Load Google Maps API key for prod environment from gradle.properties
+            val mapsApiKey = (project.findProperty("GOOGLE_MAPS_ANDROID_PROD_KEY") as String?)
+                ?: System.getenv("GOOGLE_MAPS_ANDROID_PROD_KEY")
+                ?: ""
+            
+            if (mapsApiKey.isNullOrEmpty()) {
+                logger.warn("⚠️ GOOGLE_MAPS_ANDROID_PROD_KEY not found. Run scripts/sync_android_maps_keys.ps1 to sync from .env")
+            }
+            
+            manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = mapsApiKey
         }
     }
 }
