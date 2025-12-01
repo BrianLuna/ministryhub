@@ -443,4 +443,149 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ministrySubscriptionUpdateError => 'Error updating subscription';
+
+  @override
+  String get entityCreateTitle => 'Create Entity';
+
+  @override
+  String get entityTypeMinistry => 'Ministry';
+
+  @override
+  String get entityTypeChurch => 'Church';
+
+  @override
+  String get entityNoEntities => 'No entities available';
+
+  @override
+  String get entitySelectEntity => 'Select entity';
+
+  @override
+  String get entitySettings => 'Entity Settings';
+
+  @override
+  String get entityCreate => 'Create Entity';
+
+  @override
+  String get churchCreateTitle => 'Create Church';
+
+  @override
+  String get churchNameLabel => 'Church Name';
+
+  @override
+  String get churchNameHint => 'Enter church name';
+
+  @override
+  String get churchNameRequired => 'Church name is required';
+
+  @override
+  String get churchNameTooShort => 'Church name must be at least 2 characters';
+
+  @override
+  String get churchLocationLabel => 'Location';
+
+  @override
+  String get churchLocationSearchLabel => 'Search location';
+
+  @override
+  String get churchLocationSearchHint => 'Type an address';
+
+  @override
+  String get churchLocationRequired => 'Location is required';
+
+  @override
+  String get churchMinistryLabel => 'Ministry';
+
+  @override
+  String get churchMinistryHint => 'Select ministry';
+
+  @override
+  String get churchMinistryRequired => 'Ministry is required';
+
+  @override
+  String get churchCreate => 'Create';
+
+  @override
+  String get churchCreateDialogMessage =>
+      'Click \'Create\' to continue with church details.';
+
+  @override
+  String get churchCancel => 'Cancel';
+
+  @override
+  String get churchSettingsTitle => 'Church Settings';
+
+  @override
+  String get churchSave => 'Save';
+
+  @override
+  String get churchUpdateSuccess => 'Church updated successfully';
+
+  @override
+  String get churchUpdateError => 'Error updating church';
+
+  @override
+  String get churchDeleteButton => 'Delete Church';
+
+  @override
+  String get churchDeleteTitle => 'Delete Church';
+
+  @override
+  String get churchDeleteMessage =>
+      'Are you sure you want to delete this church? This action cannot be undone.';
+
+  @override
+  String get churchDeleteCancel => 'Cancel';
+
+  @override
+  String get churchDeleteConfirm => 'Delete';
+
+  @override
+  String get churchDeleteSuccess => 'Church deleted successfully';
+
+  @override
+  String get churchDeleteError => 'Error deleting church';
+
+  @override
+  String get settingsPreferredEntitySection => 'Preferred Entity';
+
+  @override
+  String get settingsPreferredEntityLabel => 'Preferred Entity';
+
+  @override
+  String get settingsPreferredEntityHint => 'Select preferred entity';
+
+  @override
+  String get settingsNoEntitiesAvailable => 'No entities available';
+
+  @override
+  String get ministryDeleteWithChurchesTitle => 'Delete Ministry';
+
+  @override
+  String ministryDeleteWithChurchesMessage(int count) {
+    return 'This ministry has $count church(es). What would you like to do?';
+  }
+
+  @override
+  String get ministryDeleteChurchesOption => 'Delete Churches';
+
+  @override
+  String get ministryReassignChurchesOption => 'Reassign to Another Ministry';
+
+  @override
+  String get ministryReassignTargetLabel => 'Target Ministry';
+
+  @override
+  String get ministryReassignTargetHint => 'Select ministry';
+
+  @override
+  String get ministryReassignTargetRequired =>
+      'Please select a target ministry';
+
+  @override
+  String get ministryDeleteChurchesOptionDescription =>
+      'All churches will be permanently deleted';
+
+  @override
+  String get ministryReassignChurchesOptionDescription =>
+      'Churches will be moved to another ministry';
 }

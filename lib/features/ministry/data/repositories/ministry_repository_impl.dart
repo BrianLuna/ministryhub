@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:ministryhub/ministryhub.dart';
 
 /// Implementation of MinistryRepository
@@ -45,7 +46,17 @@ class MinistryRepositoryImpl implements MinistryRepository {
   Future<List<Ministry>> getMinistriesByUser(String userId) async {
     try {
       final dataList = await _firestoreDatasource.getMinistriesByUser(userId);
-      return dataList.map(_mapToMinistry).toList();
+      return dataList.map((data) {
+        try {
+          return _mapToMinistry(data);
+        } catch (e, stackTrace) {
+          // Log detailed error for debugging
+          debugPrint('Error mapping ministry data: $e');
+          debugPrint('Data: $data');
+          debugPrint('Stack trace: $stackTrace');
+          rethrow;
+        }
+      }).toList();
     } catch (e) {
       if (e is MinistryException) {
         rethrow;
@@ -331,30 +342,59 @@ class MinistryRepositoryImpl implements MinistryRepository {
   }
 
   Ministry _mapToMinistry(Map<String, dynamic> data) {
-    final createdAt = data['createdAt'];
-    DateTime createdAtDate;
-    if (createdAt is Timestamp) {
-      createdAtDate = createdAt.toDate();
-    } else if (createdAt is DateTime) {
-      createdAtDate = createdAt;
-    } else {
+    try {
+      final createdAt = data['createdAt'];
+      DateTime createdAtDate;
+      if (createdAt is Timestamp) {
+        createdAtDate = createdAt.toDate();
+      } else if (createdAt is DateTime) {
+        createdAtDate = createdAt;
+      } else {
+        throw MinistryException(
+          message:
+              'Invalid createdAt format in ministry data. Got: ${createdAt.runtimeType}',
+        );
+      }
+
+      final subscriptionTypeString = data['subscriptionType'] as String?;
+      final subscriptionType = subscriptionTypeString != null
+          ? SubscriptionType.fromString(subscriptionTypeString)
+          : SubscriptionType.free;
+
+      // Validate required fields
+      final id = data['id'] as String?;
+      if (id == null || id.isEmpty) {
+        throw MinistryException(message: 'Ministry id is missing or empty');
+      }
+
+      final name = data['name'] as String?;
+      if (name == null || name.isEmpty) {
+        throw MinistryException(message: 'Ministry name is missing or empty');
+      }
+
+      final administratorId = data['administratorId'] as String?;
+      if (administratorId == null || administratorId.isEmpty) {
+        throw MinistryException(
+          message: 'Ministry administratorId is missing or empty',
+        );
+      }
+
+      return Ministry(
+        id: id,
+        name: name,
+        createdAt: createdAtDate,
+        administratorId: administratorId,
+        logoUrl: data['logoUrl'] as String?,
+        subscriptionType: subscriptionType,
+      );
+    } catch (e) {
+      if (e is MinistryException) {
+        rethrow;
+      }
       throw MinistryException(
-        message: 'Invalid createdAt format in ministry data',
+        message: 'Failed to map ministry data: ${e.toString()}. Data: $data',
+        cause: e,
       );
     }
-
-    final subscriptionTypeString = data['subscriptionType'] as String?;
-    final subscriptionType = subscriptionTypeString != null
-        ? SubscriptionType.fromString(subscriptionTypeString)
-        : SubscriptionType.free;
-
-    return Ministry(
-      id: data['id'] as String,
-      name: data['name'] as String,
-      createdAt: createdAtDate,
-      administratorId: data['administratorId'] as String,
-      logoUrl: data['logoUrl'] as String?,
-      subscriptionType: subscriptionType,
-    );
   }
 }

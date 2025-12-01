@@ -931,6 +931,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error updating subscription'**
   String get ministrySubscriptionUpdateError;
+
+  /// Title for create entity dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Create Entity'**
+  String get entityCreateTitle;
+
+  /// Label for ministry entity type
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry'**
+  String get entityTypeMinistry;
+
+  /// Label for church entity type
+  ///
+  /// In en, this message translates to:
+  /// **'Church'**
+  String get entityTypeChurch;
+
+  /// Message when no entities are available
+  ///
+  /// In en, this message translates to:
+  /// **'No entities available'**
+  String get entityNoEntities;
+
+  /// Placeholder for entity selection
+  ///
+  /// In en, this message translates to:
+  /// **'Select entity'**
+  String get entitySelectEntity;
+
+  /// Tooltip for entity settings button
+  ///
+  /// In en, this message translates to:
+  /// **'Entity Settings'**
+  String get entitySettings;
+
+  /// Tooltip for create entity button
+  ///
+  /// In en, this message translates to:
+  /// **'Create Entity'**
+  String get entityCreate;
+
+  /// Title for create church dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Create Church'**
+  String get churchCreateTitle;
+
+  /// Label for church name field
+  ///
+  /// In en, this message translates to:
+  /// **'Church Name'**
+  String get churchNameLabel;
+
+  /// Hint for church name field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter church name'**
+  String get churchNameHint;
+
+  /// Error message when church name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Church name is required'**
+  String get churchNameRequired;
+
+  /// Error message when church name is too short
+  ///
+  /// In en, this message translates to:
+  /// **'Church name must be at least 2 characters'**
+  String get churchNameTooShort;
+
+  /// Label for church location field
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get churchLocationLabel;
+
+  /// Label for location search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search location'**
+  String get churchLocationSearchLabel;
+
+  /// Hint for location search field
+  ///
+  /// In en, this message translates to:
+  /// **'Type an address'**
+  String get churchLocationSearchHint;
+
+  /// Error message when location is not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Location is required'**
+  String get churchLocationRequired;
+
+  /// Label for church ministry field
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry'**
+  String get churchMinistryLabel;
+
+  /// Hint for church ministry field
+  ///
+  /// In en, this message translates to:
+  /// **'Select ministry'**
+  String get churchMinistryHint;
+
+  /// Error message when ministry is not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Ministry is required'**
+  String get churchMinistryRequired;
+
+  /// Button label to create church
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get churchCreate;
+
+  /// Message shown when church is selected in entity creation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Click \'Create\' to continue with church details.'**
+  String get churchCreateDialogMessage;
+
+  /// Button label to cancel church creation
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get churchCancel;
+
+  /// Title for church settings overlay
+  ///
+  /// In en, this message translates to:
+  /// **'Church Settings'**
+  String get churchSettingsTitle;
+
+  /// Button label to save church changes
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get churchSave;
+
+  /// Success message after updating church
+  ///
+  /// In en, this message translates to:
+  /// **'Church updated successfully'**
+  String get churchUpdateSuccess;
+
+  /// Error message when church update fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating church'**
+  String get churchUpdateError;
+
+  /// Button label to delete church
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Church'**
+  String get churchDeleteButton;
+
+  /// Title for delete church confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Church'**
+  String get churchDeleteTitle;
+
+  /// Message in delete church confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this church? This action cannot be undone.'**
+  String get churchDeleteMessage;
+
+  /// Button label to cancel church deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get churchDeleteCancel;
+
+  /// Button label to confirm church deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get churchDeleteConfirm;
+
+  /// Success message after deleting church
+  ///
+  /// In en, this message translates to:
+  /// **'Church deleted successfully'**
+  String get churchDeleteSuccess;
+
+  /// Error message when church deletion fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting church'**
+  String get churchDeleteError;
+
+  /// Section title for preferred entity in account settings
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Entity'**
+  String get settingsPreferredEntitySection;
+
+  /// Label for preferred entity dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Entity'**
+  String get settingsPreferredEntityLabel;
+
+  /// Hint for preferred entity dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Select preferred entity'**
+  String get settingsPreferredEntityHint;
+
+  /// Message when no entities are available for selection
+  ///
+  /// In en, this message translates to:
+  /// **'No entities available'**
+  String get settingsNoEntitiesAvailable;
+
+  /// Title for delete ministry dialog when churches exist
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Ministry'**
+  String get ministryDeleteWithChurchesTitle;
+
+  /// Message in delete ministry dialog when churches exist
+  ///
+  /// In en, this message translates to:
+  /// **'This ministry has {count} church(es). What would you like to do?'**
+  String ministryDeleteWithChurchesMessage(int count);
+
+  /// Option to delete churches when deleting ministry
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Churches'**
+  String get ministryDeleteChurchesOption;
+
+  /// Option to reassign churches when deleting ministry
+  ///
+  /// In en, this message translates to:
+  /// **'Reassign to Another Ministry'**
+  String get ministryReassignChurchesOption;
+
+  /// Label for target ministry selector when reassigning churches
+  ///
+  /// In en, this message translates to:
+  /// **'Target Ministry'**
+  String get ministryReassignTargetLabel;
+
+  /// Hint for target ministry selector
+  ///
+  /// In en, this message translates to:
+  /// **'Select ministry'**
+  String get ministryReassignTargetHint;
+
+  /// Error message when target ministry is not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a target ministry'**
+  String get ministryReassignTargetRequired;
+
+  /// Description for delete churches option
+  ///
+  /// In en, this message translates to:
+  /// **'All churches will be permanently deleted'**
+  String get ministryDeleteChurchesOptionDescription;
+
+  /// Description for reassign churches option
+  ///
+  /// In en, this message translates to:
+  /// **'Churches will be moved to another ministry'**
+  String get ministryReassignChurchesOptionDescription;
 }
 
 class _AppLocalizationsDelegate

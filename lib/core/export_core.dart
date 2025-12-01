@@ -1,3 +1,4 @@
+export 'entities/export_entities.dart';
 export 'errors/export_errors.dart';
 export 'platform/export_platform.dart';
 export 'preferences/export_preferences.dart';

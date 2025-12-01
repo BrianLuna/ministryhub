@@ -62,8 +62,9 @@ final checkUserIsAdministratorUseCaseProvider =
     });
 
 final deleteMinistryUseCaseProvider = Provider<DeleteMinistryUseCase>((ref) {
-  final repository = ref.watch(ministryRepositoryProvider);
-  return DeleteMinistryUseCase(repository);
+  final ministryRepository = ref.watch(ministryRepositoryProvider);
+  final churchRepository = ref.watch(churchRepositoryProvider);
+  return DeleteMinistryUseCase(ministryRepository, churchRepository);
 });
 
 final watchMinistryUseCaseProvider = Provider<WatchMinistryUseCase>((ref) {
@@ -145,8 +146,28 @@ class MinistryController extends StateNotifier<MinistryState> {
         if (_isDisposed) return;
       }
 
-      // If preferred ministry is set, try to select it
-      if (state.preferredMinistryId != null && ministries.isNotEmpty) {
+      // If preferred entity is set, try to select it
+      if (state.preferredEntity != null && ministries.isNotEmpty) {
+        if (state.preferredEntity!.type == EntityType.ministry) {
+          try {
+            final preferred = ministries.firstWhere(
+              (m) => m.id == state.preferredEntity!.id,
+            );
+            if (!_isDisposed) {
+              selectMinistry(preferred);
+            }
+          } catch (e) {
+            // Preferred ministry not found, select first
+            if (!_isDisposed && ministries.isNotEmpty) {
+              selectMinistry(ministries.first);
+            }
+          }
+        } else {
+          // Preferred is a church - church controller will handle selection
+          // Just ensure preferred entity is set in state
+        }
+      } else if (state.preferredMinistryId != null && ministries.isNotEmpty) {
+        // Fallback to old format
         final preferred = ministries.firstWhere(
           (m) => m.id == state.preferredMinistryId,
           orElse: () => ministries.first,
@@ -246,18 +267,54 @@ class MinistryController extends StateNotifier<MinistryState> {
     );
   }
 
-  /// Load preferred ministry from preferences
+  /// Load preferred entity from preferences
   Future<void> _loadPreferredMinistry(String userId) async {
     if (_isDisposed) return;
     try {
+      // Try to load new format first
+      final preferredTypeString = await _preferencesService.getStringForUser(
+        'preferredEntityType',
+        userId,
+      );
       final preferredId = await _preferencesService.getStringForUser(
+        'preferredEntityId',
+        userId,
+      );
+
+      if (_isDisposed) return;
+
+      if (preferredTypeString != null &&
+          preferredId != null &&
+          preferredId.isNotEmpty) {
+        final entityType = preferredTypeString == 'church'
+            ? EntityType.church
+            : EntityType.ministry;
+        final preferredEntity = PreferredEntity(
+          id: preferredId,
+          type: entityType,
+        );
+        if (!_isDisposed) {
+          state = state.copyWith(preferredEntity: preferredEntity);
+        }
+        return;
+      }
+
+      // Fallback to old format for backward compatibility
+      final oldPreferredId = await _preferencesService.getStringForUser(
         'preferredMinistryId',
         userId,
       );
       if (_isDisposed) return;
-      if (preferredId != null && preferredId.isNotEmpty) {
+      if (oldPreferredId != null && oldPreferredId.isNotEmpty) {
+        final preferredEntity = PreferredEntity(
+          id: oldPreferredId,
+          type: EntityType.ministry,
+        );
         if (!_isDisposed) {
-          state = state.copyWith(preferredMinistryId: preferredId);
+          state = state.copyWith(
+            preferredEntity: preferredEntity,
+            preferredMinistryId: oldPreferredId,
+          );
         }
       }
     } catch (e) {
@@ -265,31 +322,69 @@ class MinistryController extends StateNotifier<MinistryState> {
     }
   }
 
-  /// Set preferred ministry
-  Future<void> setPreferredMinistry(String? ministryId, String userId) async {
+  /// Set preferred entity (ministry or church)
+  Future<void> setPreferredEntity(
+    PreferredEntity? entity,
+    String userId,
+  ) async {
     if (_isDisposed) return;
     try {
-      if (ministryId != null) {
+      if (entity != null) {
         await _preferencesService.setStringForUser(
-          'preferredMinistryId',
+          'preferredEntityType',
           userId,
-          ministryId,
+          entity.type == EntityType.church ? 'church' : 'ministry',
         );
+        await _preferencesService.setStringForUser(
+          'preferredEntityId',
+          userId,
+          entity.id,
+        );
+        // Also update old format for backward compatibility
+        if (entity.type == EntityType.ministry) {
+          await _preferencesService.setStringForUser(
+            'preferredMinistryId',
+            userId,
+            entity.id,
+          );
+        }
       } else {
-        // Remove preference
-        final userKey = 'preferredMinistryId_$userId';
-        await _preferencesService.prefs?.remove(userKey);
+        // Remove preferences
+        final userKeyType = 'preferredEntityType_$userId';
+        final userKeyId = 'preferredEntityId_$userId';
+        await _preferencesService.prefs?.remove(userKeyType);
+        await _preferencesService.prefs?.remove(userKeyId);
       }
       if (!_isDisposed) {
-        state = state.copyWith(preferredMinistryId: ministryId);
+        state = state.copyWith(preferredEntity: entity);
       }
     } catch (e) {
       // Ignore errors saving preference
     }
   }
 
-  /// Get preferred ministry ID
+  /// Set preferred ministry (backward compatibility)
+  Future<void> setPreferredMinistry(String? ministryId, String userId) async {
+    if (ministryId != null) {
+      await setPreferredEntity(
+        PreferredEntity(id: ministryId, type: EntityType.ministry),
+        userId,
+      );
+    } else {
+      await setPreferredEntity(null, userId);
+    }
+  }
+
+  /// Get preferred entity
+  PreferredEntity? getPreferredEntity() {
+    return state.preferredEntity;
+  }
+
+  /// Get preferred ministry ID (backward compatibility)
   String? getPreferredMinistryId() {
+    if (state.preferredEntity?.type == EntityType.ministry) {
+      return state.preferredEntity?.id;
+    }
     return state.preferredMinistryId;
   }
 
@@ -321,7 +416,10 @@ class MinistryController extends StateNotifier<MinistryState> {
         // If this is the first ministry, set it as preferred
         // Check if list will be empty after creation (before stream updates)
         if (state.ministries.isEmpty && _userId != null) {
-          await setPreferredMinistry(ministry.id, _userId!);
+          await setPreferredEntity(
+            PreferredEntity(id: ministry.id, type: EntityType.ministry),
+            _userId!,
+          );
         }
       }
 
@@ -347,7 +445,10 @@ class MinistryController extends StateNotifier<MinistryState> {
 
     // Save as preferred if user is set
     if (ministry != null && _userId != null) {
-      setPreferredMinistry(ministry.id, _userId!);
+      setPreferredEntity(
+        PreferredEntity(id: ministry.id, type: EntityType.ministry),
+        _userId!,
+      );
       // Start listening to ministry changes
       _watchSelectedMinistry(ministry.id);
     }
@@ -730,13 +831,21 @@ class MinistryController extends StateNotifier<MinistryState> {
   }
 
   /// Delete ministry
-  Future<bool> deleteMinistry(String ministryId) async {
+  Future<bool> deleteMinistry({
+    required String ministryId,
+    MinistryDeletionStrategy? strategy,
+    String? targetMinistryId,
+  }) async {
     if (_isDisposed) return false;
     if (!_isDisposed) {
       state = state.copyWith(isDeleting: true, error: null);
     }
     try {
-      await _deleteMinistryUseCase(ministryId);
+      await _deleteMinistryUseCase(
+        ministryId: ministryId,
+        strategy: strategy,
+        targetMinistryId: targetMinistryId,
+      );
       if (_isDisposed) return false;
 
       // Remove from local state
@@ -813,6 +922,7 @@ class MinistryState {
     required this.isDeleting,
     this.ministries = const [],
     this.selectedMinistry,
+    this.preferredEntity,
     this.preferredMinistryId,
     this.selectedImage,
     this.selectedImagePath,
@@ -826,6 +936,7 @@ class MinistryState {
       isDeleting = false,
       ministries = const [],
       selectedMinistry = null,
+      preferredEntity = null,
       preferredMinistryId = null,
       selectedImage = null,
       selectedImagePath = null,
@@ -837,7 +948,8 @@ class MinistryState {
   final bool isDeleting;
   final List<Ministry> ministries;
   final Ministry? selectedMinistry;
-  final String? preferredMinistryId;
+  final PreferredEntity? preferredEntity;
+  final String? preferredMinistryId; // Deprecated, use preferredEntity
   final List<int>? selectedImage;
   final String? selectedImagePath;
   final String? error;
@@ -849,6 +961,7 @@ class MinistryState {
     bool? isDeleting,
     List<Ministry>? ministries,
     Ministry? selectedMinistry,
+    PreferredEntity? preferredEntity,
     String? preferredMinistryId,
     Object? selectedImage = _undefined,
     Object? selectedImagePath = _undefined,
@@ -861,6 +974,7 @@ class MinistryState {
       isDeleting: isDeleting ?? this.isDeleting,
       ministries: ministries ?? this.ministries,
       selectedMinistry: selectedMinistry ?? this.selectedMinistry,
+      preferredEntity: preferredEntity ?? this.preferredEntity,
       preferredMinistryId: preferredMinistryId ?? this.preferredMinistryId,
       selectedImage: selectedImage == _undefined
           ? this.selectedImage

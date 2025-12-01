@@ -19,9 +19,12 @@ class CreateMinistryDialog extends ConsumerStatefulWidget {
       _CreateMinistryDialogState();
 }
 
+enum _EntityType { ministry, church }
+
 class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  _EntityType _selectedType = _EntityType.ministry;
   bool _isCreating = false;
 
   @override
@@ -30,11 +33,22 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
     super.dispose();
   }
 
-  Future<void> _createMinistry() async {
+  Future<void> _createEntity() async {
+    if (_selectedType == _EntityType.church) {
+      // For church, close this dialog and open create church dialog
+      if (mounted) {
+        Navigator.of(context).pop();
+        await CreateChurchDialog.show(context);
+      }
+      return;
+    }
+
+    // For ministry, validate form
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
+    // Create ministry
     setState(() {
       _isCreating = true;
     });
@@ -98,28 +112,65 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
     final l10n = AppLocalizations.of(context)!;
 
     return AlertDialog(
-      title: Text(l10n.ministryCreateTitle),
+      title: Text(l10n.entityCreateTitle),
       content: Form(
         key: _formKey,
-        child: TextFormField(
-          controller: _nameController,
-          decoration: InputDecoration(
-            labelText: l10n.ministryNameLabel,
-            hintText: l10n.ministryNameHint,
-          ),
-          textCapitalization: TextCapitalization.words,
-          enabled: !_isCreating,
-          autofocus: true,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return l10n.ministryNameRequired;
-            }
-            if (value.trim().length < 2) {
-              return l10n.ministryNameTooShort;
-            }
-            return null;
-          },
-          onFieldSubmitted: (_) => _createMinistry(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Segmented button for entity type
+            SegmentedButton<_EntityType>(
+              segments: [
+                ButtonSegment(
+                  value: _EntityType.ministry,
+                  label: Text(l10n.entityTypeMinistry),
+                ),
+                ButtonSegment(
+                  value: _EntityType.church,
+                  label: Text(l10n.entityTypeChurch),
+                ),
+              ],
+              selected: {_selectedType},
+              onSelectionChanged: (Set<_EntityType> newSelection) {
+                setState(() {
+                  _selectedType = newSelection.first;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            // Show name field only for ministry
+            if (_selectedType == _EntityType.ministry)
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: l10n.ministryNameLabel,
+                  hintText: l10n.ministryNameHint,
+                ),
+                textCapitalization: TextCapitalization.words,
+                enabled: !_isCreating,
+                autofocus: true,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return l10n.ministryNameRequired;
+                  }
+                  if (value.trim().length < 2) {
+                    return l10n.ministryNameTooShort;
+                  }
+                  return null;
+                },
+                onFieldSubmitted: (_) => _createEntity(),
+              )
+            else
+              // For church, show message to continue
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  l10n.churchCreateDialogMessage,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+          ],
         ),
       ),
       actions: [
@@ -128,14 +179,18 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
           child: Text(l10n.ministryCancel),
         ),
         ElevatedButton(
-          onPressed: _isCreating ? null : _createMinistry,
+          onPressed: _isCreating ? null : _createEntity,
           child: _isCreating
               ? const SizedBox(
                   height: 20,
                   width: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(l10n.ministryCreate),
+              : Text(
+                  _selectedType == _EntityType.ministry
+                      ? l10n.ministryCreate
+                      : l10n.churchCreate,
+                ),
         ),
       ],
     );

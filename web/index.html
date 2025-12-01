@@ -42,6 +42,13 @@
 
   <title>ministryhub</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Google Maps JavaScript API -->
+  <!-- IMPORTANT: Replace 'YOUR_WEB_KEY_HERE' with your actual Google Maps Web API key -->
+  <!-- For dev: Use GOOGLE_MAPS_WEB_DEV_KEY from .env -->
+  <!-- For prod: Use GOOGLE_MAPS_WEB_PROD_KEY from .env -->
+  <!-- Note: Web requires the key hardcoded here since index.html loads before Dart -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_WEB_KEY_HERE&libraries=places"></script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

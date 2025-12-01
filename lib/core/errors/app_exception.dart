@@ -38,3 +38,9 @@ class SubscriptionException extends AppException {
   const SubscriptionException({required super.message, super.cause})
     : super(code: 'subscription_error');
 }
+
+/// Specialized exception for church operations failures.
+class ChurchException extends AppException {
+  const ChurchException({required super.message, super.cause})
+    : super(code: 'church_error');
+}

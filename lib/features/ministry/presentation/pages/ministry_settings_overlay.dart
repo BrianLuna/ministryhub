@@ -700,44 +700,25 @@ class _DeleteMinistrySection extends ConsumerWidget {
     WidgetRef ref,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.ministryDeleteTitle),
-        content: Text(l10n.ministryDeleteMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.ministryDeleteCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: Text(l10n.ministryDeleteConfirm),
-          ),
-        ],
-      ),
+
+    // Get church count for this ministry
+    final churchCount = await ref
+        .read(getChurchesCountByMinistryUseCaseProvider)
+        .call(ministry.id);
+
+    if (!context.mounted) return;
+
+    final confirmed = await DeleteMinistryDialog.show(
+      context,
+      ministry,
+      churchCount,
     );
 
-    if (confirmed == true && context.mounted) {
-      final success = await ref
-          .read(ministryControllerProvider.notifier)
-          .deleteMinistry(ministry.id);
-
-      if (!context.mounted) return;
-
-      if (success) {
-        Navigator.of(context).pop(); // Close settings overlay
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.ministryDeleteSuccess)));
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.ministryDeleteError)));
-      }
+    if (confirmed && context.mounted) {
+      Navigator.of(context).pop(); // Close settings overlay
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.ministryDeleteSuccess)));
     }
   }
 }
