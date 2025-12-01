@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:ministryhub/ministryhub.dart';
@@ -24,11 +26,13 @@ class LocationPicker extends StatefulWidget {
 class _LocationPickerState extends State<LocationPicker> {
   final _searchController = TextEditingController();
   final _debouncer = Debouncer(milliseconds: 500);
-  final _mapControllerCompleter = Completer<GoogleMapController>();
+  GoogleMapController? _mapController;
 
   List<PlacePrediction> _predictions = [];
   bool _isLoadingPredictions = false;
   Location? _selectedLocation;
+  Position? _currentPosition;
+  bool _isRequestingLocation = false;
 
   @override
   void initState() {
@@ -37,15 +41,47 @@ class _LocationPickerState extends State<LocationPicker> {
     if (_selectedLocation != null) {
       _searchController.text = _selectedLocation!.address;
     }
+    _initCurrentLocation();
   }
 
-  String get _apiKey => GoogleMapsConfig.apiKey;
+  /// Places API (New) key, independent from platform-specific Maps SDK keys
+  String get _apiKey => GoogleMapsConfig.placesKey;
 
   @override
   void dispose() {
     _searchController.dispose();
     _debouncer.dispose();
     super.dispose();
+  }
+
+  Future<void> _initCurrentLocation() async {
+    if (_isRequestingLocation) {
+      return;
+    }
+    _isRequestingLocation = true;
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.deniedForever ||
+          permission == LocationPermission.denied) {
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      if (mounted) {
+        setState(() {
+          _currentPosition = position;
+        });
+      }
+    } catch (_) {
+      // If location is not available we simply don't bias the results
+    } finally {
+      _isRequestingLocation = false;
+    }
   }
 
   Future<void> _searchPlaces(String query) async {
@@ -70,30 +106,60 @@ class _LocationPickerState extends State<LocationPicker> {
         return;
       }
 
+      // Use Places API (New) autocomplete endpoint
       final url = Uri.parse(
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json'
-        '?input=$query'
-        '&key=$apiKey'
-        '&types=establishment|geocode',
+        'https://places.googleapis.com/v1/places:autocomplete',
       );
 
-      final response = await http.get(url);
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          // API key must be sent via header for Places API (New)
+          'X-Goog-Api-Key': apiKey,
+          // Request suggestions with full placePrediction payload
+          // (we luego filtramos lo que necesitamos en el cliente)
+          'X-Goog-FieldMask': 'suggestions.placePrediction',
+        },
+        body: json.encode(<String, dynamic>{
+          'input': query,
+          if (_currentPosition != null)
+            'locationBias': {
+              'circle': {
+                'center': {
+                  'latitude': _currentPosition!.latitude,
+                  'longitude': _currentPosition!.longitude,
+                },
+                // 5km radius bias around current location
+                'radius': 5000,
+              },
+            },
+        }),
+      );
+
+      if (kDebugMode) {
+        debugPrint(
+          'Places autocomplete response: '
+          '${response.statusCode} ${response.body}',
+        );
+      }
+
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['status'] == 'OK') {
-          final predictions = (data['predictions'] as List)
-              .map((p) => PlacePrediction.fromJson(p))
-              .toList();
-          setState(() {
-            _predictions = predictions;
-            _isLoadingPredictions = false;
-          });
-        } else {
-          setState(() {
-            _predictions = [];
-            _isLoadingPredictions = false;
-          });
-        }
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        final rawSuggestions = data['suggestions'] as List<dynamic>? ?? [];
+        final predictions = rawSuggestions
+            .map(
+              (s) => PlacePrediction.fromPlacesAutocomplete(
+                s as Map<String, dynamic>,
+              ),
+            )
+            .where((p) => p.placeId.isNotEmpty)
+            .toList();
+
+        setState(() {
+          _predictions = predictions;
+          _isLoadingPredictions = false;
+        });
       } else {
         setState(() {
           _predictions = [];
@@ -120,30 +186,37 @@ class _LocationPickerState extends State<LocationPicker> {
         return;
       }
 
-      final url = Uri.parse(
-        'https://maps.googleapis.com/maps/api/place/details/json'
-        '?place_id=${prediction.placeId}'
-        '&key=$apiKey'
-        '&fields=geometry,formatted_address,place_id',
+      // Ensure placeId has the 'places/' prefix for the API call
+      final resourceName = prediction.placeId.startsWith('places/')
+          ? prediction.placeId
+          : 'places/${prediction.placeId}';
+
+      // Use Places API (New) place details endpoint
+      final url = Uri.parse('https://places.googleapis.com/v1/$resourceName');
+
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          // API key must be sent via header for Places API (New)
+          'X-Goog-Api-Key': apiKey,
+          // We only need formattedAddress and location
+          'X-Goog-FieldMask': 'formattedAddress,location',
+        },
       );
 
-      final response = await http.get(url);
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['status'] == 'OK') {
-          final result = data['result'];
-          final geometry = result['geometry'];
-          final location = geometry['location'];
-          final lat = location['lat'] as double;
-          final lng = location['lng'] as double;
-          final address = result['formatted_address'] as String;
-          final placeId = result['place_id'] as String;
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        final address = data['formattedAddress'] as String?;
+        final location = data['location'] as Map<String, dynamic>?;
+        final lat = location?['latitude'] as double?;
+        final lng = location?['longitude'] as double?;
 
+        if (address != null && lat != null && lng != null) {
           final selectedLocation = Location(
             address: address,
             latitude: lat,
             longitude: lng,
-            placeId: placeId,
+            placeId: prediction.placeId,
           );
 
           setState(() {
@@ -152,18 +225,48 @@ class _LocationPickerState extends State<LocationPicker> {
             _isLoadingPredictions = false;
           });
 
-          // Move map to selected location
-          final controller = await _mapControllerCompleter.future;
-          await controller.animateCamera(
-            CameraUpdate.newLatLng(LatLng(lat, lng)),
-          );
-
-          widget.onLocationSelected(selectedLocation);
+          // Move map to selected location after it's created
+          if (_mapController != null) {
+            _mapController!.animateCamera(
+              CameraUpdate.newLatLng(LatLng(lat, lng)),
+            );
+          }
+        } else {
+          debugPrint('LocationPicker: Invalid details data: $data');
+          setState(() {
+            _isLoadingPredictions = false;
+          });
         }
+      } else {
+        debugPrint(
+          'LocationPicker: Place details error: ${response.statusCode} ${response.body}',
+        );
+        setState(() {
+          _isLoadingPredictions = false;
+        });
       }
     } catch (e) {
+      debugPrint('LocationPicker: Error selecting place: $e');
       setState(() {
         _isLoadingPredictions = false;
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(LocationPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialLocation != oldWidget.initialLocation) {
+      setState(() {
+        _selectedLocation = widget.initialLocation;
+        if (_selectedLocation != null) {
+          _searchController.text = _selectedLocation!.address;
+          _mapController?.animateCamera(
+            CameraUpdate.newLatLng(
+              LatLng(_selectedLocation!.latitude, _selectedLocation!.longitude),
+            ),
+          );
+        }
       });
     }
   }
@@ -214,98 +317,99 @@ class _LocationPickerState extends State<LocationPicker> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Search field
-        TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            labelText: l10n.churchLocationSearchLabel,
-            hintText: l10n.churchLocationSearchHint,
-            suffixIcon: _isLoadingPredictions
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: Padding(
-                      padding: EdgeInsets.all(12),
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  )
-                : const Icon(Icons.search),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Search field
+          TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              labelText: l10n.churchLocationSearchLabel,
+              hintText: l10n.churchLocationSearchHint,
+              suffixIcon: _isLoadingPredictions
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: Padding(
+                        padding: EdgeInsets.all(12),
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : const Icon(Icons.search),
+            ),
+            onChanged: (value) {
+              _debouncer.run(() => _searchPlaces(value));
+            },
           ),
-          onChanged: (value) {
-            _debouncer.run(() => _searchPlaces(value));
-          },
-        ),
-        // Predictions list
-        if (_predictions.isNotEmpty)
-          Container(
-            constraints: const BoxConstraints(maxHeight: 200),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.shadow.withAlpha(26),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
+          // Predictions list
+          if (_predictions.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.only(top: 8),
+              constraints: const BoxConstraints(maxHeight: 200),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.colorScheme.shadow.withAlpha(26),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: _predictions
+                      .map(
+                        (prediction) => ListTile(
+                          leading: const Icon(Icons.location_on),
+                          title: Text(prediction.mainText),
+                          subtitle: Text(prediction.secondaryText),
+                          onTap: () => _selectPlace(prediction),
+                        ),
+                      )
+                      .toList(),
                 ),
-              ],
+              ),
             ),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: _predictions.length,
-              itemBuilder: (context, index) {
-                final prediction = _predictions[index];
-                return ListTile(
-                  leading: const Icon(Icons.location_on),
-                  title: Text(prediction.mainText),
-                  subtitle: Text(prediction.secondaryText),
-                  onTap: () => _selectPlace(prediction),
-                );
-              },
-            ),
-          ),
-        const SizedBox(height: 16),
-        // Map
-        SizedBox(
-          height: 300,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: _selectedLocation != null
-                    ? LatLng(
+          const SizedBox(height: 16),
+          // Map (only visible after a location is selected)
+          if (_selectedLocation != null)
+            SizedBox(
+              height: 300,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(
+                      _selectedLocation!.latitude,
+                      _selectedLocation!.longitude,
+                    ),
+                    zoom: 15,
+                  ),
+                  onMapCreated: (controller) {
+                    _mapController = controller;
+                  },
+                  onTap: _onMapTap,
+                  markers: {
+                    Marker(
+                      markerId: const MarkerId('selected_location'),
+                      position: LatLng(
                         _selectedLocation!.latitude,
                         _selectedLocation!.longitude,
-                      )
-                    : const LatLng(0, 0), // Default location
-                zoom: _selectedLocation != null ? 15 : 2,
-              ),
-              onMapCreated: (controller) {
-                _mapControllerCompleter.complete(controller);
-              },
-              onTap: _onMapTap,
-              markers: _selectedLocation != null
-                  ? {
-                      Marker(
-                        markerId: const MarkerId('selected_location'),
-                        position: LatLng(
-                          _selectedLocation!.latitude,
-                          _selectedLocation!.longitude,
-                        ),
-                        draggable: true,
-                        onDragEnd: (position) => _onMapTap(position),
                       ),
-                    }
-                  : {},
-              myLocationButtonEnabled: true,
-              mapType: MapType.normal,
+                      draggable: true,
+                      onDragEnd: (position) => _onMapTap(position),
+                    ),
+                  },
+                  myLocationButtonEnabled: true,
+                  mapType: MapType.normal,
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -335,17 +439,42 @@ class PlacePrediction {
     required this.secondaryText,
   });
 
+  /// Resource name of the place in Places API (New), e.g. `places/ChIJ...`
   final String placeId;
+
+  /// Main text to display in the autocomplete list
   final String mainText;
+
+  /// Secondary text (usually formatted address)
   final String secondaryText;
 
-  factory PlacePrediction.fromJson(Map<String, dynamic> json) {
-    final structuredFormatting =
-        json['structured_formatting'] as Map<String, dynamic>;
+  /// Build a prediction from Places API (New) autocomplete response
+  factory PlacePrediction.fromPlacesAutocomplete(Map<String, dynamic> json) {
+    final placePrediction =
+        json['placePrediction'] as Map<String, dynamic>? ?? <String, dynamic>{};
+
+    // Resource name and ID for Places API (New)
+    final placeResourceName = placePrediction['place'] as String? ?? '';
+    final placeId = placePrediction['placeId'] as String? ?? placeResourceName;
+
+    // Structured text for display
+    final structuredFormat =
+        placePrediction['structuredFormat'] as Map<String, dynamic>? ??
+        <String, dynamic>{};
+    final mainTextMap =
+        structuredFormat['mainText'] as Map<String, dynamic>? ??
+        <String, dynamic>{};
+    final secondaryTextMap =
+        structuredFormat['secondaryText'] as Map<String, dynamic>? ??
+        <String, dynamic>{};
+
+    final mainText = mainTextMap['text'] as String? ?? '';
+    final secondaryText = secondaryTextMap['text'] as String? ?? '';
+
     return PlacePrediction(
-      placeId: json['place_id'] as String,
-      mainText: structuredFormatting['main_text'] as String,
-      secondaryText: structuredFormatting['secondary_text'] as String? ?? '',
+      placeId: placeId,
+      mainText: mainText,
+      secondaryText: secondaryText,
     );
   }
 }

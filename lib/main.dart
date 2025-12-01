@@ -3,10 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ministryhub/ministryhub.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await _loadEnvironment();
 
   // Initialize Firebase with the correct options based on build mode
   await Firebase.initializeApp(
@@ -17,6 +20,10 @@ Future<void> main() async {
 
   // Initialize RevenueCat (will handle .env loading internally)
   await RevenueCatService.initialize();
+
+  if (kIsWeb) {
+    await GoogleMapsLoader.ensureInitialized();
+  }
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -45,5 +52,15 @@ class MyApp extends ConsumerWidget {
       ],
       supportedLocales: const [Locale('en'), Locale('es')],
     );
+  }
+}
+
+Future<void> _loadEnvironment() async {
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    if (kDebugMode) {
+      debugPrint('Warning: Could not load .env file: $e');
+    }
   }
 }

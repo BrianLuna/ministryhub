@@ -78,6 +78,19 @@ class GoogleMapsConfig {
     }
   }
 
+  /// Get Places API (New) key for the current environment (non-platform-specific)
+  static String get placesKey {
+    try {
+      final isDev = kDebugMode;
+      final key = isDev
+          ? dotenv.env['GOOGLE_MAPS_PLACES_DEV_KEY']
+          : dotenv.env['GOOGLE_MAPS_PLACES_PROD_KEY'];
+      return key ?? '';
+    } catch (e) {
+      return '';
+    }
+  }
+
   /// Check if Google Maps is properly configured
   static bool get isConfigured {
     return apiKey.isNotEmpty;
