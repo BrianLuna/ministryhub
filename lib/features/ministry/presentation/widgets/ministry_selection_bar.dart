@@ -20,6 +20,10 @@ class MinistrySelectionBar extends ConsumerWidget {
     final churches = churchState.churches;
     final isLoading = ministryState.isLoading || churchState.isLoading;
 
+    debugPrint(
+      'SelectionBar Build: Ministry=${selectedMinistry?.name}, Church=${selectedChurch?.name}',
+    );
+
     // Determine selected entity
     ReligiousEntity? selectedEntity;
     if (selectedChurch != null) {
@@ -28,7 +32,7 @@ class MinistrySelectionBar extends ConsumerWidget {
       selectedEntity = selectedMinistry;
     }
 
-    // Combine entities for dropdown
+    // Combine entities for dropdown (though we'll group them inside)
     final allEntities = <ReligiousEntity>[...ministries, ...churches];
 
     return Container(
@@ -52,20 +56,20 @@ class MinistrySelectionBar extends ConsumerWidget {
               selectedEntity: selectedEntity,
               isLoading: isLoading,
               onEntitySelected: (entity) {
+                debugPrint(
+                  'Entity selected: ${entity?.name} (${entity?.entityType})',
+                );
                 if (entity == null) {
                   ref
                       .read(ministryControllerProvider.notifier)
                       .selectMinistry(null);
-                  ref
-                      .read(churchControllerProvider.notifier)
-                      .selectChurch(null);
+                  ref.read(churchControllerProvider.notifier).clearSelection();
                 } else if (entity.entityType == EntityType.ministry) {
+                  // Deselect church first
+                  ref.read(churchControllerProvider.notifier).clearSelection();
                   ref
                       .read(ministryControllerProvider.notifier)
                       .selectMinistry(entity as Ministry);
-                  ref
-                      .read(churchControllerProvider.notifier)
-                      .selectChurch(null);
                 } else {
                   ref
                       .read(churchControllerProvider.notifier)
@@ -124,7 +128,7 @@ class MinistrySelectionBar extends ConsumerWidget {
   }
 }
 
-/// Modern dropdown for entity selection (ministries and churches)
+/// Modern dropdown for entity selection (grouped by ministry)
 class _EntityDropdown extends StatelessWidget {
   const _EntityDropdown({
     required this.entities,
@@ -179,48 +183,87 @@ class _EntityDropdown extends StatelessWidget {
       );
     }
 
+    // Group churches by ministry
+    final ministries = entities.whereType<Ministry>().toList();
+    final churches = entities.whereType<Church>().toList();
+    final churchesByMinistry = <String, List<Church>>{};
+
+    for (final church in churches) {
+      if (!churchesByMinistry.containsKey(church.ministryId)) {
+        churchesByMinistry[church.ministryId] = [];
+      }
+      churchesByMinistry[church.ministryId]!.add(church);
+    }
+
+    // Find orphan churches (if any)
+    final orphanChurches = churches
+        .where((c) => !ministries.any((m) => m.id == c.ministryId))
+        .toList();
+
     return MenuAnchor(
       menuChildren: [
-        // Ministries section
-        if (entities.any((e) => e.entityType == EntityType.ministry)) ...[
+        // Ministries and their churches
+        for (final ministry in ministries)
           SubmenuButton(
-            leadingIcon: const Icon(Icons.business),
+            leadingIcon: _MinistryLogo(
+              logoUrl: ministry.logoUrl,
+              size: 24,
+              fallbackIcon: Icons.business,
+            ),
             menuChildren: [
-              for (final entity in entities.where(
-                (e) => e.entityType == EntityType.ministry,
-              ))
-                MenuItemButton(
-                  onPressed: () {
-                    onEntitySelected(entity);
-                  },
-                  child: _EntityMenuItem(
-                    entity: entity,
-                    isSelected: selectedEntity?.id == entity.id,
-                  ),
+              // Option to select the ministry itself
+              MenuItemButton(
+                onPressed: () => onEntitySelected(ministry),
+                leadingIcon: Icon(
+                  Icons.dashboard_outlined,
+                  size: 18,
+                  color: theme.colorScheme.primary,
                 ),
+                child: _EntityMenuItem(
+                  entity: ministry,
+                  isSelected: selectedEntity?.id == ministry.id,
+                  showIcon: false,
+                ),
+              ),
+              // Churches in this ministry
+              if (churchesByMinistry.containsKey(ministry.id) &&
+                  churchesByMinistry[ministry.id]!.isNotEmpty) ...[
+                const Divider(),
+                for (final church in churchesByMinistry[ministry.id]!)
+                  MenuItemButton(
+                    onPressed: () => onEntitySelected(church),
+                    leadingIcon: Icon(
+                      Icons.church_outlined,
+                      size: 18,
+                      color: theme.colorScheme.secondary,
+                    ),
+                    child: _EntityMenuItem(
+                      entity: church,
+                      isSelected: selectedEntity?.id == church.id,
+                      showIcon: false, // Icon handled by leadingIcon
+                    ),
+                  ),
+              ],
             ],
-            child: Text(l10n.entityTypeMinistry),
+            child: Text(ministry.name),
           ),
-        ],
-        // Churches section
-        if (entities.any((e) => e.entityType == EntityType.church)) ...[
+
+        // Orphan churches (if any)
+        if (orphanChurches.isNotEmpty) ...[
+          const Divider(),
           SubmenuButton(
             leadingIcon: const Icon(Icons.church),
             menuChildren: [
-              for (final entity in entities.where(
-                (e) => e.entityType == EntityType.church,
-              ))
+              for (final church in orphanChurches)
                 MenuItemButton(
-                  onPressed: () {
-                    onEntitySelected(entity);
-                  },
+                  onPressed: () => onEntitySelected(church),
                   child: _EntityMenuItem(
-                    entity: entity,
-                    isSelected: selectedEntity?.id == entity.id,
+                    entity: church,
+                    isSelected: selectedEntity?.id == church.id,
                   ),
                 ),
             ],
-            child: Text(l10n.entityTypeChurch),
+            child: const Text('Other Churches'),
           ),
         ],
       ],
@@ -246,23 +289,32 @@ class _EntityDropdown extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Icon based on entity type
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(4),
+                // Icon or Logo of selected entity
+                if (selectedEntity != null &&
+                    selectedEntity is Ministry &&
+                    (selectedEntity as Ministry).logoUrl != null)
+                  _MinistryLogo(
+                    logoUrl: (selectedEntity as Ministry).logoUrl,
+                    size: 24,
+                    fallbackIcon: Icons.business,
+                  )
+                else
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Icon(
+                      (selectedEntity?.entityType ?? EntityType.ministry) ==
+                              EntityType.church
+                          ? Icons.church
+                          : Icons.business,
+                      size: 16,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                  child: Icon(
-                    (selectedEntity?.entityType ?? EntityType.ministry) ==
-                            EntityType.church
-                        ? Icons.church
-                        : Icons.business,
-                    size: 16,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -294,12 +346,47 @@ class _EntityDropdown extends StatelessWidget {
   }
 }
 
+class _MinistryLogo extends StatelessWidget {
+  const _MinistryLogo({
+    required this.logoUrl,
+    required this.size,
+    required this.fallbackIcon,
+  });
+
+  final String? logoUrl;
+  final double size;
+  final IconData fallbackIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    if (logoUrl != null && logoUrl!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Image.network(
+          logoUrl!,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              Icon(fallbackIcon, size: size * 0.7),
+        ),
+      );
+    }
+    return Icon(fallbackIcon, size: size * 0.7);
+  }
+}
+
 /// Menu item widget for entity
 class _EntityMenuItem extends StatelessWidget {
-  const _EntityMenuItem({required this.entity, required this.isSelected});
+  const _EntityMenuItem({
+    required this.entity,
+    required this.isSelected,
+    this.showIcon = true,
+  });
 
   final ReligiousEntity entity;
   final bool isSelected;
+  final bool showIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -307,23 +394,26 @@ class _EntityMenuItem extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(
-          entity.entityType == EntityType.church
-              ? Icons.church
-              : Icons.business,
-          size: 18,
-          color: entity.entityType == EntityType.church
-              ? theme.colorScheme.primary
-              : theme.colorScheme.secondary,
-        ),
-        const SizedBox(width: 12),
+        if (showIcon) ...[
+          Icon(
+            entity.entityType == EntityType.church
+                ? Icons.church
+                : Icons.business,
+            size: 18,
+            color: entity.entityType == EntityType.church
+                ? theme.colorScheme.primary
+                : theme.colorScheme.secondary,
+          ),
+          const SizedBox(width: 12),
+        ],
         Expanded(
           child: Text(
             entity.name,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: entity.entityType == EntityType.church
+              color: isSelected
                   ? theme.colorScheme.primary
                   : theme.colorScheme.onSurface,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ),

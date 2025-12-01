@@ -213,6 +213,7 @@ class ChurchController extends StateNotifier<ChurchState> {
 
   /// Select a church
   void selectChurch(Church? church) {
+    debugPrint('ChurchController: Selecting church: ${church?.name}');
     // Cancel previous subscription
     _churchSubscription?.cancel();
     _churchSubscription = null;
@@ -223,6 +224,12 @@ class ChurchController extends StateNotifier<ChurchState> {
     if (church != null) {
       _watchSelectedChurch(church.ministryId, church.id);
     }
+  }
+
+  /// Clear selected church
+  void clearSelection() {
+    debugPrint('ChurchController: Clearing selection');
+    selectChurch(null);
   }
 
   /// Watch selected church for real-time updates
@@ -361,7 +368,7 @@ class ChurchState {
     bool? isSaving,
     bool? isDeleting,
     List<Church>? churches,
-    Church? selectedChurch,
+    Object? selectedChurch = _undefined,
     Object? error = _undefined,
   }) {
     return ChurchState(
@@ -370,7 +377,9 @@ class ChurchState {
       isSaving: isSaving ?? this.isSaving,
       isDeleting: isDeleting ?? this.isDeleting,
       churches: churches ?? this.churches,
-      selectedChurch: selectedChurch ?? this.selectedChurch,
+      selectedChurch: selectedChurch == _undefined
+          ? this.selectedChurch
+          : selectedChurch as Church?,
       error: error == _undefined ? this.error : error as String?,
     );
   }
