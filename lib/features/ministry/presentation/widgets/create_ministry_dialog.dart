@@ -35,6 +35,22 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
     super.dispose();
   }
 
+  /// Determines if the create button should be enabled
+  bool get _canCreate {
+    if (_isCreating) return false;
+
+    final name = _nameController.text.trim();
+    if (name.isEmpty) return false;
+
+    if (_selectedType == _EntityType.church) {
+      // For church: name, ministry, and location are required
+      if (_selectedMinistry == null) return false;
+      if (_selectedLocation == null) return false;
+    }
+
+    return true;
+  }
+
   Future<void> _createEntity() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -285,11 +301,21 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
                           hintText: _selectedType == _EntityType.ministry
                               ? l10n.ministryNameHint
                               : l10n.churchNameHint,
+                          suffixIcon: _nameController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _nameController.clear();
+                                    setState(() {});
+                                  },
+                                )
+                              : null,
                         ),
                         keyboardType: TextInputType.text,
                         textCapitalization: TextCapitalization.words,
                         enabled: !_isCreating,
                         autofocus: true,
+                        onChanged: (_) => setState(() {}),
                         validator: (value) {
                           final trimmedValue = value?.trim() ?? '';
                           if (trimmedValue.isEmpty) {
@@ -373,7 +399,7 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
                       child: Text(l10n.ministryCancel),
                     ),
                     ElevatedButton(
-                      onPressed: _isCreating ? null : _createEntity,
+                      onPressed: _canCreate ? _createEntity : null,
                       child: _isCreating
                           ? const SizedBox(
                               height: 20,

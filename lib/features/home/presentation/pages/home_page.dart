@@ -54,15 +54,16 @@ class _HomePageState extends ConsumerState<HomePage> {
             const SizedBox(width: 12),
             Consumer(
               builder: (context, ref, _) {
-                final ministryState = ref.watch(ministryControllerProvider);
-                final selectedMinistry = ministryState.selectedMinistry;
+                final subscriptionType = ref.watch(
+                  currentSubscriptionTypeProvider,
+                );
 
-                if (selectedMinistry == null) {
+                if (subscriptionType == null) {
                   return const SizedBox.shrink();
                 }
 
                 return SubscriptionPlanBadge(
-                  subscriptionType: selectedMinistry.subscriptionType,
+                  subscriptionType: subscriptionType,
                 );
               },
             ),

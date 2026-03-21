@@ -465,6 +465,31 @@ class MinistryController extends StateNotifier<MinistryState> {
     }
   }
 
+  /// Select a ministry by ID
+  /// This is useful when selecting a church and we need to sync the related ministry
+  /// It will search in the current ministries list first, and if not found,
+  /// it will try to fetch it from the repository
+  Future<void> selectMinistryById(String ministryId) async {
+    if (_isDisposed) return;
+
+    // First, try to find in the current list
+    try {
+      final ministry = state.ministries.firstWhere((m) => m.id == ministryId);
+      selectMinistry(ministry);
+      return;
+    } catch (e) {
+      // Ministry not in list, try to fetch it
+      try {
+        final ministry = await _repository.getMinistry(ministryId);
+        if (ministry != null && !_isDisposed) {
+          selectMinistry(ministry);
+        }
+      } catch (e) {
+        debugPrint('MinistryController: Failed to select ministry by ID: $e');
+      }
+    }
+  }
+
   /// Watch selected ministry for real-time updates
   void _watchSelectedMinistry(String ministryId) {
     _ministrySubscription?.cancel();

@@ -313,7 +313,7 @@ class _LocationSection extends StatelessWidget {
   });
 
   final Location? initialLocation;
-  final ValueChanged<Location> onLocationChanged;
+  final ValueChanged<Location?> onLocationChanged;
 
   @override
   Widget build(BuildContext context) {

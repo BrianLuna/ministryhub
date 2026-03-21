@@ -14,26 +14,20 @@ class MinistrySelectionBar extends ConsumerWidget {
     final ministryState = ref.watch(ministryControllerProvider);
     final churchState = ref.watch(churchControllerProvider);
 
-    final selectedMinistry = ministryState.selectedMinistry;
-    final selectedChurch = churchState.selectedChurch;
+    final selectedEntity = ref.watch(selectedReligiousEntityProvider);
     final ministries = ministryState.ministries;
     final churches = churchState.churches;
     final isLoading = ministryState.isLoading || churchState.isLoading;
 
     debugPrint(
-      'SelectionBar Build: Ministry=${selectedMinistry?.name}, Church=${selectedChurch?.name}',
+      'SelectionBar Build: Entity=${selectedEntity?.name} (${selectedEntity?.entityType})',
     );
-
-    // Determine selected entity
-    ReligiousEntity? selectedEntity;
-    if (selectedChurch != null) {
-      selectedEntity = selectedChurch;
-    } else if (selectedMinistry != null) {
-      selectedEntity = selectedMinistry;
-    }
 
     // Combine entities for dropdown (though we'll group them inside)
     final allEntities = <ReligiousEntity>[...ministries, ...churches];
+
+    // Store selectedEntity in a local variable for use in callbacks
+    final currentSelectedEntity = selectedEntity;
 
     return Container(
       decoration: BoxDecoration(
@@ -55,7 +49,7 @@ class MinistrySelectionBar extends ConsumerWidget {
               entities: allEntities,
               selectedEntity: selectedEntity,
               isLoading: isLoading,
-              onEntitySelected: (entity) {
+              onEntitySelected: (entity) async {
                 debugPrint(
                   'Entity selected: ${entity?.name} (${entity?.entityType})',
                 );
@@ -71,12 +65,15 @@ class MinistrySelectionBar extends ConsumerWidget {
                       .read(ministryControllerProvider.notifier)
                       .selectMinistry(entity as Ministry);
                 } else {
+                  // Select church and sync related ministry
+                  final church = entity as Church;
                   ref
                       .read(churchControllerProvider.notifier)
-                      .selectChurch(entity as Church);
-                  ref
+                      .selectChurch(church);
+                  // Update the related ministry to keep subscription in sync
+                  await ref
                       .read(ministryControllerProvider.notifier)
-                      .selectMinistry(null);
+                      .selectMinistryById(church.ministryId);
                 }
               },
             ),
@@ -84,19 +81,20 @@ class MinistrySelectionBar extends ConsumerWidget {
           const SizedBox(width: 12),
           // Settings button
           IconButton(
-            onPressed: selectedEntity == null
+            onPressed: currentSelectedEntity == null
                 ? null
                 : () {
-                    final entity = selectedEntity;
-                    if (entity != null) {
-                      if (entity.entityType == EntityType.ministry) {
-                        MinistrySettingsOverlay.show(
-                          context,
-                          entity as Ministry,
-                        );
-                      } else {
-                        ChurchSettingsOverlay.show(context, entity as Church);
-                      }
+                    if (currentSelectedEntity.entityType ==
+                        EntityType.ministry) {
+                      MinistrySettingsOverlay.show(
+                        context,
+                        currentSelectedEntity as Ministry,
+                      );
+                    } else {
+                      ChurchSettingsOverlay.show(
+                        context,
+                        currentSelectedEntity as Church,
+                      );
                     }
                   },
             icon: const Icon(Icons.settings_outlined),

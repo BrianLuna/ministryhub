@@ -17,7 +17,7 @@ class LocationPicker extends StatefulWidget {
   });
 
   final Location? initialLocation;
-  final ValueChanged<Location> onLocationSelected;
+  final ValueChanged<Location?> onLocationSelected;
 
   @override
   State<LocationPicker> createState() => _LocationPickerState();
@@ -50,6 +50,8 @@ class _LocationPickerState extends State<LocationPicker> {
 
   @override
   void dispose() {
+    // Clear map controller reference - the framework will handle cleanup
+    _mapController = null;
     _searchController.dispose();
     _debouncer.dispose();
     super.dispose();
@@ -232,10 +234,15 @@ class _LocationPickerState extends State<LocationPicker> {
           widget.onLocationSelected(selectedLocation);
 
           // Move map to selected location after it's created
-          if (_mapController != null) {
-            _mapController!.animateCamera(
-              CameraUpdate.newLatLng(LatLng(lat, lng)),
-            );
+          if (mounted && _mapController != null) {
+            try {
+              _mapController!.animateCamera(
+                CameraUpdate.newLatLng(LatLng(lat, lng)),
+              );
+            } catch (e) {
+              // Map controller may have been disposed
+              debugPrint('LocationPicker: Error animating camera: $e');
+            }
           }
         } else {
           debugPrint('LocationPicker: Invalid details data: $data');
@@ -267,11 +274,24 @@ class _LocationPickerState extends State<LocationPicker> {
         _selectedLocation = widget.initialLocation;
         if (_selectedLocation != null) {
           _searchController.text = _selectedLocation!.address;
-          _mapController?.animateCamera(
-            CameraUpdate.newLatLng(
-              LatLng(_selectedLocation!.latitude, _selectedLocation!.longitude),
-            ),
-          );
+          // Only animate camera if widget is still mounted and controller exists
+          if (mounted && _mapController != null) {
+            try {
+              _mapController!.animateCamera(
+                CameraUpdate.newLatLng(
+                  LatLng(
+                    _selectedLocation!.latitude,
+                    _selectedLocation!.longitude,
+                  ),
+                ),
+              );
+            } catch (e) {
+              // Map controller may have been disposed
+              debugPrint(
+                'LocationPicker: Error animating camera in didUpdateWidget: $e',
+              );
+            }
+          }
         }
       });
     }
@@ -343,9 +363,24 @@ class _LocationPickerState extends State<LocationPicker> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       ),
                     )
+                  : _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {
+                          _predictions = [];
+                          _selectedLocation = null;
+                          _selectedPlaceName = null;
+                        });
+                        // Notify parent that location was cleared
+                        widget.onLocationSelected(null);
+                      },
+                    )
                   : const Icon(Icons.search),
             ),
             onChanged: (value) {
+              setState(() {});
               _debouncer.run(() => _searchPlaces(value));
             },
           ),
@@ -385,38 +420,70 @@ class _LocationPickerState extends State<LocationPicker> {
           if (_selectedLocation != null)
             SizedBox(
               height: 300,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(
+              width: double.infinity,
+              child: GoogleMap(
+                key: ValueKey(
+                  'map_${_selectedLocation!.latitude}_${_selectedLocation!.longitude}',
+                ),
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(
+                    _selectedLocation!.latitude,
+                    _selectedLocation!.longitude,
+                  ),
+                  zoom: 15,
+                ),
+                onMapCreated: (controller) {
+                  if (!mounted) {
+                    return;
+                  }
+                  _mapController = controller;
+                  // Force map to update after creation
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    if (mounted && _mapController != null) {
+                      try {
+                        _mapController!.animateCamera(
+                          CameraUpdate.newLatLngZoom(
+                            LatLng(
+                              _selectedLocation!.latitude,
+                              _selectedLocation!.longitude,
+                            ),
+                            15,
+                          ),
+                        );
+                      } catch (e) {
+                        // Map controller may have been disposed
+                        debugPrint(
+                          'LocationPicker: Error animating camera in onMapCreated: $e',
+                        );
+                      }
+                    }
+                  });
+                },
+                onTap: _onMapTap,
+                markers: {
+                  Marker(
+                    markerId: const MarkerId('selected_location'),
+                    position: LatLng(
                       _selectedLocation!.latitude,
                       _selectedLocation!.longitude,
                     ),
-                    zoom: 15,
-                  ),
-                  onMapCreated: (controller) {
-                    _mapController = controller;
-                  },
-                  onTap: _onMapTap,
-                  markers: {
-                    Marker(
-                      markerId: const MarkerId('selected_location'),
-                      position: LatLng(
-                        _selectedLocation!.latitude,
-                        _selectedLocation!.longitude,
-                      ),
-                      infoWindow: InfoWindow(
-                        title: _selectedPlaceName ?? _selectedLocation!.address,
-                        snippet: _selectedLocation!.address,
-                      ),
-                      draggable: true,
-                      onDragEnd: (position) => _onMapTap(position),
+                    infoWindow: InfoWindow(
+                      title: _selectedPlaceName ?? _selectedLocation!.address,
+                      snippet: _selectedLocation!.address,
                     ),
-                  },
-                  myLocationButtonEnabled: true,
-                  mapType: MapType.normal,
-                ),
+                    draggable: true,
+                    onDragEnd: (position) => _onMapTap(position),
+                  ),
+                },
+                myLocationButtonEnabled: false,
+                mapType: MapType.normal,
+                zoomControlsEnabled: true,
+                zoomGesturesEnabled: true,
+                scrollGesturesEnabled: true,
+                tiltGesturesEnabled: true,
+                rotateGesturesEnabled: true,
+                compassEnabled: true,
+                mapToolbarEnabled: false,
               ),
             ),
         ],
