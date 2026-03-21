@@ -286,8 +286,25 @@ class _CreateMinistryDialogState extends ConsumerState<CreateMinistryDialog> {
                         ],
                         selected: {_selectedType},
                         onSelectionChanged: (Set<_EntityType> newSelection) {
+                          final newType = newSelection.first;
                           setState(() {
-                            _selectedType = newSelection.first;
+                            _selectedType = newType;
+                            if (newType == _EntityType.church) {
+                              final ministryState =
+                                  ref.read(ministryControllerProvider);
+                              final current =
+                                  ministryState.selectedMinistry;
+                              if (current != null) {
+                                Ministry? match;
+                                for (final m in ministryState.ministries) {
+                                  if (m.id == current.id) {
+                                    match = m;
+                                    break;
+                                  }
+                                }
+                                _selectedMinistry = match;
+                              }
+                            }
                           });
                         },
                       ),

@@ -57,13 +57,43 @@ class _HomePageState extends ConsumerState<HomePage> {
                 final subscriptionType = ref.watch(
                   currentSubscriptionTypeProvider,
                 );
+                final subscriptionMinistry = ref.watch(
+                  currentSubscriptionMinistryProvider,
+                );
+                final user = ref.watch(authControllerProvider).user;
+                final isAdmin = subscriptionMinistry != null &&
+                    user != null &&
+                    subscriptionMinistry.administratorId == user.uid;
 
                 if (subscriptionType == null) {
                   return const SizedBox.shrink();
                 }
 
-                return SubscriptionPlanBadge(
+                final badge = SubscriptionPlanBadge(
                   subscriptionType: subscriptionType,
+                );
+
+                if (!isAdmin) {
+                  return badge;
+                }
+
+                final l10n = AppLocalizations.of(context)!;
+                return Tooltip(
+                  message: l10n.ministryChangeSubscription,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () async {
+                        await showMinistrySubscriptionChangeFlow(
+                          context,
+                          ref,
+                          subscriptionMinistry,
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: badge,
+                    ),
+                  ),
                 );
               },
             ),

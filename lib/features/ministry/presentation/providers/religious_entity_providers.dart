@@ -47,3 +47,31 @@ final currentSubscriptionTypeProvider = Provider<SubscriptionType?>((ref) {
 
   return null;
 });
+
+/// Ministry whose subscription is reflected in [currentSubscriptionTypeProvider]
+/// (direct selection or parent of the selected church).
+final currentSubscriptionMinistryProvider = Provider<Ministry?>((ref) {
+  final selectedEntity = ref.watch(selectedReligiousEntityProvider);
+  final ministryState = ref.watch(ministryControllerProvider);
+
+  if (selectedEntity == null) return null;
+
+  if (selectedEntity is Ministry) {
+    return selectedEntity;
+  }
+
+  if (selectedEntity is Church) {
+    try {
+      return ministryState.ministries.firstWhere(
+        (m) => m.id == selectedEntity.ministryId,
+      );
+    } catch (_) {
+      if (ministryState.selectedMinistry?.id == selectedEntity.ministryId) {
+        return ministryState.selectedMinistry;
+      }
+      return null;
+    }
+  }
+
+  return null;
+});

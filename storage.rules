@@ -1,0 +1,45 @@
+rules_version = '2';
+
+// Paths used by the app:
+// - Ministry logos: lib/features/ministry/data/datasources/ministry_storage_datasource.dart
+//   → ministries/{ministryId}/logo.jpg
+// - Profile photos: lib/features/settings/data/datasources/storage_datasource.dart
+//   → users/{userId}/profile.jpg
+//
+// Deploy (pick project):
+//   firebase deploy --only storage --project ministryhub-dev-38d80
+//   firebase deploy --only storage --project ministryhub-prod-22147
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function ministryDoc(ministryId) {
+      return firestore.get(/databases/(default)/documents/ministries/$(ministryId));
+    }
+
+    function isMinistryAdministrator(ministryId) {
+      return isSignedIn()
+        && firestore.exists(/databases/(default)/documents/ministries/$(ministryId))
+        && ministryDoc(ministryId).data.administratorId == request.auth.uid;
+    }
+
+    match /ministries/{ministryId}/logo.jpg {
+      allow read: if isSignedIn();
+      allow write: if isMinistryAdministrator(ministryId)
+        && request.resource.size < 6 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    match /users/{userId}/profile.jpg {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.size < 6 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}
