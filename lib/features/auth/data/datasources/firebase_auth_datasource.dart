@@ -9,7 +9,10 @@ class FirebaseAuthDatasource {
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
   }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-       _googleSignIn = googleSignIn ?? _buildGoogleSignIn();
+       // Web uses FirebaseAuth.signInWithPopup only; constructing [GoogleSignIn]
+       // still runs google_sign_in_web / GSI initialization (FedCM) even though
+       // it is never used — avoid duplicate `google.accounts.id.initialize` noise.
+       _googleSignIn = googleSignIn ?? (!kIsWeb ? GoogleSignIn() : null);
 
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn? _googleSignIn;
@@ -204,14 +207,6 @@ class FirebaseAuthDatasource {
         cause: error,
       );
     }
-  }
-
-  static GoogleSignIn? _buildGoogleSignIn() {
-    if (kIsWeb) {
-      final clientId = GoogleClientIdResolver.resolve();
-      return GoogleSignIn(clientId: clientId);
-    }
-    return GoogleSignIn();
   }
 
   String _mapFirebaseCode(String code) {

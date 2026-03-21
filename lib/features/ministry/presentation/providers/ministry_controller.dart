@@ -135,6 +135,7 @@ class MinistryController extends StateNotifier<MinistryState> {
     debugPrint('MinistryController: Loading ministries for $userId...');
     if (_isDisposed) return;
     _userId = userId;
+    await ensureAuthTokenForFirestore(userId: userId);
     if (!_isDisposed) {
       state = state.copyWith(isLoading: true);
     }

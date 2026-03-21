@@ -1,3 +1,4 @@
+export 'firebase/ensure_auth_token_for_firestore.dart';
 export 'entities/export_entities.dart';
 export 'errors/export_errors.dart';
 export 'platform/export_platform.dart';

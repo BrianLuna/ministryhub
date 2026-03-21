@@ -110,6 +110,7 @@ class ChurchController extends StateNotifier<ChurchState> {
   Future<void> loadChurches(String userId) async {
     debugPrint('ChurchController: Loading churches for $userId...');
     if (_isDisposed) return;
+    await ensureAuthTokenForFirestore(userId: userId);
     if (!_isDisposed) {
       state = state.copyWith(isLoading: true);
     }

@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "ministryhub-dev-38d80",
+    "dev": "ministryhub-dev-38d80",
+    "prod": "ministryhub-prod-22147"
+  }
+}
