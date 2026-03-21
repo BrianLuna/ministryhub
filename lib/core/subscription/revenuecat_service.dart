@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:ministryhub/ministryhub.dart';
 
 /// Service for initializing RevenueCat
@@ -18,19 +19,32 @@ class RevenueCatService {
     }
 
     try {
-      // Load .env file - always try to load it
-      try {
-        await dotenv.load(fileName: '.env');
-        if (kDebugMode) {
-          debugPrint('Successfully loaded .env file');
-        }
-      } catch (e) {
+      // Hot restart / web: native SDK may still be configured while Dart statics reset.
+      if (await Purchases.isConfigured) {
+        _isInitialized = true;
         if (kDebugMode) {
           debugPrint(
-            'Warning: Could not load .env file: $e. RevenueCat will not be initialized.',
+            'RevenueCat SDK already configured; skipping Purchases.configure().',
           );
         }
         return;
+      }
+
+      // `main()` usually loads `.env` first; avoid reloading (and duplicate logs).
+      if (!dotenv.isInitialized) {
+        try {
+          await dotenv.load(fileName: '.env');
+          if (kDebugMode) {
+            debugPrint('Successfully loaded .env file (RevenueCat)');
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            debugPrint(
+              'Warning: Could not load .env file: $e. RevenueCat will not be initialized.',
+            );
+          }
+          return;
+        }
       }
 
       // Now safe to access dotenv.env after loading

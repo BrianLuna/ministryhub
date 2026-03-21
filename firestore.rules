@@ -1,0 +1,55 @@
+rules_version = '2';
+
+// MinistryHub — align with client queries:
+// - ministries: list/query where administratorId == request.auth.uid
+// - churches: subcollection under each ministry
+// - users: profile doc per uid
+//
+// Deploy to your Firebase project (dev/prod):
+//   firebase deploy --only firestore:rules --project ministryhub-dev-38d80
+//   firebase deploy --only firestore:rules --project ministryhub-prod-22147
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // User profiles (lib/features/settings/data/datasources/firestore_datasource.dart)
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Ministries and nested churches
+    match /ministries/{ministryId} {
+      allow read: if isSignedIn()
+          && resource.data.administratorId == request.auth.uid;
+
+      allow create: if isSignedIn()
+          && request.resource.data.administratorId == request.auth.uid;
+
+      // Prevent transferring ownership via updates
+      allow update: if isSignedIn()
+          && resource.data.administratorId == request.auth.uid
+          && request.resource.data.administratorId == resource.data.administratorId;
+
+      allow delete: if isSignedIn()
+          && resource.data.administratorId == request.auth.uid;
+
+      match /churches/{churchId} {
+        allow read: if isSignedIn()
+            && get(/databases/$(database)/documents/ministries/$(ministryId)).data.administratorId
+                == request.auth.uid;
+
+        allow create, update, delete: if isSignedIn()
+            && get(/databases/$(database)/documents/ministries/$(ministryId)).data.administratorId
+                == request.auth.uid;
+      }
+    }
+  }
+}

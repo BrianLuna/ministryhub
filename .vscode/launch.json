@@ -1,26 +1,46 @@
 {
+    // Principal: Chrome con perfil persistente (${userHome}/.ministryhub_chrome_profile).
+    // Iniciá sesión una vez en Firebase/Google; las siguientes ejecuciones reutilizan cookies.
+    // Cerrá otras ventanas de Chrome que usen ese mismo perfil si ves error de "profile in use".
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "name": "ministryhub",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "deviceId": "chrome",
+            "toolArgs": [
+                "--web-browser-flag=--user-data-dir=${userHome}/.ministryhub_chrome_profile"
+            ]
         },
         {
             "name": "ministryhub (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "profile",
+            "deviceId": "chrome",
+            "toolArgs": [
+                "--web-browser-flag=--user-data-dir=${userHome}/.ministryhub_chrome_profile"
+            ]
         },
         {
             "name": "ministryhub (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "deviceId": "chrome",
+            "toolArgs": [
+                "--web-browser-flag=--user-data-dir=${userHome}/.ministryhub_chrome_profile"
+            ]
+        },
+        {
+            "name": "ministryhub (Chrome perfil temporal)",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "chrome"
         }
     ]
 }

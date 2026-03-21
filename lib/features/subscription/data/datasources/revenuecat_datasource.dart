@@ -8,6 +8,14 @@ class RevenueCatDatasource implements RevenueCatDatasourceInterface {
   @override
   Future<void> configure(String apiKey) async {
     try {
+      if (await Purchases.isConfigured) {
+        if (kDebugMode) {
+          debugPrint(
+            'RevenueCatDatasource: Purchases already configured; skipping configure().',
+          );
+        }
+        return;
+      }
       // Configure RevenueCat first
       await Purchases.configure(PurchasesConfiguration(apiKey));
 
@@ -40,8 +48,7 @@ class RevenueCatDatasource implements RevenueCatDatasourceInterface {
   @override
   Future<Offerings> getOfferings() async {
     try {
-      // Check if RevenueCat is configured
-      if (!RevenueCatService.isInitialized) {
+      if (!await Purchases.isConfigured) {
         throw SubscriptionException(
           message:
               'RevenueCat is not initialized. Please check your .env file.',
@@ -67,7 +74,7 @@ class RevenueCatDatasource implements RevenueCatDatasourceInterface {
   /// Purchase a package
   @override
   Future<CustomerInfo> purchasePackage(Package package) async {
-    if (!RevenueCatService.isInitialized) {
+    if (!await Purchases.isConfigured) {
       throw SubscriptionException(
         message: 'RevenueCat is not initialized. Please check your .env file.',
       );
@@ -101,7 +108,7 @@ class RevenueCatDatasource implements RevenueCatDatasourceInterface {
   /// Restore purchases
   @override
   Future<CustomerInfo> restorePurchases() async {
-    if (!RevenueCatService.isInitialized) {
+    if (!await Purchases.isConfigured) {
       throw SubscriptionException(
         message: 'RevenueCat is not initialized. Please check your .env file.',
       );
@@ -124,7 +131,7 @@ class RevenueCatDatasource implements RevenueCatDatasourceInterface {
   /// Get current customer info
   @override
   Future<CustomerInfo> getCustomerInfo() async {
-    if (!RevenueCatService.isInitialized) {
+    if (!await Purchases.isConfigured) {
       throw SubscriptionException(
         message: 'RevenueCat is not initialized. Please check your .env file.',
       );
