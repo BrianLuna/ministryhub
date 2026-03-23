@@ -61,7 +61,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   currentSubscriptionMinistryProvider,
                 );
                 final user = ref.watch(authControllerProvider).user;
-                final isAdmin = subscriptionMinistry != null &&
+                final isAdmin =
+                    subscriptionMinistry != null &&
                     user != null &&
                     subscriptionMinistry.administratorId == user.uid;
 
